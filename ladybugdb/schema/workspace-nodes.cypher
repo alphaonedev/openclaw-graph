@@ -1,4 +1,4 @@
--- AlphaOne LadybugDB — Workspace Node Tables
+-- LadybugDB — Workspace Node Tables
 -- Phase 1: Graph-native workspace files
 -- These tables replace SOUL.md, MEMORY.md, TOOLS.md, AGENTS.md flat files.
 
