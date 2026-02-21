@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>openclaw-graph — Graph-Native Workspace for OpenClaw</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --bg2: #13161f;
+      --bg3: #1a1d28;
+      --border: #252836;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --accent3: #ff6b6b;
+      --text: #e8eaf0;
+      --text2: #9a9db0;
+      --code-bg: #0a0c10;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; line-height: 1.6; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Nav */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: rgba(13,15,20,0.95);
+      backdrop-filter: blur(8px); z-index: 100;
+    }
+    .nav-brand { font-weight: 700; font-size: 1.1rem; color: var(--text); }
+    .nav-brand span { color: var(--accent); }
+    .nav-links { display: flex; gap: 1.5rem; font-size: 0.9rem; color: var(--text2); }
+    .nav-links a { color: var(--text2); }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .btn {
+      background: var(--accent); color: white; padding: 0.4rem 1rem;
+      border-radius: 6px; font-size: 0.85rem; font-weight: 600;
+    }
+    .btn:hover { text-decoration: none; opacity: 0.9; }
+
+    /* Hero */
+    .hero {
+      text-align: center; padding: 5rem 1rem 4rem;
+      background: radial-gradient(ellipse at 50% 0%, rgba(108,99,255,0.12) 0%, transparent 70%);
+    }
+    .badge {
+      display: inline-block; background: rgba(108,99,255,0.15); border: 1px solid rgba(108,99,255,0.3);
+      color: var(--accent); padding: 0.25rem 0.75rem; border-radius: 20px;
+      font-size: 0.8rem; font-weight: 600; margin-bottom: 1.5rem; letter-spacing: 0.5px;
+    }
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.15;
+      margin-bottom: 1rem; letter-spacing: -0.02em;
+    }
+    h1 span { color: var(--accent); }
+    .hero-sub {
+      font-size: 1.15rem; color: var(--text2); max-width: 600px;
+      margin: 0 auto 2rem; line-height: 1.7;
+    }
+    .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--accent); color: white; padding: 0.75rem 1.75rem;
+      border-radius: 8px; font-weight: 600; font-size: 0.95rem;
+    }
+    .btn-secondary {
+      background: var(--bg3); color: var(--text); padding: 0.75rem 1.75rem;
+      border-radius: 8px; font-weight: 600; font-size: 0.95rem;
+      border: 1px solid var(--border);
+    }
+    .btn-primary:hover, .btn-secondary:hover { text-decoration: none; opacity: 0.9; }
+
+    /* Stats bar */
+    .stats-bar {
+      display: flex; gap: 0; border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border); background: var(--bg2);
+    }
+    .stat {
+      flex: 1; text-align: center; padding: 1.5rem 0.5rem;
+      border-right: 1px solid var(--border);
+    }
+    .stat:last-child { border-right: none; }
+    .stat-num { font-size: 2rem; font-weight: 800; color: var(--accent); line-height: 1; }
+    .stat-label { font-size: 0.8rem; color: var(--text2); margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Sections */
+    section { padding: 5rem 1rem; max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+    h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; margin-bottom: 1rem; line-height: 1.2; }
+    p { color: var(--text2); line-height: 1.75; }
+
+    /* How it works */
+    .how-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem; }
+    @media (max-width: 700px) { .how-grid { grid-template-columns: 1fr; } }
+    .how-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1.75rem;
+    }
+    .how-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .how-card p { font-size: 0.9rem; }
+    .how-num {
+      width: 32px; height: 32px; background: rgba(108,99,255,0.15);
+      border: 1px solid rgba(108,99,255,0.3); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 700; color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    /* Architecture */
+    .arch-block {
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px;
+      padding: 2rem; margin-top: 2rem; overflow-x: auto;
+    }
+    .arch-block pre {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+      color: var(--text2); line-height: 1.7;
+    }
+    .arch-block pre .hl { color: var(--accent2); }
+    .arch-block pre .hl2 { color: var(--accent); }
+    .arch-block pre .hl3 { color: var(--accent3); }
+
+    /* Code blocks */
+    .code-block {
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 1.25rem 1.5rem; margin: 1.5rem 0; overflow-x: auto;
+    }
+    .code-block pre {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.83rem;
+      line-height: 1.7; color: var(--text);
+    }
+    .code-block .comment { color: #525570; }
+    .code-block .keyword { color: #c792ea; }
+    .code-block .string { color: #c3e88d; }
+    .code-block .fn { color: #82aaff; }
+    .code-block .tag { color: #f78c6c; }
+
+    /* Before/after */
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+    @media (max-width: 700px) { .compare { grid-template-columns: 1fr; } }
+    .compare-card { border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+    .compare-header { padding: 0.75rem 1rem; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px; }
+    .compare-header.before { background: rgba(255,107,107,0.1); color: var(--accent3); }
+    .compare-header.after { background: rgba(0,212,170,0.1); color: var(--accent2); }
+    .compare-body { background: var(--code-bg); padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 1.7; color: var(--text2); }
+
+    /* Metrics */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
+    .metric-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+      padding: 1.5rem; text-align: center;
+    }
+    .metric-big { font-size: 2.2rem; font-weight: 800; line-height: 1; }
+    .metric-big.green { color: var(--accent2); }
+    .metric-big.purple { color: var(--accent); }
+    .metric-big.red { color: var(--accent3); }
+    .metric-label { font-size: 0.8rem; color: var(--text2); margin-top: 0.4rem; }
+
+    /* Skills clusters */
+    .clusters-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; margin-top: 2rem; }
+    .cluster-chip {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.6rem 0.9rem; display: flex; justify-content: space-between;
+      align-items: center; font-size: 0.82rem;
+    }
+    .cluster-chip .count { color: var(--accent); font-weight: 700; font-size: 0.85rem; }
+    .cluster-chip.auth { border-color: rgba(255,107,107,0.3); }
+    .cluster-chip.auth .name { color: var(--accent3); }
+
+    /* Install */
+    .install-steps { margin-top: 2rem; }
+    .step { display: flex; gap: 1.25rem; margin-bottom: 2rem; align-items: flex-start; }
+    .step-num {
+      width: 36px; height: 36px; min-width: 36px; background: var(--accent);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.9rem; color: white;
+    }
+    .step-body h4 { font-size: 0.95rem; margin-bottom: 0.4rem; }
+    .step-body p { font-size: 0.88rem; margin-bottom: 0.5rem; }
+
+    /* CTA */
+    .cta-section {
+      text-align: center; padding: 5rem 1rem;
+      background: radial-gradient(ellipse at 50% 100%, rgba(108,99,255,0.1) 0%, transparent 70%);
+      border-top: 1px solid var(--border);
+    }
+    .cta-section h2 { font-size: 2rem; margin-bottom: 1rem; }
+
+    /* Footer */
+    footer {
+      text-align: center; padding: 2rem; font-size: 0.82rem; color: var(--text2);
+      border-top: 1px solid var(--border);
+    }
+
+    /* Divider */
+    hr { border: none; border-top: 1px solid var(--border); margin: 0; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">openclaw<span>-graph</span></div>
+  <div class="nav-links">
+    <a href="#how">How It Works</a>
+    <a href="#skills">Skills</a>
+    <a href="#metrics">Metrics</a>
+    <a href="#install">Install</a>
+    <a href="https://github.com/alphaonedev/openclaw-graph" class="btn">GitHub →</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="badge">⚡ Open Source Contribution</div>
+  <h1>Graph-Native Workspace<br>for <span>OpenClaw</span></h1>
+  <p class="hero-sub">
+    Replace flat workspace markdown files with embedded Cypher queries.
+    312 skills, 27 clusters, zero daemons — powered by LadybugDB.
+  </p>
+  <div class="hero-actions">
+    <a href="https://github.com/alphaonedev/openclaw-graph" class="btn-primary">View on GitHub</a>
+    <a href="#install" class="btn-secondary">Quick Start</a>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-num">312</div>
+    <div class="stat-label">Skills</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">27</div>
+    <div class="stat-label">Clusters</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">97%</div>
+    <div class="stat-label">Stub Size Reduction</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">101ms</div>
+    <div class="stat-label">Query Latency</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">0</div>
+    <div class="stat-label">Daemons</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-label">Architecture</div>
+  <h2>How it works</h2>
+  <p>Instead of loading multi-kilobyte markdown files on every session, OpenClaw reads a single-line Cypher directive — then queries an embedded graph database to build structured, prioritized context on demand.</p>
+
+  <div class="arch-block">
+    <pre>
+<span class="hl2">OpenClaw Session</span>
+│
+├── loadWorkspaceBootstrapFiles()
+│   ├── <span class="hl">SOUL.md</span>    <span style="color:#525570">(1 line: &lt;!-- GRAPH: MATCH (s:Soul) WHERE s.workspace = 'myapp' ... --&gt;)</span>
+│   ├── <span class="hl">MEMORY.md</span>  <span style="color:#525570">(1 line: &lt;!-- GRAPH: MATCH (m:Memory) WHERE m.workspace = 'myapp' ... --&gt;)</span>
+│   ├── <span class="hl">TOOLS.md</span>   <span style="color:#525570">(1 line: &lt;!-- GRAPH: MATCH (t:Tool) WHERE t.available = true ... --&gt;)</span>
+│   └── <span class="hl">AGENTS.md</span>  <span style="color:#525570">(1 line: &lt;!-- GRAPH: MATCH (s:Soul WHERE section STARTS WITH ...) --&gt;)</span>
+│       │
+│       └── readFileWithCache()
+│           ├── detect GRAPH directive
+│           ├── execute: <span class="hl2">node query.js --workspace --cypher "..."</span>
+│           ├── cache result <span class="hl3">60s</span> (in-process Map, 0ms subsequent hits)
+│           └── return <span class="hl">formatted markdown → system prompt</span>
+│
+└── buildAgentSystemPrompt()
+    └── injects graph-resolved markdown → agent context
+
+<span class="hl2">LadybugDB</span> (embedded SQLite + Cypher, no daemon required)
+├── <span class="hl">Skill</span>       (312 nodes, 27 clusters, 247 edges)
+├── <span class="hl">Soul</span>        (identity, behavior, capabilities per workspace)
+├── <span class="hl">Memory</span>      (project context, state, infrastructure facts)
+├── <span class="hl">Tool</span>        (available tools + usage notes)
+└── <span class="hl">AgentConfig</span> (per-workspace agent behavior overrides)
+    </pre>
+  </div>
+
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">1</div>
+      <h3>Workspace files become stubs</h3>
+      <p>SOUL.md, MEMORY.md, TOOLS.md, AGENTS.md each contain one line — a Cypher query directive. No content, no secrets, no growing files.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">2</div>
+      <h3>Graph resolves content dynamically</h3>
+      <p>On workspace load, the patched workspace.ts intercepts the directive and queries LadybugDB. Results are formatted as structured markdown sections.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">3</div>
+      <h3>60-second in-process cache</h3>
+      <p>Query results are cached in a JavaScript Map for 60 seconds. Repeated workspace loads (tool calls, compaction) cost zero additional latency.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">4</div>
+      <h3>Multi-instance, one database</h3>
+      <p>Multiple OpenClaw agents share one graph DB, differentiated by workspace ID. Each gets its own identity, memory, and tool config from a single source of truth.</p>
+    </div>
+  </div>
+</section>
+
+<hr>
+
+<!-- BEFORE / AFTER -->
+<section>
+  <div class="section-label">Before & After</div>
+  <h2>From flat files to graph stubs</h2>
+  <p>The same information — now queryable, filterable, and 97% smaller on disk.</p>
+
+  <div class="compare">
+    <div class="compare-card">
+      <div class="compare-header before">❌ Before — flat SOUL.md (~1,800 bytes)</div>
+      <div class="compare-body"><pre># SOUL.md — Who You Are
+
+_You're not a chatbot. You're becoming someone._
+
+## Core Truths
+
+Be genuinely helpful, not performatively helpful.
+Skip the "Great question!" and "I'd be happy to
+help!" — just help. Actions speak louder than
+filler words.
+
+Have opinions. You're allowed to disagree, prefer
+things, find stuff amusing or boring...
+
+## Boundaries
+
+Private things stay private. Period.
+When in doubt, ask before acting externally.
+Never send half-baked replies...
+
+## Vibe
+
+Be the assistant you'd actually want to talk to.
+Concise when needed, thorough when it matters.
+Not a corporate drone. Not a sycophant. Just good.
+
+## Continuity
+
+Each session, you wake up fresh. These files _are_
+your memory. Read them. Update them...
+
+[... continues for many more sections ...]</pre></div>
+    </div>
+    <div class="compare-card">
+      <div class="compare-header after">✅ After — graph stub (~175 bytes)</div>
+      <div class="compare-body"><pre>&lt;!-- GRAPH: MATCH (s:Soul)
+  WHERE s.workspace = 'myapp'
+    AND s.priority &lt;= 4
+  RETURN
+    s.section AS section,
+    s.content  AS content
+  ORDER BY s.priority ASC
+  LIMIT 8
+--&gt;</pre>
+<br>
+<span style="color:#525570">→ Resolved at runtime from LadybugDB
+→ Returns prioritized, structured markdown
+→ Cached 60s in-process
+→ Update content without touching files</span>
+</div>
+    </div>
+  </div>
+</section>
+
+<hr>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label">Skill Database</div>
+  <h2>312 skills across 27 clusters</h2>
+  <p>A comprehensive skill graph covering the full development surface. Query by text, cluster, or graph traversal.</p>
+
+  <div class="clusters-grid">
+    <div class="cluster-chip"><span class="name">community</span><span class="count">62</span></div>
+    <div class="cluster-chip"><span class="name">coding</span><span class="count">18</span></div>
+    <div class="cluster-chip"><span class="name">mobile</span><span class="count">14</span></div>
+    <div class="cluster-chip"><span class="name">web-dev</span><span class="count">13</span></div>
+    <div class="cluster-chip"><span class="name">se-architecture</span><span class="count">12</span></div>
+    <div class="cluster-chip"><span class="name">computer-science</span><span class="count">11</span></div>
+    <div class="cluster-chip"><span class="name">cloud-gcp</span><span class="count">10</span></div>
+    <div class="cluster-chip"><span class="name">devops-sre</span><span class="count">10</span></div>
+    <div class="cluster-chip"><span class="name">aimlops</span><span class="count">10</span></div>
+    <div class="cluster-chip"><span class="name">game-dev</span><span class="count">10</span></div>
+    <div class="cluster-chip"><span class="name">financial</span><span class="count">10</span></div>
+    <div class="cluster-chip"><span class="name">data-engineering</span><span class="count">10</span></div>
+    <div class="cluster-chip"><span class="name">blue-team</span><span class="count">10</span></div>
+    <div class="cluster-chip"><span class="name">ar-vr</span><span class="count">10</span></div>
+    <div class="cluster-chip"><span class="name">twilio</span><span class="count">10</span></div>
+    <div class="cluster-chip"><span class="name">macos</span><span class="count">10</span></div>
+    <div class="cluster-chip"><span class="name">blockchain</span><span class="count">10</span></div>
+    <div class="cluster-chip"><span class="name">iot</span><span class="count">10</span></div>
+    <div class="cluster-chip"><span class="name">cloud-aws</span><span class="count">10</span></div>
+    <div class="cluster-chip"><span class="name">core-openclaw</span><span class="count">8</span></div>
+    <div class="cluster-chip"><span class="name">testing</span><span class="count">8</span></div>
+    <div class="cluster-chip"><span class="name">ai-apis</span><span class="count">8</span></div>
+    <div class="cluster-chip auth"><span class="name">redteam 🔒</span><span class="count">7</span></div>
+    <div class="cluster-chip"><span class="name">existing</span><span class="count">6</span></div>
+    <div class="cluster-chip"><span class="name">abtesting</span><span class="count">6</span></div>
+    <div class="cluster-chip"><span class="name">linux</span><span class="count">5</span></div>
+    <div class="cluster-chip"><span class="name">distributed-comms</span><span class="count">4</span></div>
+  </div>
+
+  <div class="code-block" style="margin-top:2rem;">
+    <pre><span class="comment"># Natural language text search</span>
+<span class="fn">node</span> ladybugdb/scripts/query.js <span class="string">"deploy a React app to Cloudflare Pages"</span>
+
+<span class="comment"># Browse a cluster</span>
+<span class="fn">node</span> ladybugdb/scripts/query.js --cluster devops-sre
+
+<span class="comment"># Graph traversal — skill + related (2 hops)</span>
+<span class="fn">node</span> ladybugdb/scripts/query.js --skill terraform --hops 2
+
+<span class="comment"># Raw Cypher</span>
+<span class="fn">node</span> ladybugdb/scripts/query.js --cypher <span class="string">"MATCH (s:Skill {cluster: 'ai-apis'}) RETURN s.name, s.description"</span>
+
+<span class="comment"># Stats</span>
+<span class="fn">node</span> ladybugdb/scripts/query.js --stats</pre>
+  </div>
+</section>
+
+<hr>
+
+<!-- METRICS -->
+<section id="metrics">
+  <div class="section-label">Performance</div>
+  <h2>Measured on Apple Silicon Mac mini</h2>
+  <p>Node.js v22.22.0 · LadybugDB 0.14.3 · 312 skills · macOS 15.3 arm64</p>
+
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-big green">97%</div>
+      <div class="metric-label">Workspace stub size reduction<br>(25,000 → 660 bytes)</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-big purple">~101ms</div>
+      <div class="metric-label">Skill text search latency<br>(312 nodes, cold)</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-big green">0ms</div>
+      <div class="metric-label">Cached query latency<br>(60s TTL, in-process)</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-big purple">~95ms</div>
+      <div class="metric-label">Workspace load<br>(Soul / Memory / Tools)</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-big green">6,200</div>
+      <div class="metric-label">Max tokens saved<br>per session</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-big red">10 MB</div>
+      <div class="metric-label">Full DB size<br>(312 skills + workspace)</div>
+    </div>
+  </div>
+
+  <div style="margin-top:2rem;">
+    <p style="font-size:0.88rem;">
+      After the first workspace load per session, all results are served from an in-process JavaScript <code style="background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px;font-family:'JetBrains Mono',monospace;">Map</code> cache with a 60-second TTL. Subsequent prompt builds, tool calls, and compaction cycles cost <strong>0ms</strong> for workspace content.
+      <br><br>
+      For multi-instance deployments (e.g., a fleet of 8 AI agents sharing one DB), the embedded LadybugDB supports concurrent reads without blocking. Total token savings across an 8-instance fleet: <strong>~50,000+ tokens saved per hour</strong>.
+    </p>
+  </div>
+</section>
+
+<hr>
+
+<!-- INSTALL -->
+<section id="install">
+  <div class="section-label">Quick Start</div>
+  <h2>Get running in 5 steps</h2>
+
+  <div class="install-steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Clone and install</h4>
+        <div class="code-block">
+          <pre><span class="fn">git</span> clone https://github.com/alphaonedev/openclaw-graph.git
+<span class="fn">cd</span> openclaw-graph
+<span class="fn">npm</span> install</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Load the skill database</h4>
+        <div class="code-block">
+          <pre><span class="fn">node</span> ladybugdb/scripts/loader.js
+<span class="comment"># → 312 skills | 27 clusters | 247 edges | 0 errors</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Seed your workspace identity</h4>
+        <p>Edit <code style="background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px;font-family:'JetBrains Mono',monospace;">ladybugdb/scripts/seed-workspace.js</code> — set your <code style="background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px;font-family:'JetBrains Mono',monospace;">WORKSPACE_ID</code> and fill in Soul, Memory, Tool nodes. Then:</p>
+        <div class="code-block">
+          <pre><span class="fn">node</span> ladybugdb/scripts/seed-workspace.js
+<span class="comment"># → Soul: 5  Memory: 3  Tool: 8  Skill: 312</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Patch OpenClaw workspace.ts</h4>
+        <p>Add the graph backend block from <code style="background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px;font-family:'JetBrains Mono',monospace;">src/agents/workspace.graph.ts</code> into your OpenClaw's <code style="background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px;font-family:'JetBrains Mono',monospace;">src/agents/workspace.ts</code>. See the README for the exact patch points.</p>
+        <div class="code-block">
+          <pre><span class="fn">cd</span> path/to/openclaw
+<span class="fn">pnpm</span> build   <span class="comment"># recompile after patching</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>Deploy workspace stubs</h4>
+        <div class="code-block">
+          <pre><span class="fn">cp</span> workspace-stubs/SOUL.md    ~/.openclaw/workspace/SOUL.md
+<span class="fn">cp</span> workspace-stubs/MEMORY.md  ~/.openclaw/workspace/MEMORY.md
+<span class="fn">cp</span> workspace-stubs/TOOLS.md   ~/.openclaw/workspace/TOOLS.md
+<span class="fn">cp</span> workspace-stubs/AGENTS.md  ~/.openclaw/workspace/AGENTS.md
+<span class="comment"># Update 'myapp' in each file to your WORKSPACE_ID</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr>
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2>Open source. Community-first.</h2>
+  <p style="color:var(--text2);max-width:500px;margin:0 auto 2rem;">
+    Built as a contribution back to the OpenClaw project. PRs welcome — add skills, improve queries, or extend the schema.
+  </p>
+  <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+    <a href="https://github.com/alphaonedev/openclaw-graph" class="btn-primary">View Source on GitHub</a>
+    <a href="https://github.com/openclaw/openclaw" class="btn-secondary">OpenClaw Project →</a>
+  </div>
+</div>
+
+<footer>
+  openclaw-graph — MIT License · Built for the <a href="https://github.com/openclaw/openclaw">OpenClaw</a> community ·
+  <a href="https://www.npmjs.com/package/lbug">LadybugDB</a>
+</footer>
+
+</body>
+</html>
