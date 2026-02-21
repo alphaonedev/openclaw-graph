@@ -1,5 +1,5 @@
 /**
- * AlphaOne OpenClaw — LadybugDB Skill Loader
+ * openclaw-graph — LadybugDB Skill Loader
  * Reads all SKILL.md files, creates nodes + relationships in LadybugDB
  * Run: node ladybugdb/scripts/loader.js
  */
@@ -24,7 +24,7 @@ function esc(str) {
 }
 
 async function main() {
-  console.log('=== AlphaOne LadybugDB Skill Loader ===');
+  console.log('=== LadybugDB Skill Loader ===');
   console.log(`DB Path: ${DB_PATH}`);
   
   const db = new Database(DB_PATH);
