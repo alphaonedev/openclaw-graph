@@ -1,0 +1,9 @@
+node_modules/
+ladybugdb/db/*.db
+ladybugdb/db/*.db.wal
+ladybugdb/db/*.db-shm
+.env
+.env.*
+*.local
+.DS_Store
+dist/
