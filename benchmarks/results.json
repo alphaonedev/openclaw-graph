@@ -1,36 +1,30 @@
 {
-  "skills": 312,
-  "clusters": 27,
-  "content": 312,
-  "embed": 312,
-  "dbMB": "20.99",
-  "totalStub": 604,
-  "stubLines": 18,
-  "stubBytes": 1031,
-  "latencies": {
-    "Soul query (workspace)": {
-      "cold": "0.6",
-      "median": "1.8"
-    },
-    "Memory query": {
-      "cold": "0.6",
-      "median": "1.5"
-    },
-    "Tool query": {
-      "cold": "0.5",
-      "median": "1.6"
-    },
-    "Skill text search": {
-      "cold": "0.4",
-      "median": "1.1"
-    },
-    "Skill content (gh-issues)": {
-      "cold": "0.8",
-      "median": "1.1"
-    },
-    "Full skill scan (312)": {
-      "cold": "2.2",
-      "median": "2.3"
-    }
+  "ts": "2026-02-21T23:22:21.284Z",
+  "node_version": "v22.22.0",
+  "lbug_version": "0.14.3",
+  "platform": "darwin arm64 (Apple Silicon Mac mini)",
+  "db_skills": 322,
+  "db_clusters": 28,
+  "db_size_mb": 64.25,
+  "wal_size_kb": 0,
+  "embeddings": 322,
+  "embedding_model": "text-embedding-3-small",
+  "embedding_dims": 1536,
+  "workspace_avg_ms": 0.264,
+  "fastest_min_ms": 0.149,
+  "slowest_avg_ms": 0.857,
+  "benchmarks": {
+    "full_count": { "avg": 0.225, "median": 0.221, "p95": 0.318, "min": 0.168, "runs": 10 },
+    "text_search_name": { "avg": 0.167, "median": 0.163, "p95": 0.202, "min": 0.144, "runs": 10 },
+    "cluster_filter": { "avg": 0.175, "median": 0.173, "p95": 0.205, "min": 0.161, "runs": 10 },
+    "multi_cluster_or": { "avg": 0.186, "median": 0.189, "p95": 0.216, "min": 0.161, "runs": 10 },
+    "description_search": { "avg": 0.168, "median": 0.168, "p95": 0.177, "min": 0.157, "runs": 10 },
+    "workspace_soul": { "avg": 0.308, "median": 0.296, "p95": 0.365, "min": 0.264, "runs": 10 },
+    "workspace_memory": { "avg": 0.245, "median": 0.240, "p95": 0.300, "min": 0.226, "runs": 10 },
+    "workspace_tool": { "avg": 0.241, "median": 0.234, "p95": 0.286, "min": 0.218, "runs": 10 },
+    "stats_group_by_cluster": { "avg": 0.857, "median": 0.412, "p95": 5.000, "min": 0.355, "runs": 10 },
+    "read_content_10_skills": { "avg": 0.428, "median": 0.404, "p95": 0.494, "min": 0.389, "runs": 5 },
+    "embedding_presence_check": { "avg": 0.462, "median": 0.459, "p95": 0.511, "min": 0.420, "runs": 10 },
+    "tag_search": { "avg": 0.159, "median": 0.159, "p95": 0.166, "min": 0.149, "runs": 10 }
   }
 }
