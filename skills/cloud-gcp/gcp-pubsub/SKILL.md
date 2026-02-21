@@ -15,75 +15,54 @@ embedding_hint: "gcp pubsub messaging google cloud publish subscribe event-drive
 
 # gcp-pubsub
 
-## Purpose
-This skill allows the AI to interact with Google Cloud Pub/Sub for publishing messages to topics, subscribing to receive messages, and managing resources, enabling scalable event-driven architectures.
+## Google Cloud Integration
 
-## When to Use
-Use this skill for decoupling microservices, real-time event processing (e.g., user actions triggering workflows), or handling high-volume messaging in applications like IoT data streams or notification systems. Apply it when you need reliable, at-least-once delivery for asynchronous communication.
+This skill delegates all GCP provisioning and operations to the official Google Cloud Python client libraries.
 
-## Key Capabilities
-- Publish messages to topics with attributes for filtering.
-- Create subscriptions for topics, supporting pull (polling) or push (webhook) delivery.
-- Manage topics and subscriptions via API or CLI, with support for message ordering and dead-letter queues.
-- Scale automatically to handle millions of messages per second, with global reach via multi-region topics.
-- Integrate with other GCP services like Cloud Functions for event triggers.
+```bash
+# Core GCP client library
+pip install google-cloud-python
 
-## Usage Patterns
-- **Event Publishing**: Send events from one service to another; e.g., a web app publishes user events to a topic for processing by backend services.
-- **Subscription Handling**: Set up pull subscriptions for batch processing or push subscriptions to deliver messages to HTTP endpoints.
-- **Fan-out Patterns**: Publish to a topic and have multiple subscribers react independently, such as logging and analytics services.
-- Always authenticate first using `$GOOGLE_APPLICATION_CREDENTIALS` env var pointing to a service account JSON key.
+# Vertex AI + Agent Engine (AI/ML workloads)
+pip install google-cloud-aiplatform
 
-## Common Commands/API
-Use the gcloud CLI or Pub/Sub REST API. For authentication, set `$GOOGLE_APPLICATION_CREDENTIALS` to your service account key file.
+# Specific service clients (install only what you need)
+pip install google-cloud-bigquery      # BigQuery
+pip install google-cloud-storage       # Cloud Storage
+pip install google-cloud-pubsub        # Pub/Sub
+pip install google-cloud-run           # Cloud Run
+```
 
-- **CLI Commands**:
-  - Create a topic: `gcloud pubsub topics create my-topic --project=my-project-id`
-  - Publish a message: `gcloud pubsub topics publish my-topic --message="Hello, Pub/Sub" --attribute=key=value`
-  - Create a subscription: `gcloud pubsub subscriptions create my-sub --topic=my-topic --ack-deadline=10`
-  - Pull messages: `gcloud pubsub subscriptions pull my-sub --auto-ack`
+**SDK Docs:** https://github.com/googleapis/google-cloud-python
+**Vertex AI SDK:** https://cloud.google.com/vertex-ai/docs/python-sdk/use-vertex-ai-python-sdk
 
-- **API Endpoints**:
-  - Publish: POST https://pubsub.googleapis.com/v1/projects/{project-id}/topics/{topic-id}:publish with JSON body: `{"messages": [{"data": base64_encoded_message}]}` 
-  - Get subscription: GET https://pubsub.googleapis.com/v1/projects/{project-id}/subscriptions/{subscription-id}
+Use the Google Cloud Python SDK for all GCP provisioning and operational actions. This skill provides architecture guidance, cost modeling, and pre-flight requirements — the SDK handles execution.
 
-- **Code Snippets (Python)**:
-  - Publish a message:
-    ```python
-    from google.cloud import pubsub_v1
-    publisher = pubsub_v1.PublisherClient()
-    topic_path = publisher.topic_path('my-project-id', 'my-topic')
-    publisher.publish(topic_path, b'Hello, Pub/Sub')
-    ```
-  - Pull messages:
-    ```python
-    subscriber = pubsub_v1.SubscriberClient()
-    subscription_path = subscriber.subscription_path('my-project-id', 'my-sub')
-    response = subscriber.pull(subscription_path, max_messages=1)
-    for msg in response.received_messages: print(msg.message.data)
-    ```
+## Architecture Guidance
 
-## Integration Notes
-- **Authentication**: Always export `$GOOGLE_APPLICATION_CREDENTIALS` as the path to your JSON key, e.g., `export GOOGLE_APPLICATION_CREDENTIALS="/path/to/key.json"`. Use IAM roles for least privilege access.
-- **Config Formats**: Topics and subscriptions are defined in JSON via API; for example, create a topic with: `{"name": "projects/my-project-id/topics/my-topic"}`. In code, use the google-cloud-pubsub library (install via `pip install google-cloud-pubsub`).
-- **Integrations**: Link with Cloud Storage for message archiving or BigQuery for analytics. For push subscriptions, provide an HTTPS endpoint that can handle POST requests with message payloads.
-- **Environment Setup**: Ensure the GCP project is set via `gcloud config set project my-project-id` before running commands.
+Consult this skill for:
+- GCP service selection and trade-off analysis
+- Cost estimation and optimization (committed use discounts, sustained use)
+- Pre-flight IAM / Workload Identity Federation requirements
+- IaC approach (Terraform AzureRM vs Deployment Manager vs Config Connector)
+- Integration patterns with Google Workspace and other GCP services
+- Vertex AI Agent Engine for multi-agent workflow design
 
-## Error Handling
-- Common errors: "Permission denied" (check IAM roles), "Resource not found" (verify topic/subscription exists), or "Deadline exceeded" (increase ack deadline).
-- In code, use try-except blocks: 
-  ```python
-  try:
-      publisher.publish(topic_path, b'Message')
-  except Exception as e:
-      print(f"Error: {e}");  # Log and retry if transient
-  ```
-- For CLI, check exit codes and use `--quiet` to suppress output, then parse errors. Retry transient errors like 503 with exponential backoff. Always validate inputs, e.g., ensure topic names follow the format `projects/{project}/topics/{topic}`.
+## Agent & AI Capabilities
 
-## Concrete Usage Examples
-1. **Publish a user event**: To notify a logging service, first create a topic if needed (`gcloud pubsub topics create user-events`), then publish: `gcloud pubsub topics publish user-events --message='User logged in' --attribute=event_type=login`. In code: Use the snippet above to publish from an app when a user action occurs.
-2. **Subscribe to process orders**: Create a subscription (`gcloud pubsub subscriptions create order-sub --topic=orders`), then pull messages in a loop: Use the pull snippet to process e-commerce orders, e.g., in a Cloud Function triggered by the subscription.
+| Capability | Tool |
+|---|---|
+| LLM agents | Vertex AI Agent Engine |
+| Model serving | Vertex AI Model Garden |
+| RAG | Vertex AI Search + Embeddings API |
+| Multi-agent | Agent Development Kit (google/adk-python) |
+| MCP | Vertex AI Extensions (MCP-compatible) |
 
-## Graph Relationships
-- Related to cluster: "cloud-gcp" (e.g., links to gcp-storage, gcp-compute for integrated workflows).
-- Tags connections: "gcp" (shares with gcp-firestore), "pubsub" (unique), "messaging" (links to aws-sqs for cross-cloud comparisons).
+## Reference
+
+- [Google Cloud Python Client](https://github.com/googleapis/google-cloud-python)
+- [Vertex AI Python SDK](https://cloud.google.com/vertex-ai/docs/python-sdk/use-vertex-ai-python-sdk)
+- [Google ADK](https://github.com/google/adk-python)
+- [GCP Pricing Calculator](https://cloud.google.com/products/calculator)
+- [IAM Best Practices](https://cloud.google.com/iam/docs/best-practices-for-using-and-securing-service-accounts)
+- [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation)
