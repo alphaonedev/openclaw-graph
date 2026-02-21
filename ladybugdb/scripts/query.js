@@ -1,5 +1,5 @@
 /**
- * AlphaOne OpenClaw — LadybugDB Skill Query CLI
+ * openclaw-graph — LadybugDB Skill Query CLI
  * Usage:
  *   node query.js "build a SwiftUI watchOS app"
  *   node query.js --skill cloudflare --hops 2
@@ -129,7 +129,7 @@ async function queryStats() {
   const clusters = await runQuery(conn, 'MATCH (s:Skill) RETURN s.cluster AS cluster, count(*) AS cnt ORDER BY cnt DESC');
   const authSkills = await runQuery(conn, "MATCH (s:Skill) WHERE s.authorization_required = true RETURN s.name AS name, s.cluster AS cluster");
   
-  console.log('\n=== AlphaOne Skill Graph Stats ===');
+  console.log('\n=== Skill Graph Stats ===');
   console.log(`Total nodes: ${totalNodes[0]?.total}`);
   console.log(`Auth-required skills: ${authSkills.length}`);
   console.log('\nCluster breakdown:');

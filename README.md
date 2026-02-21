@@ -328,6 +328,6 @@ What the agent can do with this skill.
 
 ## License
 
-MIT © 2025 AlphaOne Dev
+MIT © 2025 openclaw-graph contributors
 
 OpenClaw is © its respective authors. This project is an independent community contribution and is not affiliated with or endorsed by the OpenClaw project.
