@@ -39,7 +39,7 @@ import path from "node:path";
 import os from "node:os";
 import { execSync } from "node:child_process";
 
-// ─── AlphaOne LadybugDB Graph Backend ────────────────────────────────────────
+// ─── openclaw-graph LadybugDB Backend ──────────────────────────────────────────
 // Copy this entire block into your workspace.ts, after the imports.
 // Adjust GRAPH_NODE_BIN and GRAPH_QUERY_SCRIPT to your environment.
 

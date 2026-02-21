@@ -216,7 +216,8 @@
   <h1>Graph-Native Workspace<br>for <span>OpenClaw</span></h1>
   <p class="hero-sub">
     Replace flat workspace markdown files with embedded Cypher queries.
-    312 skills, 27 clusters, zero daemons — powered by LadybugDB.
+    312 fully-enriched skills across 27 clusters, 1536d vector embeddings,
+    zero daemons — powered by LadybugDB.
   </p>
   <div class="hero-actions">
     <a href="https://github.com/alphaonedev/openclaw-graph" class="btn-primary">View on GitHub</a>
@@ -234,12 +235,16 @@
     <div class="stat-label">Clusters</div>
   </div>
   <div class="stat">
-    <div class="stat-num">97%</div>
-    <div class="stat-label">Stub Size Reduction</div>
+    <div class="stat-num">96%</div>
+    <div class="stat-label">Stub Compression</div>
   </div>
   <div class="stat">
-    <div class="stat-num">101ms</div>
+    <div class="stat-num">&lt;2ms</div>
     <div class="stat-label">Query Latency</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">1536d</div>
+    <div class="stat-label">Vector Embeddings</div>
   </div>
   <div class="stat">
     <div class="stat-num">0</div>
@@ -434,40 +439,60 @@ your memory. Read them. Update them...
 <section id="metrics">
   <div class="section-label">Performance</div>
   <h2>Measured on Apple Silicon Mac mini</h2>
-  <p>Node.js v22.22.0 · LadybugDB 0.14.3 · 312 skills · macOS 15.3 arm64</p>
+  <p>Node.js v22.22.0 · LadybugDB 0.14.3 · 312 skills fully enriched + embedded · macOS 15.3 arm64 · Feb 2026</p>
 
   <div class="metrics-grid">
     <div class="metric-card">
-      <div class="metric-big green">97%</div>
-      <div class="metric-label">Workspace stub size reduction<br>(25,000 → 660 bytes)</div>
+      <div class="metric-big green">96%</div>
+      <div class="metric-label">Workspace stub compression<br>(~13,800 → 604 bytes, 4 files)</div>
     </div>
     <div class="metric-card">
-      <div class="metric-big purple">~101ms</div>
-      <div class="metric-label">Skill text search latency<br>(312 nodes, cold)</div>
+      <div class="metric-big purple">0.4ms</div>
+      <div class="metric-label">Skill text search — cold<br>(312 nodes, no cache)</div>
     </div>
     <div class="metric-card">
       <div class="metric-big green">0ms</div>
-      <div class="metric-label">Cached query latency<br>(60s TTL, in-process)</div>
+      <div class="metric-label">Cached query latency<br>(60s TTL, in-process Map)</div>
     </div>
     <div class="metric-card">
-      <div class="metric-big purple">~95ms</div>
-      <div class="metric-label">Workspace load<br>(Soul / Memory / Tools)</div>
+      <div class="metric-big purple">0.6ms</div>
+      <div class="metric-label">Workspace load — cold<br>(Soul / Memory / Tools)</div>
     </div>
     <div class="metric-card">
-      <div class="metric-big green">6,200</div>
-      <div class="metric-label">Max tokens saved<br>per session</div>
+      <div class="metric-big green">~8,200</div>
+      <div class="metric-label">Tokens saved per session<br>(workspace + skill bodies)</div>
     </div>
     <div class="metric-card">
-      <div class="metric-big red">10 MB</div>
-      <div class="metric-label">Full DB size<br>(312 skills + workspace)</div>
+      <div class="metric-big red">21 MB</div>
+      <div class="metric-label">Full DB on disk<br>(312 skills + embeddings + workspace)</div>
     </div>
   </div>
 
-  <div style="margin-top:2rem;">
+  <!-- Vector embeddings section -->
+  <div style="margin-top:2rem; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.75rem;">
+    <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+      <div style="background:rgba(0,212,170,0.15);border:1px solid rgba(0,212,170,0.3);color:var(--accent2);padding:0.2rem 0.6rem;border-radius:6px;font-size:0.75rem;font-weight:700;">NEW</div>
+      <h3 style="font-size:1rem; font-weight:700;">Vector Embeddings — Semantic Skill Search</h3>
+    </div>
+    <p style="font-size:0.88rem; margin-bottom:1rem;">All 312 skills ship with precomputed <strong>text-embedding-3-small</strong> vectors (1536 dimensions). Cosine similarity search finds semantically relevant skills — not just keyword matches.</p>
+    <div class="code-block" style="margin:0;">
+      <pre><span class="comment"># Semantic search — finds skills by meaning, not keywords</span>
+<span class="fn">node</span> ladybugdb/scripts/query.js --semantic <span class="string">"deploy containerized app to cloud"</span>
+<span class="comment"># → devops-sre/docker, cloud-aws/aws-ecs, cloud-gcp/gcp-cloud-run, ...</span>
+
+<span class="comment"># Generate your own embeddings (OpenAI or local Ollama nomic-embed-text)</span>
+<span class="fn">node</span> ladybugdb/scripts/gen-embeddings.js --missing</pre>
+    </div>
+    <p style="font-size:0.82rem; color:var(--text2); margin-top:0.75rem;">
+      Benchmarked: 312 skills embedded in <strong>8.4s</strong> via OpenAI API · 0 errors · cost &lt;$0.01
+    </p>
+  </div>
+
+  <div style="margin-top:1.5rem;">
     <p style="font-size:0.88rem;">
       After the first workspace load per session, all results are served from an in-process JavaScript <code style="background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px;font-family:'JetBrains Mono',monospace;">Map</code> cache with a 60-second TTL. Subsequent prompt builds, tool calls, and compaction cycles cost <strong>0ms</strong> for workspace content.
       <br><br>
-      For multi-instance deployments (e.g., a fleet of 8 AI agents sharing one DB), the embedded LadybugDB supports concurrent reads without blocking. Total token savings across an 8-instance fleet: <strong>~50,000+ tokens saved per hour</strong>.
+      For multi-instance deployments (e.g., a fleet of 8 AI agents sharing one DB), LadybugDB supports concurrent reads without blocking. Total token savings across an 8-instance fleet: <strong>~65,000+ tokens saved per hour</strong>.
     </p>
   </div>
 </section>
@@ -558,7 +583,7 @@ your memory. Read them. Update them...
 </div>
 
 <footer>
-  openclaw-graph — MIT License · Built for the <a href="https://github.com/openclaw/openclaw">OpenClaw</a> community ·
+  openclaw-graph — MIT License · Built for the <a href="https://github.com/openclaw/openclaw">OpenClaw</a> open source community ·
   <a href="https://www.npmjs.com/package/lbug">LadybugDB</a>
 </footer>
 

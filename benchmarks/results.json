@@ -1,0 +1,36 @@
+{
+  "skills": 312,
+  "clusters": 27,
+  "content": 312,
+  "embed": 312,
+  "dbMB": "20.99",
+  "totalStub": 604,
+  "stubLines": 18,
+  "stubBytes": 1031,
+  "latencies": {
+    "Soul query (workspace)": {
+      "cold": "0.6",
+      "median": "1.8"
+    },
+    "Memory query": {
+      "cold": "0.6",
+      "median": "1.5"
+    },
+    "Tool query": {
+      "cold": "0.5",
+      "median": "1.6"
+    },
+    "Skill text search": {
+      "cold": "0.4",
+      "median": "1.1"
+    },
+    "Skill content (gh-issues)": {
+      "cold": "0.8",
+      "median": "1.1"
+    },
+    "Full skill scan (312)": {
+      "cold": "2.2",
+      "median": "2.3"
+    }
+  }
+}
