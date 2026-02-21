@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skills Directory — openclaw-graph</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --bg2: #13161f;
+      --bg3: #1a1d28;
+      --border: #252836;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --accent3: #ff6b6b;
+      --accent4: #f8b500;
+      --text: #e8eaf0;
+      --text2: #9a9db0;
+      --code-bg: #0a0c10;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; line-height: 1.6; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Nav */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: rgba(13,15,20,0.97);
+      backdrop-filter: blur(8px); z-index: 100;
+    }
+    .nav-brand { font-weight: 700; font-size: 1.1rem; color: var(--text); }
+    .nav-brand span { color: var(--accent); }
+    .nav-links { display: flex; gap: 1.5rem; font-size: 0.9rem; color: var(--text2); align-items: center; flex-wrap: wrap; }
+    .nav-links a { color: var(--text2); }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .nav-links a.active { color: var(--accent); font-weight: 600; }
+    .btn { background: var(--accent); color: white; padding: 0.4rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
+    .btn:hover { text-decoration: none; opacity: 0.9; }
+
+    /* Page header */
+    .page-header {
+      text-align: center; padding: 4rem 1rem 3rem;
+      background: radial-gradient(ellipse at 50% 0%, rgba(108,99,255,0.1) 0%, transparent 65%);
+      border-bottom: 1px solid var(--border);
+    }
+    .badge {
+      display: inline-block; background: rgba(108,99,255,0.15); border: 1px solid rgba(108,99,255,0.3);
+      color: var(--accent); padding: 0.25rem 0.75rem; border-radius: 20px;
+      font-size: 0.8rem; font-weight: 600; margin-bottom: 1.25rem; letter-spacing: 0.5px;
+    }
+    h1 { font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 800; margin-bottom: 0.75rem; }
+    h1 span { color: var(--accent); }
+    .page-sub { color: var(--text2); font-size: 1rem; max-width: 580px; margin: 0 auto 1.5rem; }
+
+    /* Search + filter bar */
+    .controls {
+      max-width: 900px; margin: 0 auto 2.5rem; padding: 0 1rem;
+      display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;
+    }
+    .search-wrap { position: relative; flex: 1; min-width: 240px; }
+    .search-wrap svg { position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--text2); pointer-events: none; }
+    #searchInput {
+      width: 100%; background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.6rem 0.9rem 0.6rem 2.4rem;
+      color: var(--text); font-family: inherit; font-size: 0.9rem; outline: none;
+    }
+    #searchInput:focus { border-color: var(--accent); }
+    #searchInput::placeholder { color: var(--text2); }
+    .filter-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .filter-btn {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+      padding: 0.45rem 0.85rem; font-size: 0.8rem; color: var(--text2);
+      cursor: pointer; font-family: inherit; transition: all 0.15s;
+    }
+    .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+    .filter-btn.active { background: rgba(108,99,255,0.15); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+    /* Summary pills */
+    .summary-pills {
+      display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center;
+      padding: 0 1rem 2.5rem; max-width: 900px; margin: 0 auto;
+    }
+    .pill {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 20px;
+      padding: 0.35rem 0.9rem; font-size: 0.8rem; color: var(--text2);
+    }
+    .pill strong { color: var(--text); }
+
+    /* TOC */
+    .toc-wrap {
+      max-width: 1100px; margin: 0 auto 3rem; padding: 0 1rem;
+    }
+    .toc {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .toc h3 { font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+    .toc-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .toc-item {
+      background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+      padding: 0.3rem 0.7rem; font-size: 0.78rem; color: var(--text2);
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .toc-item:hover { border-color: var(--accent); color: var(--text); text-decoration: none; }
+    .toc-item .toc-count { color: var(--accent); font-weight: 700; font-size: 0.78rem; }
+
+    /* Main content */
+    .content { max-width: 1100px; margin: 0 auto; padding: 0 1rem 6rem; }
+
+    /* Cluster section */
+    .cluster-section { margin-bottom: 3.5rem; }
+    .cluster-section.hidden { display: none; }
+    .cluster-header {
+      display: flex; align-items: center; gap: 0.9rem; margin-bottom: 1.25rem;
+      padding-bottom: 0.9rem; border-bottom: 1px solid var(--border);
+    }
+    .cluster-icon {
+      width: 40px; height: 40px; min-width: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+    .cluster-meta h2 { font-size: 1.15rem; font-weight: 700; }
+    .cluster-meta p { font-size: 0.83rem; color: var(--text2); margin-top: 0.15rem; }
+    .cluster-tag {
+      margin-left: auto; background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 0.25rem 0.65rem; font-size: 0.78rem;
+      color: var(--text2); white-space: nowrap;
+    }
+    .cluster-tag strong { color: var(--accent); }
+
+    /* Skills grid */
+    .skills-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.65rem;
+    }
+    .skill-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 9px;
+      padding: 0.85rem 1rem; display: flex; flex-direction: column; gap: 0.3rem;
+      transition: border-color 0.15s, transform 0.1s;
+    }
+    .skill-card:hover { border-color: var(--accent); transform: translateY(-1px); text-decoration: none; }
+    .skill-card.hidden { display: none; }
+    .skill-name {
+      font-size: 0.87rem; font-weight: 600; color: var(--text);
+      font-family: 'JetBrains Mono', monospace; letter-spacing: -0.3px;
+    }
+    .skill-slug { font-size: 0.74rem; color: var(--text2); }
+    .skill-actions { display: flex; gap: 0.5rem; margin-top: 0.25rem; }
+    .skill-link {
+      font-size: 0.72rem; color: var(--accent); border: 1px solid rgba(108,99,255,0.3);
+      border-radius: 4px; padding: 0.15rem 0.5rem; background: rgba(108,99,255,0.08);
+    }
+    .skill-link:hover { background: rgba(108,99,255,0.18); text-decoration: none; }
+    .skill-link.raw { color: var(--accent2); border-color: rgba(0,212,170,0.3); background: rgba(0,212,170,0.07); }
+    .skill-link.raw:hover { background: rgba(0,212,170,0.15); }
+
+    /* Private badge */
+    .private-badge {
+      display: inline-block; background: rgba(255,107,107,0.12);
+      border: 1px solid rgba(255,107,107,0.3); color: var(--accent3);
+      padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;
+    }
+
+    /* Integration badge */
+    .integration-badge {
+      display: inline-block; background: rgba(248,181,0,0.1);
+      border: 1px solid rgba(248,181,0,0.25); color: var(--accent4);
+      padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;
+    }
+
+    /* No results */
+    #noResults { display: none; text-align: center; padding: 4rem 1rem; color: var(--text2); }
+    #noResults h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text); }
+
+    /* Footer */
+    footer { text-align: center; padding: 2rem; font-size: 0.82rem; color: var(--text2); border-top: 1px solid var(--border); }
+
+    /* Back to top */
+    .back-top {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: var(--accent); color: white; border: none; border-radius: 8px;
+      padding: 0.6rem 1rem; font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; font-family: inherit; opacity: 0; transition: opacity 0.2s;
+      z-index: 50;
+    }
+    .back-top.visible { opacity: 1; }
+    .back-top:hover { opacity: 0.9; }
+
+    @media (max-width: 600px) {
+      nav { padding: 0.75rem 1rem; }
+      .nav-links { gap: 0.75rem; font-size: 0.82rem; }
+      .skills-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 400px) {
+      .skills-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-brand" style="text-decoration:none;">openclaw<span>-graph</span></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="skills.html" class="active">Skills</a>
+    <a href="https://github.com/alphaonedev/openclaw-graph" class="btn">GitHub →</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="badge">📦 Complete Skills Directory</div>
+  <h1>312 Skills · <span>27 Clusters</span></h1>
+  <p class="page-sub">Every installed skill, grouped by cluster — with direct links to source and raw content on GitHub.</p>
+</div>
+
+<div style="padding-top:2rem;">
+  <div class="controls">
+    <div class="search-wrap">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 6.5C10 8.433 8.433 10 6.5 10C4.567 10 3 8.433 3 6.5C3 4.567 4.567 3 6.5 3C8.433 3 10 4.567 10 6.5ZM9.33 10.037a5.5 5.5 0 1 1 .707-.707l3.182 3.182a.5.5 0 1 1-.707.707L9.33 10.037Z" fill="currentColor"/></svg>
+      <input id="searchInput" type="text" placeholder="Search skills (e.g. terraform, react, kafka…)" autocomplete="off" />
+    </div>
+    <div class="filter-group">
+      <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" data-filter="core-openclaw" onclick="setFilter('core-openclaw',this)">Core</button>
+      <button class="filter-btn" data-filter="coding" onclick="setFilter('coding',this)">Coding</button>
+      <button class="filter-btn" data-filter="devops" onclick="setFilter('devops',this)">DevOps</button>
+      <button class="filter-btn" data-filter="security" onclick="setFilter('security',this)">Security</button>
+      <button class="filter-btn" data-filter="cloud" onclick="setFilter('cloud',this)">Cloud</button>
+      <button class="filter-btn" data-filter="mobile" onclick="setFilter('mobile',this)">Mobile</button>
+    </div>
+  </div>
+
+  <div class="summary-pills">
+    <div class="pill"><strong>312</strong> total skills</div>
+    <div class="pill"><strong>27</strong> clusters</div>
+    <div class="pill"><strong>1</strong> locked cluster (redteam)</div>
+    <div class="pill"><strong>3</strong> integration clusters (cloud)</div>
+    <div class="pill"><strong>1536d</strong> vector embeddings</div>
+  </div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc-wrap">
+  <div class="toc">
+    <h3>Jump to Cluster</h3>
+    <div class="toc-grid">
+      <a href="#core-openclaw" class="toc-item">🧠 core-openclaw <span class="toc-count">8</span></a>
+      <a href="#existing" class="toc-item">📁 existing <span class="toc-count">6</span></a>
+      <a href="#community" class="toc-item">🌐 community <span class="toc-count">62</span></a>
+      <a href="#coding" class="toc-item">💻 coding <span class="toc-count">18</span></a>
+      <a href="#web-dev" class="toc-item">🌍 web-dev <span class="toc-count">13</span></a>
+      <a href="#mobile" class="toc-item">📱 mobile <span class="toc-count">14</span></a>
+      <a href="#se-architecture" class="toc-item">🏛️ se-architecture <span class="toc-count">12</span></a>
+      <a href="#computer-science" class="toc-item">🎓 computer-science <span class="toc-count">11</span></a>
+      <a href="#devops-sre" class="toc-item">⚙️ devops-sre <span class="toc-count">10</span></a>
+      <a href="#linux" class="toc-item">🐧 linux <span class="toc-count">5</span></a>
+      <a href="#macos" class="toc-item">🍎 macos <span class="toc-count">10</span></a>
+      <a href="#testing" class="toc-item">🧪 testing <span class="toc-count">8</span></a>
+      <a href="#abtesting" class="toc-item">📊 abtesting <span class="toc-count">6</span></a>
+      <a href="#aimlops" class="toc-item">🤖 aimlops <span class="toc-count">10</span></a>
+      <a href="#ai-apis" class="toc-item">🔌 ai-apis <span class="toc-count">8</span></a>
+      <a href="#data-engineering" class="toc-item">🗄️ data-engineering <span class="toc-count">10</span></a>
+      <a href="#distributed-comms" class="toc-item">📡 distributed-comms <span class="toc-count">4</span></a>
+      <a href="#twilio" class="toc-item">📞 twilio <span class="toc-count">10</span></a>
+      <a href="#blue-team" class="toc-item">🛡️ blue-team <span class="toc-count">10</span></a>
+      <a href="#redteam" class="toc-item" style="color:var(--accent3);">🔒 redteam <span class="toc-count" style="color:var(--accent3);">7</span></a>
+      <a href="#financial" class="toc-item">💰 financial <span class="toc-count">10</span></a>
+      <a href="#blockchain" class="toc-item">⛓️ blockchain <span class="toc-count">10</span></a>
+      <a href="#game-dev" class="toc-item">🎮 game-dev <span class="toc-count">10</span></a>
+      <a href="#ar-vr" class="toc-item">🥽 ar-vr <span class="toc-count">10</span></a>
+      <a href="#iot" class="toc-item">📡 iot <span class="toc-count">10</span></a>
+      <a href="#cloud-aws" class="toc-item" style="color:var(--accent4);">☁️ cloud-aws <span class="toc-count" style="color:var(--accent4);">10</span></a>
+      <a href="#cloud-gcp" class="toc-item" style="color:var(--accent4);">☁️ cloud-gcp <span class="toc-count" style="color:var(--accent4);">10</span></a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="noResults">
+    <h3>No skills match your search</h3>
+    <p>Try a different term or clear the filter.</p>
+  </div>
+
+  <!-- ─── CORE-OPENCLAW ──────────────────────────────────── -->
+  <div class="cluster-section" id="core-openclaw" data-cluster="core-openclaw core">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(108,99,255,0.15);">🧠</div>
+      <div class="cluster-meta">
+        <h2>core-openclaw</h2>
+        <p>Core OpenClaw primitives — graph, cron, sessions, admin, Cloudflare</p>
+      </div>
+      <div class="cluster-tag"><strong>8</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/core-openclaw/cloudflare/SKILL.md" target="_blank" rel="noopener">
+        <div class="skill-name">cloudflare</div>
+        <div class="skill-slug">core-openclaw/cloudflare</div>
+        <div class="skill-actions"><span class="skill-link">View →</span><span class="skill-link raw">Raw</span></div>
+      </a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/core-openclaw/cron-ops/SKILL.md" target="_blank" rel="noopener">
+        <div class="skill-name">cron-ops</div>
+        <div class="skill-slug">core-openclaw/cron-ops</div>
+        <div class="skill-actions"><span class="skill-link">View →</span><span class="skill-link raw">Raw</span></div>
+      </a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/core-openclaw/cypher/SKILL.md" target="_blank" rel="noopener">
+        <div class="skill-name">cypher</div>
+        <div class="skill-slug">core-openclaw/cypher</div>
+        <div class="skill-actions"><span class="skill-link">View →</span><span class="skill-link raw">Raw</span></div>
+      </a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/core-openclaw/ladybugdb/SKILL.md" target="_blank" rel="noopener">
+        <div class="skill-name">ladybugdb</div>
+        <div class="skill-slug">core-openclaw/ladybugdb</div>
+        <div class="skill-actions"><span class="skill-link">View →</span><span class="skill-link raw">Raw</span></div>
+      </a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/core-openclaw/openclaw-admin/SKILL.md" target="_blank" rel="noopener">
+        <div class="skill-name">openclaw-admin</div>
+        <div class="skill-slug">core-openclaw/openclaw-admin</div>
+        <div class="skill-actions"><span class="skill-link">View →</span><span class="skill-link raw">Raw</span></div>
+      </a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/core-openclaw/session-logs/SKILL.md" target="_blank" rel="noopener">
+        <div class="skill-name">session-logs</div>
+        <div class="skill-slug">core-openclaw/session-logs</div>
+        <div class="skill-actions"><span class="skill-link">View →</span><span class="skill-link raw">Raw</span></div>
+      </a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/core-openclaw/skill-graph/SKILL.md" target="_blank" rel="noopener">
+        <div class="skill-name">skill-graph</div>
+        <div class="skill-slug">core-openclaw/skill-graph</div>
+        <div class="skill-actions"><span class="skill-link">View →</span><span class="skill-link raw">Raw</span></div>
+      </a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/core-openclaw/summarize/SKILL.md" target="_blank" rel="noopener">
+        <div class="skill-name">summarize</div>
+        <div class="skill-slug">core-openclaw/summarize</div>
+        <div class="skill-actions"><span class="skill-link">View →</span><span class="skill-link raw">Raw</span></div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ─── EXISTING ──────────────────────────────────────── -->
+  <div class="cluster-section" id="existing" data-cluster="existing">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(0,212,170,0.12);">📁</div>
+      <div class="cluster-meta">
+        <h2>existing</h2>
+        <p>Skills bundled with OpenClaw by default — stubs maintained here for graph inventory</p>
+      </div>
+      <div class="cluster-tag"><strong>6</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/existing/coding-agent/SKILL.md" target="_blank" rel="noopener">
+        <div class="skill-name">coding-agent</div>
+        <div class="skill-slug">existing/coding-agent</div>
+        <div class="skill-actions"><span class="skill-link">View →</span><span class="skill-link raw">Raw</span></div>
+      </a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/existing/gh-issues/SKILL.md" target="_blank" rel="noopener">
+        <div class="skill-name">gh-issues</div>
+        <div class="skill-slug">existing/gh-issues</div>
+        <div class="skill-actions"><span class="skill-link">View →</span><span class="skill-link raw">Raw</span></div>
+      </a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/existing/github/SKILL.md" target="_blank" rel="noopener">
+        <div class="skill-name">github</div>
+        <div class="skill-slug">existing/github</div>
+        <div class="skill-actions"><span class="skill-link">View →</span><span class="skill-link raw">Raw</span></div>
+      </a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/existing/healthcheck/SKILL.md" target="_blank" rel="noopener">
+        <div class="skill-name">healthcheck</div>
+        <div class="skill-slug">existing/healthcheck</div>
+        <div class="skill-actions"><span class="skill-link">View →</span><span class="skill-link raw">Raw</span></div>
+      </a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/existing/skill-creator/SKILL.md" target="_blank" rel="noopener">
+        <div class="skill-name">skill-creator</div>
+        <div class="skill-slug">existing/skill-creator</div>
+        <div class="skill-actions"><span class="skill-link">View →</span><span class="skill-link raw">Raw</span></div>
+      </a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/existing/weather/SKILL.md" target="_blank" rel="noopener">
+        <div class="skill-name">weather</div>
+        <div class="skill-slug">existing/weather</div>
+        <div class="skill-actions"><span class="skill-link">View →</span><span class="skill-link raw">Raw</span></div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ─── COMMUNITY ─────────────────────────────────────── -->
+  <div class="cluster-section" id="community" data-cluster="community">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(108,99,255,0.12);">🌐</div>
+      <div class="cluster-meta">
+        <h2>community</h2>
+        <p>ClaWHub community skills — integrations, productivity, messaging, media, and more</p>
+      </div>
+      <div class="cluster-tag"><strong>62</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/1password/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">1password</div><div class="skill-slug">community/1password</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/agentmail/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">agentmail</div><div class="skill-slug">community/agentmail</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/apple-notes/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">apple-notes</div><div class="skill-slug">community/apple-notes</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/apple-reminders/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">apple-reminders</div><div class="skill-slug">community/apple-reminders</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/auto-updater-skill/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">auto-updater-skill</div><div class="skill-slug">community/auto-updater-skill</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/automation-workflows/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">automation-workflows</div><div class="skill-slug">community/automation-workflows</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/bear-notes/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">bear-notes</div><div class="skill-slug">community/bear-notes</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/blogwatcher/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">blogwatcher</div><div class="skill-slug">community/blogwatcher</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/blucli/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">blucli</div><div class="skill-slug">community/blucli</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/bluebubbles/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">bluebubbles</div><div class="skill-slug">community/bluebubbles</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/camsnap/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">camsnap</div><div class="skill-slug">community/camsnap</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/canvas/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">canvas</div><div class="skill-slug">community/canvas</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/clawflows/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">clawflows</div><div class="skill-slug">community/clawflows</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/clawhub/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">clawhub</div><div class="skill-slug">community/clawhub</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/clickup/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">clickup</div><div class="skill-slug">community/clickup</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/discord/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">discord</div><div class="skill-slug">community/discord</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/eightctl/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">eightctl</div><div class="skill-slug">community/eightctl</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/exa-web-search/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">exa-web-search</div><div class="skill-slug">community/exa-web-search</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/find-skills/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">find-skills</div><div class="skill-slug">community/find-skills</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/food-order/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">food-order</div><div class="skill-slug">community/food-order</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/gemini/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">gemini</div><div class="skill-slug">community/gemini</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/gifgrep/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">gifgrep</div><div class="skill-slug">community/gifgrep</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/gog/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">gog</div><div class="skill-slug">community/gog</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/goplaces/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">goplaces</div><div class="skill-slug">community/goplaces</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/himalaya/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">himalaya</div><div class="skill-slug">community/himalaya</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/humanize-ai-text/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">humanize-ai-text</div><div class="skill-slug">community/humanize-ai-text</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/imsg/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">imsg</div><div class="skill-slug">community/imsg</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/linear/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">linear</div><div class="skill-slug">community/linear</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/mcporter/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">mcporter</div><div class="skill-slug">community/mcporter</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/model-usage/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">model-usage</div><div class="skill-slug">community/model-usage</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/monday/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">monday</div><div class="skill-slug">community/monday</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/nano-banana-pro/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">nano-banana-pro</div><div class="skill-slug">community/nano-banana-pro</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/nano-pdf/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">nano-pdf</div><div class="skill-slug">community/nano-pdf</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/notion/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">notion</div><div class="skill-slug">community/notion</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/obsidian-direct/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">obsidian-direct</div><div class="skill-slug">community/obsidian-direct</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/obsidian/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">obsidian</div><div class="skill-slug">community/obsidian</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/openai-image-gen/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">openai-image-gen</div><div class="skill-slug">community/openai-image-gen</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/openai-whisper-api/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">openai-whisper-api</div><div class="skill-slug">community/openai-whisper-api</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/openai-whisper/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">openai-whisper</div><div class="skill-slug">community/openai-whisper</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/openhue/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">openhue</div><div class="skill-slug">community/openhue</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/oracle/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">oracle</div><div class="skill-slug">community/oracle</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/ordercli/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">ordercli</div><div class="skill-slug">community/ordercli</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/pdf-2/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">pdf-2</div><div class="skill-slug">community/pdf-2</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/peekaboo/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">peekaboo</div><div class="skill-slug">community/peekaboo</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/playwright-mcp/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">playwright-mcp</div><div class="skill-slug">community/playwright-mcp</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/playwright-scraper/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">playwright-scraper</div><div class="skill-slug">community/playwright-scraper</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/proactive-agent/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">proactive-agent</div><div class="skill-slug">community/proactive-agent</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/sag/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">sag</div><div class="skill-slug">community/sag</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/sherpa-onnx-tts/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">sherpa-onnx-tts</div><div class="skill-slug">community/sherpa-onnx-tts</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/slack/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">slack</div><div class="skill-slug">community/slack</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/songsee/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">songsee</div><div class="skill-slug">community/songsee</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/sonoscli/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">sonoscli</div><div class="skill-slug">community/sonoscli</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/spotify-player/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">spotify-player</div><div class="skill-slug">community/spotify-player</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/tavily-web-search/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">tavily-web-search</div><div class="skill-slug">community/tavily-web-search</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/things-mac/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">things-mac</div><div class="skill-slug">community/things-mac</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/tmux/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">tmux</div><div class="skill-slug">community/tmux</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/todoist-rs/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">todoist-rs</div><div class="skill-slug">community/todoist-rs</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/trello/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">trello</div><div class="skill-slug">community/trello</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/video-frames/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">video-frames</div><div class="skill-slug">community/video-frames</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/voice-call/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">voice-call</div><div class="skill-slug">community/voice-call</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/wacli/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">wacli</div><div class="skill-slug">community/wacli</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/community/youtube-full/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">youtube-full</div><div class="skill-slug">community/youtube-full</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── CODING ────────────────────────────────────────── -->
+  <div class="cluster-section" id="coding" data-cluster="coding">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(0,212,170,0.12);">💻</div>
+      <div class="cluster-meta">
+        <h2>coding</h2>
+        <p>Programming languages — Python, Go, Rust, TypeScript, Swift, Kotlin, and more</p>
+      </div>
+      <div class="cluster-tag"><strong>18</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding</div><div class="skill-slug">coding/coding</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-dart/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-dart</div><div class="skill-slug">coding/coding-dart</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-data-science/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-data-science</div><div class="skill-slug">coding/coding-data-science</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-go/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-go</div><div class="skill-slug">coding/coding-go</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-java/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-java</div><div class="skill-slug">coding/coding-java</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-javascript/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-javascript</div><div class="skill-slug">coding/coding-javascript</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-julia/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-julia</div><div class="skill-slug">coding/coding-julia</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-kotlin/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-kotlin</div><div class="skill-slug">coding/coding-kotlin</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-nim/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-nim</div><div class="skill-slug">coding/coding-nim</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-node/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-node</div><div class="skill-slug">coding/coding-node</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-python/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-python</div><div class="skill-slug">coding/coding-python</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-r/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-r</div><div class="skill-slug">coding/coding-r</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-ruby/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-ruby</div><div class="skill-slug">coding/coding-ruby</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-rust/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-rust</div><div class="skill-slug">coding/coding-rust</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-swift/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-swift</div><div class="skill-slug">coding/coding-swift</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-systems/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-systems</div><div class="skill-slug">coding/coding-systems</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-typescript/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-typescript</div><div class="skill-slug">coding/coding-typescript</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/coding/coding-web/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">coding-web</div><div class="skill-slug">coding/coding-web</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── WEB-DEV ────────────────────────────────────────── -->
+  <div class="cluster-section" id="web-dev" data-cluster="web-dev web">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(0,212,170,0.1);">🌍</div>
+      <div class="cluster-meta">
+        <h2>web-dev</h2>
+        <p>Frontend & full-stack — React, Next.js, Vue, CSS, Tailwind, WebAssembly, PWA</p>
+      </div>
+      <div class="cluster-tag"><strong>13</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/web-dev/web/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">web</div><div class="skill-slug">web-dev/web</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/web-dev/web-api/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">web-api</div><div class="skill-slug">web-dev/web-api</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/web-dev/web-css/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">web-css</div><div class="skill-slug">web-dev/web-css</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/web-dev/web-deploy/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">web-deploy</div><div class="skill-slug">web-dev/web-deploy</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/web-dev/web-html/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">web-html</div><div class="skill-slug">web-dev/web-html</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/web-dev/web-nextjs/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">web-nextjs</div><div class="skill-slug">web-dev/web-nextjs</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/web-dev/web-performance/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">web-performance</div><div class="skill-slug">web-dev/web-performance</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/web-dev/web-pwa/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">web-pwa</div><div class="skill-slug">web-dev/web-pwa</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/web-dev/web-react/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">web-react</div><div class="skill-slug">web-dev/web-react</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/web-dev/web-security/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">web-security</div><div class="skill-slug">web-dev/web-security</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/web-dev/web-tailwind/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">web-tailwind</div><div class="skill-slug">web-dev/web-tailwind</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/web-dev/web-vue/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">web-vue</div><div class="skill-slug">web-dev/web-vue</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/web-dev/web-wasm/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">web-wasm</div><div class="skill-slug">web-dev/web-wasm</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── MOBILE ────────────────────────────────────────── -->
+  <div class="cluster-section" id="mobile" data-cluster="mobile">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(108,99,255,0.1);">📱</div>
+      <div class="cluster-meta">
+        <h2>mobile</h2>
+        <p>iOS (Swift, SwiftUI, UIKit, watchOS) and Android (Kotlin, Jetpack Compose) development</p>
+      </div>
+      <div class="cluster-tag"><strong>14</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/mobile/mobile/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">mobile</div><div class="skill-slug">mobile/mobile</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/mobile/ios/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">ios</div><div class="skill-slug">mobile/ios</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/mobile/ios-swift/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">ios-swift</div><div class="skill-slug">mobile/ios-swift</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/mobile/ios-swiftui/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">ios-swiftui</div><div class="skill-slug">mobile/ios-swiftui</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/mobile/ios-uikit/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">ios-uikit</div><div class="skill-slug">mobile/ios-uikit</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/mobile/ios-frameworks/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">ios-frameworks</div><div class="skill-slug">mobile/ios-frameworks</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/mobile/ios-deploy/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">ios-deploy</div><div class="skill-slug">mobile/ios-deploy</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/mobile/ios-watchos/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">ios-watchos</div><div class="skill-slug">mobile/ios-watchos</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/mobile/android/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">android</div><div class="skill-slug">mobile/android</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/mobile/android-kotlin/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">android-kotlin</div><div class="skill-slug">mobile/android-kotlin</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/mobile/android-compose/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">android-compose</div><div class="skill-slug">mobile/android-compose</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/mobile/android-jetpack/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">android-jetpack</div><div class="skill-slug">mobile/android-jetpack</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/mobile/android-deploy/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">android-deploy</div><div class="skill-slug">mobile/android-deploy</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/mobile/cross-platform/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">cross-platform</div><div class="skill-slug">mobile/cross-platform</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── SE-ARCHITECTURE ───────────────────────────────── -->
+  <div class="cluster-section" id="se-architecture" data-cluster="se-architecture architecture">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(0,212,170,0.1);">🏛️</div>
+      <div class="cluster-meta">
+        <h2>se-architecture</h2>
+        <p>Software architecture patterns — microservices, event-driven, DDD, API design, distributed systems</p>
+      </div>
+      <div class="cluster-tag"><strong>12</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/se-architecture/arch/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">arch</div><div class="skill-slug">se-architecture/arch</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/se-architecture/arch-api/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">arch-api</div><div class="skill-slug">se-architecture/arch-api</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/se-architecture/arch-clean/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">arch-clean</div><div class="skill-slug">se-architecture/arch-clean</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/se-architecture/arch-cloud/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">arch-cloud</div><div class="skill-slug">se-architecture/arch-cloud</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/se-architecture/arch-database/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">arch-database</div><div class="skill-slug">se-architecture/arch-database</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/se-architecture/arch-diagrams/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">arch-diagrams</div><div class="skill-slug">se-architecture/arch-diagrams</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/se-architecture/arch-distributed/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">arch-distributed</div><div class="skill-slug">se-architecture/arch-distributed</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/se-architecture/arch-domain-driven/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">arch-domain-driven</div><div class="skill-slug">se-architecture/arch-domain-driven</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/se-architecture/arch-event-driven/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">arch-event-driven</div><div class="skill-slug">se-architecture/arch-event-driven</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/se-architecture/arch-microservices/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">arch-microservices</div><div class="skill-slug">se-architecture/arch-microservices</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/se-architecture/arch-patterns/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">arch-patterns</div><div class="skill-slug">se-architecture/arch-patterns</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/se-architecture/arch-scalability/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">arch-scalability</div><div class="skill-slug">se-architecture/arch-scalability</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── COMPUTER-SCIENCE ──────────────────────────────── -->
+  <div class="cluster-section" id="computer-science" data-cluster="computer-science cs">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(108,99,255,0.12);">🎓</div>
+      <div class="cluster-meta">
+        <h2>computer-science</h2>
+        <p>CS fundamentals — algorithms, data structures, crypto, compilers, OS, networking, ML theory</p>
+      </div>
+      <div class="cluster-tag"><strong>11</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/computer-science/cs/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">cs</div><div class="skill-slug">computer-science/cs</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/computer-science/cs-algorithms/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">cs-algorithms</div><div class="skill-slug">computer-science/cs-algorithms</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/computer-science/cs-compilers/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">cs-compilers</div><div class="skill-slug">computer-science/cs-compilers</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/computer-science/cs-concurrency/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">cs-concurrency</div><div class="skill-slug">computer-science/cs-concurrency</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/computer-science/cs-crypto/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">cs-crypto</div><div class="skill-slug">computer-science/cs-crypto</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/computer-science/cs-data-structures/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">cs-data-structures</div><div class="skill-slug">computer-science/cs-data-structures</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/computer-science/cs-formal/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">cs-formal</div><div class="skill-slug">computer-science/cs-formal</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/computer-science/cs-math/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">cs-math</div><div class="skill-slug">computer-science/cs-math</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/computer-science/cs-ml/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">cs-ml</div><div class="skill-slug">computer-science/cs-ml</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/computer-science/cs-networks/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">cs-networks</div><div class="skill-slug">computer-science/cs-networks</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/computer-science/cs-os/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">cs-os</div><div class="skill-slug">computer-science/cs-os</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── DEVOPS-SRE ────────────────────────────────────── -->
+  <div class="cluster-section" id="devops-sre" data-cluster="devops-sre devops sre">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(0,212,170,0.1);">⚙️</div>
+      <div class="cluster-meta">
+        <h2>devops-sre</h2>
+        <p>Kubernetes, Helm, Terraform, Prometheus, Grafana, CI/CD, chaos engineering, SRE runbooks</p>
+      </div>
+      <div class="cluster-tag"><strong>10</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/devops-sre/ansible/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">ansible</div><div class="skill-slug">devops-sre/ansible</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/devops-sre/chaos-engineering/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">chaos-engineering</div><div class="skill-slug">devops-sre/chaos-engineering</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/devops-sre/ci-cd-ops/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">ci-cd-ops</div><div class="skill-slug">devops-sre/ci-cd-ops</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/devops-sre/grafana/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">grafana</div><div class="skill-slug">devops-sre/grafana</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/devops-sre/helm/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">helm</div><div class="skill-slug">devops-sre/helm</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/devops-sre/incident-response/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">incident-response</div><div class="skill-slug">devops-sre/incident-response</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/devops-sre/k8s/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">k8s</div><div class="skill-slug">devops-sre/k8s</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/devops-sre/prometheus/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">prometheus</div><div class="skill-slug">devops-sre/prometheus</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/devops-sre/sre-runbooks/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">sre-runbooks</div><div class="skill-slug">devops-sre/sre-runbooks</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/devops-sre/terraform/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">terraform</div><div class="skill-slug">devops-sre/terraform</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── LINUX ──────────────────────────────────────────── -->
+  <div class="cluster-section" id="linux" data-cluster="linux">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(248,181,0,0.1);">🐧</div>
+      <div class="cluster-meta">
+        <h2>linux</h2>
+        <p>Linux administration — systemd, networking, Docker, cgroups, system admin</p>
+      </div>
+      <div class="cluster-tag"><strong>5</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/linux/linux-admin/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">linux-admin</div><div class="skill-slug">linux/linux-admin</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/linux/linux-cgroups/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">linux-cgroups</div><div class="skill-slug">linux/linux-cgroups</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/linux/linux-docker/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">linux-docker</div><div class="skill-slug">linux/linux-docker</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/linux/linux-networking/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">linux-networking</div><div class="skill-slug">linux/linux-networking</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/linux/linux-systemd/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">linux-systemd</div><div class="skill-slug">linux/linux-systemd</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── MACOS ──────────────────────────────────────────── -->
+  <div class="cluster-section" id="macos" data-cluster="macos mac apple">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(0,212,170,0.08);">🍎</div>
+      <div class="cluster-meta">
+        <h2>macos</h2>
+        <p>macOS development — Xcode, Homebrew, automation, security, networking, launchd, performance</p>
+      </div>
+      <div class="cluster-tag"><strong>10</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/macos/macos/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">macos</div><div class="skill-slug">macos/macos</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/macos/macos-admin/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">macos-admin</div><div class="skill-slug">macos/macos-admin</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/macos/macos-automation/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">macos-automation</div><div class="skill-slug">macos/macos-automation</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/macos/macos-brew/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">macos-brew</div><div class="skill-slug">macos/macos-brew</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/macos/macos-keychain/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">macos-keychain</div><div class="skill-slug">macos/macos-keychain</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/macos/macos-launchd/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">macos-launchd</div><div class="skill-slug">macos/macos-launchd</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/macos/macos-networking/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">macos-networking</div><div class="skill-slug">macos/macos-networking</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/macos/macos-perf/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">macos-perf</div><div class="skill-slug">macos/macos-perf</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/macos/macos-security/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">macos-security</div><div class="skill-slug">macos/macos-security</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/macos/macos-xcode/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">macos-xcode</div><div class="skill-slug">macos/macos-xcode</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── TESTING ───────────────────────────────────────── -->
+  <div class="cluster-section" id="testing" data-cluster="testing qa">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(0,212,170,0.1);">🧪</div>
+      <div class="cluster-meta">
+        <h2>testing</h2>
+        <p>Software quality — unit, integration, E2E, performance, security, mobile, CI testing</p>
+      </div>
+      <div class="cluster-tag"><strong>8</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/testing/testing/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">testing</div><div class="skill-slug">testing/testing</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/testing/testing-ci/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">testing-ci</div><div class="skill-slug">testing/testing-ci</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/testing/testing-e2e/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">testing-e2e</div><div class="skill-slug">testing/testing-e2e</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/testing/testing-integration/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">testing-integration</div><div class="skill-slug">testing/testing-integration</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/testing/testing-mobile/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">testing-mobile</div><div class="skill-slug">testing/testing-mobile</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/testing/testing-performance/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">testing-performance</div><div class="skill-slug">testing/testing-performance</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/testing/testing-security/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">testing-security</div><div class="skill-slug">testing/testing-security</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/testing/testing-unit/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">testing-unit</div><div class="skill-slug">testing/testing-unit</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── ABTESTING ─────────────────────────────────────── -->
+  <div class="cluster-section" id="abtesting" data-cluster="abtesting ab-testing experimentation">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(108,99,255,0.1);">📊</div>
+      <div class="cluster-meta">
+        <h2>abtesting</h2>
+        <p>A/B testing and experimentation — design, analysis, statistics, web/mobile experiments</p>
+      </div>
+      <div class="cluster-tag"><strong>6</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/abtesting/abtesting/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">abtesting</div><div class="skill-slug">abtesting/abtesting</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/abtesting/abtesting-analysis/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">abtesting-analysis</div><div class="skill-slug">abtesting/abtesting-analysis</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/abtesting/abtesting-design/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">abtesting-design</div><div class="skill-slug">abtesting/abtesting-design</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/abtesting/abtesting-mobile/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">abtesting-mobile</div><div class="skill-slug">abtesting/abtesting-mobile</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/abtesting/abtesting-stats/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">abtesting-stats</div><div class="skill-slug">abtesting/abtesting-stats</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/abtesting/abtesting-web/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">abtesting-web</div><div class="skill-slug">abtesting/abtesting-web</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── AIMLOPS ────────────────────────────────────────── -->
+  <div class="cluster-section" id="aimlops" data-cluster="aimlops ai ml mlops llm">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(108,99,255,0.15);">🤖</div>
+      <div class="cluster-meta">
+        <h2>aimlops</h2>
+        <p>AI/ML operations — LangChain, RAG, vector DBs, fine-tuning, prompt engineering, MLflow, model deployment</p>
+      </div>
+      <div class="cluster-tag"><strong>10</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/aimlops/ai-gateway/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">ai-gateway</div><div class="skill-slug">aimlops/ai-gateway</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/aimlops/embedding-pipelines/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">embedding-pipelines</div><div class="skill-slug">aimlops/embedding-pipelines</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/aimlops/fine-tuning/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">fine-tuning</div><div class="skill-slug">aimlops/fine-tuning</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/aimlops/langchain/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">langchain</div><div class="skill-slug">aimlops/langchain</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/aimlops/llm-ops/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">llm-ops</div><div class="skill-slug">aimlops/llm-ops</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/aimlops/mlflow/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">mlflow</div><div class="skill-slug">aimlops/mlflow</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/aimlops/model-deployment/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">model-deployment</div><div class="skill-slug">aimlops/model-deployment</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/aimlops/prompt-engineering/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">prompt-engineering</div><div class="skill-slug">aimlops/prompt-engineering</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/aimlops/rag/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">rag</div><div class="skill-slug">aimlops/rag</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/aimlops/vector-db/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">vector-db</div><div class="skill-slug">aimlops/vector-db</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── AI-APIS ───────────────────────────────────────── -->
+  <div class="cluster-section" id="ai-apis" data-cluster="ai-apis ai apis openai anthropic">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(0,212,170,0.12);">🔌</div>
+      <div class="cluster-meta">
+        <h2>ai-apis</h2>
+        <p>AI provider integrations — OpenAI, Anthropic, Google AI, Mistral, Cohere, xAI, Perplexity, Brave</p>
+      </div>
+      <div class="cluster-tag"><strong>8</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ai-apis/anthropic-api/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">anthropic-api</div><div class="skill-slug">ai-apis/anthropic-api</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ai-apis/brave-search/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">brave-search</div><div class="skill-slug">ai-apis/brave-search</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ai-apis/cohere-api/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">cohere-api</div><div class="skill-slug">ai-apis/cohere-api</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ai-apis/google-ai/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">google-ai</div><div class="skill-slug">ai-apis/google-ai</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ai-apis/mistral-api/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">mistral-api</div><div class="skill-slug">ai-apis/mistral-api</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ai-apis/openai-api/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">openai-api</div><div class="skill-slug">ai-apis/openai-api</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ai-apis/perplexity-api/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">perplexity-api</div><div class="skill-slug">ai-apis/perplexity-api</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ai-apis/xai-grok/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">xai-grok</div><div class="skill-slug">ai-apis/xai-grok</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── DATA-ENGINEERING ──────────────────────────────── -->
+  <div class="cluster-section" id="data-engineering" data-cluster="data-engineering data">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(0,212,170,0.1);">🗄️</div>
+      <div class="cluster-meta">
+        <h2>data-engineering</h2>
+        <p>Data pipelines — Airflow, Kafka, Spark, dbt, Snowflake, stream processing, data quality, lakehouses</p>
+      </div>
+      <div class="cluster-tag"><strong>10</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/data-engineering/airflow/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">airflow</div><div class="skill-slug">data-engineering/airflow</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/data-engineering/data-catalog/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">data-catalog</div><div class="skill-slug">data-engineering/data-catalog</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/data-engineering/data-lakehouse/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">data-lakehouse</div><div class="skill-slug">data-engineering/data-lakehouse</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/data-engineering/data-quality/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">data-quality</div><div class="skill-slug">data-engineering/data-quality</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/data-engineering/dbt/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">dbt</div><div class="skill-slug">data-engineering/dbt</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/data-engineering/etl-pipelines/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">etl-pipelines</div><div class="skill-slug">data-engineering/etl-pipelines</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/data-engineering/kafka/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">kafka</div><div class="skill-slug">data-engineering/kafka</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/data-engineering/snowflake/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">snowflake</div><div class="skill-slug">data-engineering/snowflake</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/data-engineering/spark/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">spark</div><div class="skill-slug">data-engineering/spark</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/data-engineering/stream-processing/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">stream-processing</div><div class="skill-slug">data-engineering/stream-processing</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── DISTRIBUTED-COMMS ─────────────────────────────── -->
+  <div class="cluster-section" id="distributed-comms" data-cluster="distributed-comms distributed">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(108,99,255,0.1);">📡</div>
+      <div class="cluster-meta">
+        <h2>distributed-comms</h2>
+        <p>Multi-agent session mesh, channel bridging, orchestration, node operations</p>
+      </div>
+      <div class="cluster-tag"><strong>4</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/distributed-comms/channel-bridge/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">channel-bridge</div><div class="skill-slug">distributed-comms/channel-bridge</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/distributed-comms/node-ops/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">node-ops</div><div class="skill-slug">distributed-comms/node-ops</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/distributed-comms/orchestrator/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">orchestrator</div><div class="skill-slug">distributed-comms/orchestrator</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/distributed-comms/session-mesh/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">session-mesh</div><div class="skill-slug">distributed-comms/session-mesh</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── TWILIO ────────────────────────────────────────── -->
+  <div class="cluster-section" id="twilio" data-cluster="twilio sms voice messaging">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(255,107,107,0.1);">📞</div>
+      <div class="cluster-meta">
+        <h2>twilio</h2>
+        <p>Twilio platform — SMS, Voice, Video, WhatsApp, Conversations, Verify, Email, Lookup</p>
+      </div>
+      <div class="cluster-tag"><strong>10</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/twilio/twilio/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">twilio</div><div class="skill-slug">twilio/twilio</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/twilio/twilio-admin/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">twilio-admin</div><div class="skill-slug">twilio/twilio-admin</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/twilio/twilio-conversations/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">twilio-conversations</div><div class="skill-slug">twilio/twilio-conversations</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/twilio/twilio-email/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">twilio-email</div><div class="skill-slug">twilio/twilio-email</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/twilio/twilio-lookup/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">twilio-lookup</div><div class="skill-slug">twilio/twilio-lookup</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/twilio/twilio-sms/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">twilio-sms</div><div class="skill-slug">twilio/twilio-sms</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/twilio/twilio-verify/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">twilio-verify</div><div class="skill-slug">twilio/twilio-verify</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/twilio/twilio-video/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">twilio-video</div><div class="skill-slug">twilio/twilio-video</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/twilio/twilio-voice/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">twilio-voice</div><div class="skill-slug">twilio/twilio-voice</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/twilio/twilio-whatsapp/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">twilio-whatsapp</div><div class="skill-slug">twilio/twilio-whatsapp</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── BLUE-TEAM ─────────────────────────────────────── -->
+  <div class="cluster-section" id="blue-team" data-cluster="blue-team security defense">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(0,212,170,0.12);">🛡️</div>
+      <div class="cluster-meta">
+        <h2>blue-team</h2>
+        <p>Defensive security — DFIR, threat hunting, SIEM, SOAR, log analysis, network/memory forensics, malware analysis</p>
+      </div>
+      <div class="cluster-tag"><strong>10</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blue-team/blue-team-root/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">blue-team-root</div><div class="skill-slug">blue-team/blue-team-root</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blue-team/dfir/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">dfir</div><div class="skill-slug">blue-team/dfir</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blue-team/ioc-analysis/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">ioc-analysis</div><div class="skill-slug">blue-team/ioc-analysis</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blue-team/log-analysis/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">log-analysis</div><div class="skill-slug">blue-team/log-analysis</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blue-team/malware-analysis/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">malware-analysis</div><div class="skill-slug">blue-team/malware-analysis</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blue-team/memory-forensics/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">memory-forensics</div><div class="skill-slug">blue-team/memory-forensics</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blue-team/network-forensics/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">network-forensics</div><div class="skill-slug">blue-team/network-forensics</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blue-team/siem/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">siem</div><div class="skill-slug">blue-team/siem</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blue-team/soar/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">soar</div><div class="skill-slug">blue-team/soar</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blue-team/threat-hunting/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">threat-hunting</div><div class="skill-slug">blue-team/threat-hunting</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── REDTEAM ───────────────────────────────────────── -->
+  <div class="cluster-section" id="redteam" data-cluster="redteam security">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(255,107,107,0.12);">🔒</div>
+      <div class="cluster-meta">
+        <h2>redteam</h2>
+        <p>Offensive security skills — AppSec, network, OSINT, code review, architecture, reporting</p>
+      </div>
+      <div class="cluster-tag"><strong>7</strong> skills</div>
+    </div>
+    <div style="background:rgba(255,107,107,0.06);border:1px solid rgba(255,107,107,0.2);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem;font-size:0.85rem;color:#f08080;">
+      🔒 <strong>Private cluster</strong> — redteam skills are maintained in a separate private repository and are not included in this public graph. Skill nodes exist in LadybugDB for graph traversal; SKILL.md files are excluded from this repo.
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card" style="opacity:0.6;cursor:default;">
+        <div class="skill-name">redteam</div><div class="skill-slug">redteam/redteam</div>
+        <div style="margin-top:0.3rem;"><span class="private-badge">🔒 Private</span></div>
+      </div>
+      <div class="skill-card" style="opacity:0.6;cursor:default;">
+        <div class="skill-name">redteam-appsec</div><div class="skill-slug">redteam/redteam-appsec</div>
+        <div style="margin-top:0.3rem;"><span class="private-badge">🔒 Private</span></div>
+      </div>
+      <div class="skill-card" style="opacity:0.6;cursor:default;">
+        <div class="skill-name">redteam-architecture</div><div class="skill-slug">redteam/redteam-architecture</div>
+        <div style="margin-top:0.3rem;"><span class="private-badge">🔒 Private</span></div>
+      </div>
+      <div class="skill-card" style="opacity:0.6;cursor:default;">
+        <div class="skill-name">redteam-code</div><div class="skill-slug">redteam/redteam-code</div>
+        <div style="margin-top:0.3rem;"><span class="private-badge">🔒 Private</span></div>
+      </div>
+      <div class="skill-card" style="opacity:0.6;cursor:default;">
+        <div class="skill-name">redteam-network</div><div class="skill-slug">redteam/redteam-network</div>
+        <div style="margin-top:0.3rem;"><span class="private-badge">🔒 Private</span></div>
+      </div>
+      <div class="skill-card" style="opacity:0.6;cursor:default;">
+        <div class="skill-name">redteam-osint</div><div class="skill-slug">redteam/redteam-osint</div>
+        <div style="margin-top:0.3rem;"><span class="private-badge">🔒 Private</span></div>
+      </div>
+      <div class="skill-card" style="opacity:0.6;cursor:default;">
+        <div class="skill-name">redteam-reporting</div><div class="skill-slug">redteam/redteam-reporting</div>
+        <div style="margin-top:0.3rem;"><span class="private-badge">🔒 Private</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── FINANCIAL ────────────────────────────────────── -->
+  <div class="cluster-section" id="financial" data-cluster="financial finance trading">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(248,181,0,0.1);">💰</div>
+      <div class="cluster-meta">
+        <h2>financial</h2>
+        <p>Financial engineering — algo trading, backtesting, Alpaca API, options, risk, portfolio, market data</p>
+      </div>
+      <div class="cluster-tag"><strong>10</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/financial/algo-trading/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">algo-trading</div><div class="skill-slug">financial/algo-trading</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/financial/alpaca-api/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">alpaca-api</div><div class="skill-slug">financial/alpaca-api</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/financial/backtesting/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">backtesting</div><div class="skill-slug">financial/backtesting</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/financial/financial-reporting/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">financial-reporting</div><div class="skill-slug">financial/financial-reporting</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/financial/flowpatrol-ops/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">flowpatrol-ops</div><div class="skill-slug">financial/flowpatrol-ops</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/financial/market-data/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">market-data</div><div class="skill-slug">financial/market-data</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/financial/market-regime/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">market-regime</div><div class="skill-slug">financial/market-regime</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/financial/options-analysis/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">options-analysis</div><div class="skill-slug">financial/options-analysis</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/financial/portfolio-management/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">portfolio-management</div><div class="skill-slug">financial/portfolio-management</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/financial/risk-management/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">risk-management</div><div class="skill-slug">financial/risk-management</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── BLOCKCHAIN ────────────────────────────────────── -->
+  <div class="cluster-section" id="blockchain" data-cluster="blockchain web3 crypto defi">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(108,99,255,0.1);">⛓️</div>
+      <div class="cluster-meta">
+        <h2>blockchain</h2>
+        <p>Web3 & blockchain — Solidity, Hardhat, Foundry, DeFi, NFT, IPFS, ethers.js, web3.py</p>
+      </div>
+      <div class="cluster-tag"><strong>10</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blockchain/defi-protocols/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">defi-protocols</div><div class="skill-slug">blockchain/defi-protocols</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blockchain/ethers-js/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">ethers-js</div><div class="skill-slug">blockchain/ethers-js</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blockchain/foundry/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">foundry</div><div class="skill-slug">blockchain/foundry</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blockchain/hardhat/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">hardhat</div><div class="skill-slug">blockchain/hardhat</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blockchain/ipfs/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">ipfs</div><div class="skill-slug">blockchain/ipfs</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blockchain/nft/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">nft</div><div class="skill-slug">blockchain/nft</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blockchain/smart-contracts/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">smart-contracts</div><div class="skill-slug">blockchain/smart-contracts</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blockchain/solidity/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">solidity</div><div class="skill-slug">blockchain/solidity</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blockchain/wallet-integration/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">wallet-integration</div><div class="skill-slug">blockchain/wallet-integration</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/blockchain/web3-py/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">web3-py</div><div class="skill-slug">blockchain/web3-py</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── GAME-DEV ───────────────────────────────────────── -->
+  <div class="cluster-section" id="game-dev" data-cluster="game-dev games unity unreal godot">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(108,99,255,0.12);">🎮</div>
+      <div class="cluster-meta">
+        <h2>game-dev</h2>
+        <p>Game development — Unity, Unreal, Godot, shaders, physics, AI, audio, networking, analytics</p>
+      </div>
+      <div class="cluster-tag"><strong>10</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/game-dev/game-ai/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">game-ai</div><div class="skill-slug">game-dev/game-ai</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/game-dev/game-analytics/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">game-analytics</div><div class="skill-slug">game-dev/game-analytics</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/game-dev/game-audio/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">game-audio</div><div class="skill-slug">game-dev/game-audio</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/game-dev/game-networking/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">game-networking</div><div class="skill-slug">game-dev/game-networking</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/game-dev/game-physics/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">game-physics</div><div class="skill-slug">game-dev/game-physics</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/game-dev/godot/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">godot</div><div class="skill-slug">game-dev/godot</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/game-dev/procedural-generation/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">procedural-generation</div><div class="skill-slug">game-dev/procedural-generation</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/game-dev/shader-programming/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">shader-programming</div><div class="skill-slug">game-dev/shader-programming</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/game-dev/unity/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">unity</div><div class="skill-slug">game-dev/unity</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/game-dev/unreal-engine/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">unreal-engine</div><div class="skill-slug">game-dev/unreal-engine</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── AR-VR ─────────────────────────────────────────── -->
+  <div class="cluster-section" id="ar-vr" data-cluster="ar-vr ar vr xr spatial">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(0,212,170,0.1);">🥽</div>
+      <div class="cluster-meta">
+        <h2>ar-vr</h2>
+        <p>Spatial computing — ARKit, ARCore, OpenXR, WebXR, visionOS, Unity XR, 3D modeling, hand tracking</p>
+      </div>
+      <div class="cluster-tag"><strong>10</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ar-vr/3d-modeling/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">3d-modeling</div><div class="skill-slug">ar-vr/3d-modeling</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ar-vr/ar-vr-design/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">ar-vr-design</div><div class="skill-slug">ar-vr/ar-vr-design</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ar-vr/arcore/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">arcore</div><div class="skill-slug">ar-vr/arcore</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ar-vr/arkit-advanced/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">arkit-advanced</div><div class="skill-slug">ar-vr/arkit-advanced</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ar-vr/hand-tracking/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">hand-tracking</div><div class="skill-slug">ar-vr/hand-tracking</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ar-vr/openxr/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">openxr</div><div class="skill-slug">ar-vr/openxr</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ar-vr/spatial-audio/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">spatial-audio</div><div class="skill-slug">ar-vr/spatial-audio</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ar-vr/unity-xr/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">unity-xr</div><div class="skill-slug">ar-vr/unity-xr</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ar-vr/visionos/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">visionos</div><div class="skill-slug">ar-vr/visionos</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/ar-vr/webxr/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">webxr</div><div class="skill-slug">ar-vr/webxr</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── IOT ───────────────────────────────────────────── -->
+  <div class="cluster-section" id="iot" data-cluster="iot embedded hardware raspberry arduino">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(0,212,170,0.1);">🔌</div>
+      <div class="cluster-meta">
+        <h2>iot</h2>
+        <p>IoT & embedded systems — Arduino, Raspberry Pi, MQTT, edge computing, sensor fusion, home automation</p>
+      </div>
+      <div class="cluster-tag"><strong>10</strong> skills</div>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/iot/arduino/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">arduino</div><div class="skill-slug">iot/arduino</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/iot/edge-computing/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">edge-computing</div><div class="skill-slug">iot/edge-computing</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/iot/embedded-c/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">embedded-c</div><div class="skill-slug">iot/embedded-c</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/iot/home-automation/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">home-automation</div><div class="skill-slug">iot/home-automation</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/iot/iot-cloud/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">iot-cloud</div><div class="skill-slug">iot/iot-cloud</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/iot/iot-protocols/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">iot-protocols</div><div class="skill-slug">iot/iot-protocols</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/iot/iot-security/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">iot-security</div><div class="skill-slug">iot/iot-security</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/iot/mqtt/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">mqtt</div><div class="skill-slug">iot/mqtt</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/iot/raspberry-pi/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">raspberry-pi</div><div class="skill-slug">iot/raspberry-pi</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/iot/sensor-fusion/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">sensor-fusion</div><div class="skill-slug">iot/sensor-fusion</div><div class="skill-actions"><span class="skill-link">View →</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── CLOUD-AWS ─────────────────────────────────────── -->
+  <div class="cluster-section" id="cloud-aws" data-cluster="cloud cloud-aws aws amazon">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(248,181,0,0.1);">☁️</div>
+      <div class="cluster-meta">
+        <h2>cloud-aws</h2>
+        <p>AWS Cloud — integration placeholder pointing to <strong>awslabs/agent-plugins</strong></p>
+      </div>
+      <div class="cluster-tag"><strong>10</strong> skills</div>
+    </div>
+    <div style="background:rgba(248,181,0,0.06);border:1px solid rgba(248,181,0,0.2);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem;font-size:0.85rem;color:#c8960a;">
+      ☁️ <strong>Integration cluster</strong> — these skills are integration-first placeholders that defer to <a href="https://github.com/awslabs/agent-plugins" target="_blank" style="color:inherit;">awslabs/agent-plugins</a>. Install with: <code style="background:rgba(0,0,0,0.2);padding:0.1rem 0.4rem;border-radius:3px;">/plugin install deploy-on-aws@agent-plugins-for-aws</code>
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-aws/aws-cdk/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">aws-cdk</div><div class="skill-slug">cloud-aws/aws-cdk</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-aws/aws-cloudformation/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">aws-cloudformation</div><div class="skill-slug">cloud-aws/aws-cloudformation</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-aws/aws-ec2/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">aws-ec2</div><div class="skill-slug">cloud-aws/aws-ec2</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-aws/aws-ecs/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">aws-ecs</div><div class="skill-slug">cloud-aws/aws-ecs</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-aws/aws-iam/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">aws-iam</div><div class="skill-slug">cloud-aws/aws-iam</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-aws/aws-lambda/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">aws-lambda</div><div class="skill-slug">cloud-aws/aws-lambda</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-aws/aws-rds/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">aws-rds</div><div class="skill-slug">cloud-aws/aws-rds</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-aws/aws-s3/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">aws-s3</div><div class="skill-slug">cloud-aws/aws-s3</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-aws/aws-sagemaker/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">aws-sagemaker</div><div class="skill-slug">cloud-aws/aws-sagemaker</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-aws/aws-vpc/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">aws-vpc</div><div class="skill-slug">cloud-aws/aws-vpc</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+    </div>
+  </div>
+
+  <!-- ─── CLOUD-GCP ─────────────────────────────────────── -->
+  <div class="cluster-section" id="cloud-gcp" data-cluster="cloud cloud-gcp gcp google">
+    <div class="cluster-header">
+      <div class="cluster-icon" style="background:rgba(248,181,0,0.1);">☁️</div>
+      <div class="cluster-meta">
+        <h2>cloud-gcp</h2>
+        <p>Google Cloud — integration placeholder pointing to <strong>google-cloud-python</strong> + Vertex AI SDK + Google ADK</p>
+      </div>
+      <div class="cluster-tag"><strong>10</strong> skills</div>
+    </div>
+    <div style="background:rgba(248,181,0,0.06);border:1px solid rgba(248,181,0,0.2);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem;font-size:0.85rem;color:#c8960a;">
+      ☁️ <strong>Integration cluster</strong> — defers to <a href="https://github.com/googleapis/google-cloud-python" target="_blank" style="color:inherit;">googleapis/google-cloud-python</a>, <code style="background:rgba(0,0,0,0.2);padding:0.1rem 0.4rem;border-radius:3px;">google-cloud-aiplatform</code> (Vertex AI SDK), and the <a href="https://github.com/google/genai-processors" target="_blank" style="color:inherit;">Google ADK</a>.
+    </div>
+    <div class="skills-grid">
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-gcp/gcp-bigquery/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">gcp-bigquery</div><div class="skill-slug">cloud-gcp/gcp-bigquery</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-gcp/gcp-cloud-run/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">gcp-cloud-run</div><div class="skill-slug">cloud-gcp/gcp-cloud-run</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-gcp/gcp-compute/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">gcp-compute</div><div class="skill-slug">cloud-gcp/gcp-compute</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-gcp/gcp-functions/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">gcp-functions</div><div class="skill-slug">cloud-gcp/gcp-functions</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-gcp/gcp-gke/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">gcp-gke</div><div class="skill-slug">cloud-gcp/gcp-gke</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-gcp/gcp-iam/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">gcp-iam</div><div class="skill-slug">cloud-gcp/gcp-iam</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-gcp/gcp-pubsub/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">gcp-pubsub</div><div class="skill-slug">cloud-gcp/gcp-pubsub</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-gcp/gcp-storage/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">gcp-storage</div><div class="skill-slug">cloud-gcp/gcp-storage</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-gcp/gcp-terraform/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">gcp-terraform</div><div class="skill-slug">cloud-gcp/gcp-terraform</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+      <a class="skill-card" href="https://github.com/alphaonedev/openclaw-graph/blob/main/skills/cloud-gcp/gcp-vertexai/SKILL.md" target="_blank" rel="noopener"><div class="skill-name">gcp-vertexai</div><div class="skill-slug">cloud-gcp/gcp-vertexai</div><div class="skill-actions"><span class="skill-link">View →</span><span class="integration-badge">Integration</span></div></a>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<div id="noResults">
+  <h3>No skills match your search</h3>
+  <p>Try a different term or clear the filter.</p>
+</div>
+
+<footer>
+  openclaw-graph — 312 skills · 27 clusters · MIT License ·
+  <a href="https://github.com/alphaonedev/openclaw-graph">GitHub</a> ·
+  <a href="index.html">← Back to Home</a>
+</footer>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Top</button>
+
+<script>
+  // Search
+  const searchInput = document.getElementById('searchInput');
+  const sections = document.querySelectorAll('.cluster-section');
+  const noResults = document.getElementById('noResults');
+  let activeFilter = 'all';
+
+  const filterMap = {
+    'all': null,
+    'core-openclaw': ['core-openclaw'],
+    'coding': ['coding', 'web-dev', 'mobile', 'computer-science', 'se-architecture'],
+    'devops': ['devops-sre', 'linux', 'distributed-comms', 'testing', 'abtesting'],
+    'security': ['blue-team', 'redteam'],
+    'cloud': ['cloud-aws', 'cloud-gcp'],
+    'mobile': ['mobile', 'ar-vr', 'iot']
+  };
+
+  function applyFilters() {
+    const query = searchInput.value.trim().toLowerCase();
+    const clusterFilter = filterMap[activeFilter];
+    let anyVisible = false;
+
+    sections.forEach(section => {
+      const cluster = section.id;
+      const clusterData = section.dataset.cluster || '';
+      const cards = section.querySelectorAll('.skill-card');
+
+      // Cluster filter
+      const clusterMatch = !clusterFilter || clusterFilter.includes(cluster);
+      if (!clusterMatch) { section.classList.add('hidden'); return; }
+
+      if (!query) {
+        // No search — show all cards in matching cluster
+        cards.forEach(c => c.classList.remove('hidden'));
+        section.classList.remove('hidden');
+        anyVisible = true;
+        return;
+      }
+
+      // Search within cluster
+      let clusterHasMatch = clusterData.includes(query);
+      let cardCount = 0;
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if (text.includes(query) || clusterData.includes(query)) {
+          card.classList.remove('hidden');
+          cardCount++;
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      if (cardCount > 0 || clusterHasMatch) {
+        section.classList.remove('hidden');
+        anyVisible = true;
+      } else {
+        section.classList.add('hidden');
+      }
+    });
+
+    noResults.style.display = anyVisible ? 'none' : 'block';
+  }
+
+  searchInput.addEventListener('input', applyFilters);
+
+  function setFilter(filter, btn) {
+    activeFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  }
+
+  // Back to top
+  const backTop = document.getElementById('backTop');
+  window.addEventListener('scroll', () => {
+    backTop.classList.toggle('visible', window.scrollY > 400);
+  });
+
+  // Smooth scroll for TOC
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+</body>
+</html>
