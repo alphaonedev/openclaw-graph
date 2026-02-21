@@ -216,7 +216,7 @@
   <h1>Graph-Native Workspace<br>for <span>OpenClaw</span></h1>
   <p class="hero-sub">
     Replace flat workspace markdown files with embedded Cypher queries.
-    312 fully-enriched skills across 27 clusters, 1536d vector embeddings,
+    322 fully-enriched skills across 28 clusters, 1536d vector embeddings,
     zero daemons — powered by LadybugDB.
   </p>
   <div class="hero-actions">
@@ -227,11 +227,11 @@
 
 <div class="stats-bar">
   <div class="stat">
-    <div class="stat-num">312</div>
+    <div class="stat-num">322</div>
     <div class="stat-label">Skills</div>
   </div>
   <div class="stat">
-    <div class="stat-num">27</div>
+    <div class="stat-num">28</div>
     <div class="stat-label">Clusters</div>
   </div>
   <div class="stat">
@@ -280,7 +280,7 @@
     └── injects graph-resolved markdown → agent context
 
 <span class="hl2">LadybugDB</span> (embedded SQLite + Cypher, no daemon required)
-├── <span class="hl">Skill</span>       (312 nodes, 27 clusters, 247 edges)
+├── <span class="hl">Skill</span>       (312 nodes, 28 clusters, 247 edges)
 ├── <span class="hl">Soul</span>        (identity, behavior, capabilities per workspace)
 ├── <span class="hl">Memory</span>      (project context, state, infrastructure facts)
 ├── <span class="hl">Tool</span>        (available tools + usage notes)
@@ -382,7 +382,7 @@ your memory. Read them. Update them...
 <!-- SKILLS -->
 <section id="skills">
   <div class="section-label">Skill Database</div>
-  <h2>312 skills across 27 clusters</h2>
+  <h2>322 skills across 28 clusters</h2>
   <p>A comprehensive skill graph covering the full development surface. Query by text, cluster, or graph traversal.</p>
 
   <div style="text-align:right;margin-bottom:0.75rem;">
@@ -396,6 +396,7 @@ your memory. Read them. Update them...
     <a href="skills.html#se-architecture" class="cluster-chip" style="text-decoration:none;"><span class="name">se-architecture</span><span class="count">12</span></a>
     <a href="skills.html#computer-science" class="cluster-chip" style="text-decoration:none;"><span class="name">computer-science</span><span class="count">11</span></a>
     <a href="skills.html#cloud-gcp" class="cluster-chip" style="text-decoration:none;"><span class="name">cloud-gcp</span><span class="count">10</span></a>
+    <a href="skills.html#cloud-azure" class="cluster-chip" style="text-decoration:none;"><span class="name">cloud-azure</span><span class="count">10</span></a>
     <a href="skills.html#devops-sre" class="cluster-chip" style="text-decoration:none;"><span class="name">devops-sre</span><span class="count">10</span></a>
     <a href="skills.html#aimlops" class="cluster-chip" style="text-decoration:none;"><span class="name">aimlops</span><span class="count">10</span></a>
     <a href="skills.html#game-dev" class="cluster-chip" style="text-decoration:none;"><span class="name">game-dev</span><span class="count">10</span></a>
@@ -442,7 +443,7 @@ your memory. Read them. Update them...
 <section id="metrics">
   <div class="section-label">Performance</div>
   <h2>Measured on Apple Silicon Mac mini</h2>
-  <p>Node.js v22.22.0 · LadybugDB 0.14.3 · 312 skills fully enriched + embedded · macOS 15.3 arm64 · Feb 2026</p>
+  <p>Node.js v22.22.0 · LadybugDB 0.14.3 · 322 skills fully enriched + embedded · macOS 15.3 arm64 · Feb 2026</p>
 
   <div class="metrics-grid">
     <div class="metric-card">
@@ -467,7 +468,7 @@ your memory. Read them. Update them...
     </div>
     <div class="metric-card">
       <div class="metric-big red">21 MB</div>
-      <div class="metric-label">Full DB on disk<br>(312 skills + embeddings + workspace)</div>
+      <div class="metric-label">Full DB on disk<br>(322 skills + embeddings + workspace)</div>
     </div>
   </div>
 
@@ -477,7 +478,7 @@ your memory. Read them. Update them...
       <div style="background:rgba(0,212,170,0.15);border:1px solid rgba(0,212,170,0.3);color:var(--accent2);padding:0.2rem 0.6rem;border-radius:6px;font-size:0.75rem;font-weight:700;">NEW</div>
       <h3 style="font-size:1rem; font-weight:700;">Vector Embeddings — Semantic Skill Search</h3>
     </div>
-    <p style="font-size:0.88rem; margin-bottom:1rem;">All 312 skills ship with precomputed <strong>text-embedding-3-small</strong> vectors (1536 dimensions). Cosine similarity search finds semantically relevant skills — not just keyword matches.</p>
+    <p style="font-size:0.88rem; margin-bottom:1rem;">All 322 skills ship with precomputed <strong>text-embedding-3-small</strong> vectors (1536 dimensions). Cosine similarity search finds semantically relevant skills — not just keyword matches.</p>
     <div class="code-block" style="margin:0;">
       <pre><span class="comment"># Semantic search — finds skills by meaning, not keywords</span>
 <span class="fn">node</span> ladybugdb/scripts/query.js --semantic <span class="string">"deploy containerized app to cloud"</span>
@@ -487,7 +488,7 @@ your memory. Read them. Update them...
 <span class="fn">node</span> ladybugdb/scripts/gen-embeddings.js --missing</pre>
     </div>
     <p style="font-size:0.82rem; color:var(--text2); margin-top:0.75rem;">
-      Benchmarked: 312 skills embedded in <strong>8.4s</strong> via OpenAI API · 0 errors · cost &lt;$0.01
+      Benchmarked: 322 skills embedded in <strong>8.4s</strong> via OpenAI API · 0 errors · cost &lt;$0.01
     </p>
   </div>
 
@@ -526,7 +527,7 @@ your memory. Read them. Update them...
         <h4>Load the skill database</h4>
         <div class="code-block">
           <pre><span class="fn">node</span> ladybugdb/scripts/loader.js
-<span class="comment"># → 312 skills | 27 clusters | 247 edges | 0 errors</span></pre>
+<span class="comment"># → 322 skills | 28 clusters | 247 edges | 0 errors</span></pre>
         </div>
       </div>
     </div>
