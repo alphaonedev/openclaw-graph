@@ -1,7 +1,7 @@
 ---
 name: gcp-cloud-run
 cluster: cloud-gcp
-description: "Deploy and manage stateless containers on Google\'s serverless platform for scalable web applications."
+description: "Deploy and manage stateless containers on Google's serverless platform for scalable web applications."
 tags: ["gcp","cloud-run","serverless"]
 dependencies: []
 composes: []
@@ -15,74 +15,54 @@ embedding_hint: "gcp cloud run serverless containers deployment scaling gcp serv
 
 # gcp-cloud-run
 
-## Purpose
-This skill enables deploying and managing stateless containers on Google Cloud Run, a serverless platform for running scalable web applications on GCP. It focuses on containerized workloads that handle HTTP requests without managing servers.
+## Google Cloud Integration
 
-## When to Use
-Use this skill for applications needing automatic scaling, such as REST APIs, web hooks, or microservices. Ideal when your app is stateless, requires pay-per-use pricing, and integrates with other GCP services. Avoid if you need persistent storage or long-running processes beyond Cloud Run's limits (e.g., >15 minutes execution).
+This skill delegates all GCP provisioning and operations to the official Google Cloud Python client libraries.
 
-## Key Capabilities
-- Deploy containers from Docker images to Cloud Run services.
-- Automatic scaling based on traffic, with limits configurable via CPU/memory settings.
-- Support for HTTPS, custom domains, and environment variables for configuration.
-- Integration with GCP services like Pub/Sub for event-driven workflows or Cloud SQL for databases.
-- Real-time metrics via Cloud Monitoring, including request latency and error rates.
+```bash
+# Core GCP client library
+pip install google-cloud-python
 
-## Usage Patterns
-To deploy an app, build a Docker image, then use gcloud CLI to create or update a service. For updates, redeploy with new image tags. Pattern for event-driven apps: Use Cloud Run with Pub/Sub triggers. For CI/CD, integrate with Cloud Build to automate deployments from source code.
+# Vertex AI + Agent Engine (AI/ML workloads)
+pip install google-cloud-aiplatform
 
-## Common Commands/API
-Authenticate first by setting `$GOOGLE_APPLICATION_CREDENTIALS` to your service account JSON key file.
-
-- **Deploy a service**: Use `gcloud run deploy SERVICE-NAME --image gcr.io/PROJECT-ID/IMAGE-NAME --platform managed --region us-central1 --allow-unauthenticated`. This creates or updates a service with the specified image.
-  
-  Example code snippet:
-  ```
-  gcloud run deploy my-app --image gcr.io/my-project/my-image:latest
-  --set-env-vars=PORT=8080
-  ```
-
-- **List services**: Run `gcloud run services list --region us-central1` to view all services in a region.
-
-- **Invoke a service**: Use the API endpoint `https://REGION-run.googleapis.com/v1/namespaces/PROJECT-ID/services/SERVICE-NAME:invoke` with a POST request. Include headers like `Content-Type: application/json`.
-
-- **Update configuration**: Command: `gcloud run services update SERVICE-NAME --set-cpu 1 --memory 512Mi --region us-central1`. This adjusts resources for the service.
-
-- **API interactions**: Use the Cloud Run API; for example, to get service details, send a GET to `https://run.googleapis.com/v1/projects/PROJECT-ID/locations/REGION/services/SERVICE-NAME`. Authenticate requests with OAuth 2.0 tokens via `$GOOGLE_OAUTH_TOKEN`.
-
-Config formats: Services use YAML for manifests, e.g., in Cloud Build:
-```
-apiVersion: serving.knative.dev/v1
-kind: Service
-metadata:
-  name: my-service
-spec:
-  template:
-    spec:
-      containers:
-      - image: gcr.io/my-project/my-image
+# Specific service clients (install only what you need)
+pip install google-cloud-bigquery      # BigQuery
+pip install google-cloud-storage       # Cloud Storage
+pip install google-cloud-pubsub        # Pub/Sub
+pip install google-cloud-run           # Cloud Run
 ```
 
-## Integration Notes
-Integrate Cloud Run with other GCP services by adding triggers or using environment variables. For Pub/Sub, set up a topic and subscribe your service; use `--set-env-vars=PUBSUB_TOPIC=projects/PROJECT-ID/topics/TOPIC-NAME` during deployment. For Cloud Storage, access via the Google Cloud Client Library in your code. In multi-service setups, use service URLs as dependencies, e.g., invoke another Cloud Run service via HTTP from your app code. Ensure IAM roles are set; grant `roles/run.invoker` to service accounts for cross-service calls.
+**SDK Docs:** https://github.com/googleapis/google-cloud-python
+**Vertex AI SDK:** https://cloud.google.com/vertex-ai/docs/python-sdk/use-vertex-ai-python-sdk
 
-## Error Handling
-Common errors include authentication failures (e.g., "Permission denied"), resolved by running `gcloud auth login` and verifying `$GOOGLE_APPLICATION_CREDENTIALS`. For deployment issues like invalid images, check with `gcloud builds log`. Handle runtime errors in code; Cloud Run logs to Cloud Logging, so query with `gcloud logging read "resource.type=cloud_run_revision"`. If scaling fails due to quotas, use `gcloud compute project-info add-metadata --metadata quotas=KEY=VALUE` to request increases. Always wrap API calls in try-catch blocks, e.g.:
+Use the Google Cloud Python SDK for all GCP provisioning and operational actions. This skill provides architecture guidance, cost modeling, and pre-flight requirements — the SDK handles execution.
 
-```
-try {
-  const response = await fetch('https://SERVICE-URL', { method: 'POST' });
-  if (!response.ok) throw new Error('HTTP error ' + response.status);
-} catch (error) {
-  console.error('Invocation failed:', error);
-}
-```
+## Architecture Guidance
 
-## Concrete Usage Examples
-1. **Deploy a simple Node.js app**: First, build and push your Docker image: `docker build -t gcr.io/my-project/my-app . && docker push gcr.io/my-project/my-app`. Then deploy: `gcloud run deploy my-app --image gcr.io/my-project/my-app --platform managed --region us-central1 --allow-unauthenticated`. Access the app at the provided URL.
+Consult this skill for:
+- GCP service selection and trade-off analysis
+- Cost estimation and optimization (committed use discounts, sustained use)
+- Pre-flight IAM / Workload Identity Federation requirements
+- IaC approach (Terraform AzureRM vs Deployment Manager vs Config Connector)
+- Integration patterns with Google Workspace and other GCP services
+- Vertex AI Agent Engine for multi-agent workflow design
 
-2. **Update a service with environment variables**: If your app needs config changes, run: `gcloud run services update my-app --set-env-vars=API_KEY=$MY_API_KEY --region us-central1`. This updates the service in place without downtime, using the env var for sensitive data.
+## Agent & AI Capabilities
 
-## Graph Relationships
-- Related to cluster: cloud-gcp (e.g., links to gcp-pubsub, gcp-cloud-storage for integrations).
-- Tagged with: gcp, cloud-run, serverless (connects to other serverless skills like aws-lambda in broader ecosystems).
+| Capability | Tool |
+|---|---|
+| LLM agents | Vertex AI Agent Engine |
+| Model serving | Vertex AI Model Garden |
+| RAG | Vertex AI Search + Embeddings API |
+| Multi-agent | Agent Development Kit (google/adk-python) |
+| MCP | Vertex AI Extensions (MCP-compatible) |
+
+## Reference
+
+- [Google Cloud Python Client](https://github.com/googleapis/google-cloud-python)
+- [Vertex AI Python SDK](https://cloud.google.com/vertex-ai/docs/python-sdk/use-vertex-ai-python-sdk)
+- [Google ADK](https://github.com/google/adk-python)
+- [GCP Pricing Calculator](https://cloud.google.com/products/calculator)
+- [IAM Best Practices](https://cloud.google.com/iam/docs/best-practices-for-using-and-securing-service-accounts)
+- [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation)

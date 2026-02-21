@@ -15,87 +15,54 @@ embedding_hint: "gcp storage bucket object file upload download lifecycle"
 
 # gcp-storage
 
-## Purpose
-This skill enables interaction with Google Cloud Storage (GCS) for managing buckets, objects, and access controls, providing scalable data storage solutions via the GCS API or gsutil CLI.
+## Google Cloud Integration
 
-## When to Use
-Use this skill when you need to store, retrieve, or manage large-scale unstructured data in the cloud, such as backing up files, hosting static websites, or handling data lakes. It's ideal for applications requiring durability and global accessibility, like data archiving or media storage, especially within GCP ecosystems.
+This skill delegates all GCP provisioning and operations to the official Google Cloud Python client libraries.
 
-## Key Capabilities
-- Create and delete buckets using GCS API or gsutil.
-- Upload, download, and delete objects with support for resumable transfers.
-- Manage access controls via ACLs or IAM policies.
-- Configure lifecycle policies for automatic object management (e.g., expiration rules).
-- Handle metadata and versioning for objects.
+```bash
+# Core GCP client library
+pip install google-cloud-python
 
-## Usage Patterns
-Always authenticate first by setting the environment variable `GOOGLE_APPLICATION_CREDENTIALS` to the path of your service account JSON key (e.g., `export GOOGLE_APPLICATION_CREDENTIALS="/path/to/key.json"`). Use gsutil for CLI operations or the GCS client library in code. For scripts, wrap operations in try-except blocks to handle transient errors. Start with listing buckets to verify access, then perform actions like uploading files. For API calls, use HTTP requests with OAuth 2.0 tokens obtained via the Google Auth library.
+# Vertex AI + Agent Engine (AI/ML workloads)
+pip install google-cloud-aiplatform
 
-## Common Commands/API
-Use gsutil for quick CLI tasks or the GCS JSON API for programmatic access. Set up authentication via `$GOOGLE_APPLICATION_CREDENTIALS`.
+# Specific service clients (install only what you need)
+pip install google-cloud-bigquery      # BigQuery
+pip install google-cloud-storage       # Cloud Storage
+pip install google-cloud-pubsub        # Pub/Sub
+pip install google-cloud-run           # Cloud Run
+```
 
-- **Create a bucket**:  
-  `gsutil mb gs://my-bucket/`  
-  Or API: POST https://storage.googleapis.com/storage/v1/b?project=my-project with JSON body: {"name": "my-bucket"}
+**SDK Docs:** https://github.com/googleapis/google-cloud-python
+**Vertex AI SDK:** https://cloud.google.com/vertex-ai/docs/python-sdk/use-vertex-ai-python-sdk
 
-- **Upload an object**:  
-  `gsutil cp localfile.txt gs://my-bucket/`  
-  Or in Python:  
-  ```python
-  from google.cloud import storage
-  client = storage.Client()
-  bucket = client.bucket('my-bucket')
-  blob = bucket.blob('localfile.txt')
-  blob.upload_from_filename('localfile.txt')
-  ```
+Use the Google Cloud Python SDK for all GCP provisioning and operational actions. This skill provides architecture guidance, cost modeling, and pre-flight requirements — the SDK handles execution.
 
-- **List objects in a bucket**:  
-  `gsutil ls gs://my-bucket/`  
-  Or API: GET https://storage.googleapis.com/storage/v1/b/my-bucket/o
+## Architecture Guidance
 
-- **Delete an object**:  
-  `gsutil rm gs://my-bucket/object.txt`  
-  Or in Python:  
-  ```python
-  blob = bucket.blob('object.txt')
-  blob.delete()
-  ```
+Consult this skill for:
+- GCP service selection and trade-off analysis
+- Cost estimation and optimization (committed use discounts, sustained use)
+- Pre-flight IAM / Workload Identity Federation requirements
+- IaC approach (Terraform AzureRM vs Deployment Manager vs Config Connector)
+- Integration patterns with Google Workspace and other GCP services
+- Vertex AI Agent Engine for multi-agent workflow design
 
-- **Set ACL for an object**:  
-  `gsutil acl ch -u user@example.com:R gs://my-bucket/object.txt`  
-  Or API: PATCH https://storage.googleapis.com/storage/v1/b/my-bucket/o/object.txt with body: {"acl": [{"entity": "user-user@example.com", "role": "READER"}]}
-  
-Include flags like `-m` for multi-threaded operations (e.g., `gsutil -m cp dir/* gs://my-bucket/`) or `--quiet` to suppress output.
+## Agent & AI Capabilities
 
-## Integration Notes
-Integrate GCS with applications by using the Google Cloud client library in languages like Python or Java. For config, provide a service account key via `$GOOGLE_APPLICATION_CREDENTIALS` or use Application Default Credentials in GCP environments. In Kubernetes, mount the key as a secret and set the env var. For web apps, use signed URLs for temporary access (e.g., generate with `blob.generate_signed_url()`). Ensure your project ID is specified in API calls (e.g., via `storage.Client(project='my-project')`). Avoid hardcoding keys; use IAM roles for secure access.
+| Capability | Tool |
+|---|---|
+| LLM agents | Vertex AI Agent Engine |
+| Model serving | Vertex AI Model Garden |
+| RAG | Vertex AI Search + Embeddings API |
+| Multi-agent | Agent Development Kit (google/adk-python) |
+| MCP | Vertex AI Extensions (MCP-compatible) |
 
-## Error Handling
-Check for common errors like authentication failures (e.g., "401 Unauthorized" – ensure `$GOOGLE_APPLICATION_CREDENTIALS` is set correctly) or bucket not found (e.g., "404" – verify bucket name). Use try-except in code:  
-```python
-try:
-    blob.upload_from_filename('file.txt')
-except google.cloud.exceptions.NotFound:
-    print("Bucket does not exist; create it first.")
-```  
-For CLI, parse output or use `--debug` flag (e.g., `gsutil cp file.txt gs://bucket/ --debug=2`). Handle rate limits with exponential backoff; retry transient errors like 429 using libraries like `tenacity`. Always validate inputs, such as checking if the file exists before uploading.
+## Reference
 
-## Concrete Usage Examples
-1. **Upload a file and set metadata**: First, authenticate with `export GOOGLE_APPLICATION_CREDENTIALS="/path/to/key.json"`. Then, run `gsutil cp localfile.txt gs://my-bucket/` followed by `gsutil setmeta -h "x-goog-meta-key:value" gs://my-bucket/localfile.txt`. In code:  
-   ```python
-   blob = bucket.blob('localfile.txt')
-   blob.metadata = {'key': 'value'}
-   blob.upload_from_filename('localfile.txt')
-   ```
-   This uploads a file and adds custom metadata for tracking.
-
-2. **Manage lifecycle policy**: Create a bucket if needed with `gsutil mb gs://my-lifecycle-bucket/`. Then, apply a policy: `gsutil lifecycle set lifecycle.json gs://my-lifecycle-bucket/` where lifecycle.json is:  
-   ```json
-   {"rule":[{"action":{"type":"Delete"},"condition":{"age":30}}]}
-   ```  
-   This automatically deletes objects older than 30 days. Monitor with `gsutil ls -l gs://my-lifecycle-bucket/` to verify.
-
-## Graph Relationships
-- Related to: cloud-gcp (cluster), as it shares authentication and project contexts.
-- Connected to: gcp-compute (for VM-based data processing), gcp-networking (for VPC access controls).
-- Links with: Other storage skills if available, via shared GCP APIs.
+- [Google Cloud Python Client](https://github.com/googleapis/google-cloud-python)
+- [Vertex AI Python SDK](https://cloud.google.com/vertex-ai/docs/python-sdk/use-vertex-ai-python-sdk)
+- [Google ADK](https://github.com/google/adk-python)
+- [GCP Pricing Calculator](https://cloud.google.com/products/calculator)
+- [IAM Best Practices](https://cloud.google.com/iam/docs/best-practices-for-using-and-securing-service-accounts)
+- [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation)
