@@ -443,7 +443,7 @@ your memory. Read them. Update them...
 <section id="metrics">
   <div class="section-label">Performance</div>
   <h2>Measured on Apple Silicon Mac mini</h2>
-  <p>Node.js v22.22.0 · LadybugDB 0.14.3 · 322 skills fully enriched + embedded · macOS 15.3 arm64 · Feb 2026</p>
+  <p>Node.js v22.22.0 · LadybugDB 0.14.3 · 322 skills + 322/322 embeddings · macOS 15.3 arm64 · Feb 2026 · 10 runs each</p>
 
   <div class="metrics-grid">
     <div class="metric-card">
@@ -451,7 +451,7 @@ your memory. Read them. Update them...
       <div class="metric-label">Workspace stub compression<br>(~13,800 → 604 bytes, 4 files)</div>
     </div>
     <div class="metric-card">
-      <div class="metric-big purple">0.4ms</div>
+      <div class="metric-big purple">0.17ms</div>
       <div class="metric-label">Skill text search — cold<br>(322 nodes, no cache)</div>
     </div>
     <div class="metric-card">
@@ -459,7 +459,7 @@ your memory. Read them. Update them...
       <div class="metric-label">Cached query latency<br>(60s TTL, in-process Map)</div>
     </div>
     <div class="metric-card">
-      <div class="metric-big purple">0.6ms</div>
+      <div class="metric-big purple">0.26ms</div>
       <div class="metric-label">Workspace load — cold<br>(Soul / Memory / Tools)</div>
     </div>
     <div class="metric-card">
@@ -467,8 +467,8 @@ your memory. Read them. Update them...
       <div class="metric-label">Tokens saved per session<br>(workspace + skill bodies)</div>
     </div>
     <div class="metric-card">
-      <div class="metric-big red">21 MB</div>
-      <div class="metric-label">Full DB on disk<br>(322 skills + embeddings + workspace)</div>
+      <div class="metric-big red">64 MB</div>
+      <div class="metric-label">Full DB on disk<br>(322 skills + 1536d embeddings + workspace)</div>
     </div>
   </div>
 
