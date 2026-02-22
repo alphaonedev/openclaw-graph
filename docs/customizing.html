@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customizing Your Workspace — openclaw-graph</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --bg2: #13161f;
+      --bg3: #1a1d28;
+      --border: #252836;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --accent3: #ff6b6b;
+      --text: #e8eaf0;
+      --text2: #9a9db0;
+      --code-bg: #0a0c10;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; line-height: 1.6; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: rgba(13,15,20,0.95);
+      backdrop-filter: blur(8px); z-index: 100;
+    }
+    .nav-brand { font-weight: 700; font-size: 1.1rem; color: var(--text); }
+    .nav-brand span { color: var(--accent); }
+    .nav-links { display: flex; gap: 1.5rem; font-size: 0.9rem; color: var(--text2); flex-wrap: wrap; }
+    .nav-links a { color: var(--text2); }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .nav-links a.active { color: var(--accent); font-weight: 600; }
+    .btn { background: var(--accent); color: white; padding: 0.4rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
+    .btn:hover { text-decoration: none; opacity: 0.9; }
+
+    .doc-hero {
+      text-align: center; padding: 3.5rem 1rem 2.5rem;
+      background: radial-gradient(ellipse at 50% 0%, rgba(255,107,107,0.08) 0%, transparent 70%);
+      border-bottom: 1px solid var(--border);
+    }
+    .doc-hero h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 0.5rem; }
+    .doc-hero h1 span { color: var(--accent3); }
+    .doc-hero p { color: var(--text2); font-size: 1.05rem; max-width: 600px; margin: 0 auto; }
+
+    .doc-layout { display: flex; max-width: 1200px; margin: 0 auto; min-height: calc(100vh - 200px); }
+
+    .doc-sidebar {
+      width: 260px; min-width: 260px; padding: 2rem 1.5rem; border-right: 1px solid var(--border);
+      position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto;
+    }
+    .doc-sidebar h4 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text2); margin-bottom: 0.75rem; }
+    .doc-sidebar a {
+      display: block; padding: 0.35rem 0.75rem; margin-bottom: 0.15rem; font-size: 0.85rem;
+      color: var(--text2); border-radius: 6px; transition: all 0.15s;
+    }
+    .doc-sidebar a:hover { color: var(--text); background: var(--bg3); text-decoration: none; }
+    .doc-sidebar hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+
+    .doc-content { flex: 1; padding: 3rem 3rem 5rem; max-width: 860px; overflow-x: hidden; }
+    @media (max-width: 900px) {
+      .doc-layout { flex-direction: column; }
+      .doc-sidebar { width: 100%; min-width: 100%; position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+      .doc-content { padding: 2rem 1.25rem 4rem; }
+    }
+
+    .doc-content h2 {
+      font-size: 1.6rem; font-weight: 700; margin: 3rem 0 1rem; padding-top: 1rem;
+      border-top: 1px solid var(--border); color: var(--text);
+    }
+    .doc-content h2:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+    .doc-content h3 { font-size: 1.15rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .doc-content p { color: var(--text2); margin-bottom: 1rem; line-height: 1.75; }
+    .doc-content strong { color: var(--text); }
+    .doc-content ul, .doc-content ol { color: var(--text2); margin: 0.5rem 0 1rem 1.5rem; line-height: 1.8; }
+    .doc-content li { margin-bottom: 0.25rem; }
+
+    .doc-content table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: 0.88rem; }
+    .doc-content th {
+      text-align: left; padding: 0.6rem 0.75rem; background: var(--bg3);
+      border: 1px solid var(--border); font-weight: 600; color: var(--text); font-size: 0.82rem;
+      text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .doc-content td { padding: 0.5rem 0.75rem; border: 1px solid var(--border); color: var(--text2); }
+    .doc-content td code {
+      background: rgba(108,99,255,0.12); color: var(--accent); padding: 0.1rem 0.35rem;
+      border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+    }
+
+    .code-block {
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 1.25rem 1.5rem; margin: 1rem 0 1.5rem; overflow-x: auto;
+    }
+    .code-block pre {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; line-height: 1.7; color: var(--text);
+      white-space: pre; word-wrap: normal;
+    }
+    .code-block .comment { color: #525570; }
+    .code-block .keyword { color: #c792ea; }
+    .code-block .string { color: #c3e88d; }
+    .code-block .fn { color: #82aaff; }
+
+    code {
+      background: rgba(108,99,255,0.12); color: var(--accent); padding: 0.1rem 0.35rem;
+      border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 0.88em;
+    }
+
+    .callout {
+      background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid var(--accent2);
+      border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0 1.5rem; font-size: 0.9rem;
+    }
+    .callout p { margin-bottom: 0; }
+    .callout.warn { border-left-color: var(--accent3); }
+
+    .step-header {
+      display: flex; align-items: center; gap: 0.75rem; margin: 3rem 0 1rem; padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .step-header:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+    .step-num {
+      width: 36px; height: 36px; min-width: 36px; background: var(--accent); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+      font-size: 0.9rem; color: white;
+    }
+    .step-header h2 { font-size: 1.6rem; font-weight: 700; color: var(--text); margin: 0; padding: 0; border: none; }
+
+    .node-badge {
+      display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.3px;
+    }
+    .node-badge.soul { background: rgba(108,99,255,0.15); color: var(--accent); }
+    .node-badge.memory { background: rgba(0,212,170,0.15); color: var(--accent2); }
+    .node-badge.config { background: rgba(255,107,107,0.15); color: var(--accent3); }
+    .node-badge.tool { background: rgba(255,183,77,0.15); color: #ffb74d; }
+
+    footer {
+      text-align: center; padding: 2rem; font-size: 0.82rem; color: var(--text2);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-brand" style="text-decoration:none;">openclaw<span>-graph</span></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="admin-guide.html">Admin Guide</a>
+    <a href="user-guide.html">User Guide</a>
+    <a href="customizing.html" class="active">Customize</a>
+    <a href="skills.html">Skills</a>
+    <a href="https://github.com/alphaonedev/openclaw-graph" class="btn">GitHub</a>
+  </div>
+</nav>
+
+<div class="doc-hero">
+  <h1><span>Customize</span> Your Workspace</h1>
+  <p>Personalize identity, memory, tools, and agent behavior &mdash; step by step.</p>
+</div>
+
+<div class="doc-layout">
+  <aside class="doc-sidebar">
+    <h4>Overview</h4>
+    <a href="#whats-included">What ships in the DB</a>
+    <hr>
+    <h4>Steps</h4>
+    <a href="#step-1">1. Verify defaults</a>
+    <a href="#step-2">2. Update identity</a>
+    <a href="#step-3">3. Principal &amp; Infrastructure</a>
+    <a href="#step-4">4. Add memory domains</a>
+    <a href="#step-5">5. Restrict or expand tools</a>
+    <hr>
+    <h4>Advanced</h4>
+    <a href="#fleet">Multiple workspaces</a>
+    <a href="#forking">Fork the seed script</a>
+    <a href="#upgrades">Surviving upgrades</a>
+    <a href="#node-ids">Node ID reference</a>
+  </aside>
+
+  <main class="doc-content">
+
+    <!-- WHAT SHIPS -->
+    <h2 id="whats-included">What ships in the DB</h2>
+    <p>Every v1.2+ release includes these <code>workspace='openclaw'</code> nodes out of the box:</p>
+    <table>
+      <tr><th>Table</th><th>Nodes</th><th>What's there</th></tr>
+      <tr><td><span class="node-badge soul">Soul</span></td><td>4</td><td>Prime Directive &middot; Identity (placeholder) &middot; Safety &middot; Heartbeat Protocol</td></tr>
+      <tr><td><span class="node-badge memory">Memory</span></td><td>2</td><td>Principal (placeholder) &middot; Infrastructure (placeholder)</td></tr>
+      <tr><td><span class="node-badge config">AgentConfig</span></td><td>9</td><td>Every Session &middot; Delegation &middot; Safety &middot; Heartbeats &middot; Memory &middot; TOON &middot; Search Resilience &middot; Schema Rules &middot; Path Aliases</td></tr>
+      <tr><td><span class="node-badge tool">Tool</span></td><td>26</td><td>All standard OpenClaw tools &middot; <code>sessions_spawn=true</code></td></tr>
+      <tr><td>QueryMetrics</td><td>0</td><td>Schema only &mdash; populated automatically by workspace.ts</td></tr>
+    </table>
+    <div class="callout"><p>These work out of the box. The placeholders tell you exactly what to fill in.</p></div>
+
+    <!-- STEP 1 -->
+    <div class="step-header" id="step-1">
+      <div class="step-num">1</div>
+      <h2>Verify the defaults loaded</h2>
+    </div>
+    <div class="code-block"><pre>node ladybugdb/scripts/query.js --cypher \
+  <span class="string">"MATCH (s:Soul {workspace:'openclaw'}) RETURN s.section, s.priority ORDER BY s.priority"</span>
+
+node ladybugdb/scripts/query.js --cypher \
+  <span class="string">"MATCH (a:AgentConfig {workspace:'openclaw'}) RETURN a.key ORDER BY a.id"</span></pre></div>
+    <p>You should see 4 Soul sections and 9 AgentConfig keys. If not, run <code>node ladybugdb/scripts/seed-default-workspace.mjs</code> to seed them.</p>
+
+    <!-- STEP 2 -->
+    <div class="step-header" id="step-2">
+      <div class="step-num">2</div>
+      <h2>Update your Identity</h2>
+    </div>
+    <p>The Identity soul node ships as a placeholder. Replace it with your agent's name and role:</p>
+    <div class="code-block"><pre>node ladybugdb/scripts/query.js --cypher \
+  <span class="string">"MATCH (s:Soul {id:'soul-openclaw-identity'}) \
+   SET s.content = 'Name: Aria | Role: DevOps automation agent | Emoji: &#x1f6e1;&#xfe0f; | Workspace: openclaw'"</span></pre></div>
+
+    <!-- STEP 3 -->
+    <div class="step-header" id="step-3">
+      <div class="step-num">3</div>
+      <h2>Fill in your Principal and Infrastructure</h2>
+    </div>
+    <p>These Memory nodes tell the agent who it works for and what environment it operates in.</p>
+    <div class="code-block"><pre><span class="comment"># Principal &mdash; who you're helping</span>
+node ladybugdb/scripts/query.js --cypher \
+  <span class="string">"MATCH (m:Memory {id:'mem-openclaw-principal'}) \
+   SET m.content = 'Name: Alice | Timezone: America/Chicago | Channel: signal | UUID: uuid:...'"</span>
+
+<span class="comment"># Infrastructure &mdash; your environment facts</span>
+node ladybugdb/scripts/query.js --cypher \
+  <span class="string">"MATCH (m:Memory {id:'mem-openclaw-infrastructure'}) \
+   SET m.content = 'DB: ~/myapp/ladybugdb/db/alphaone-skills.db | Node: /usr/local/bin/node | Workspace: ~/.openclaw/workspace/'"</span></pre></div>
+
+    <!-- STEP 4 -->
+    <div class="step-header" id="step-4">
+      <div class="step-num">4</div>
+      <h2>Add more Memory domains</h2>
+    </div>
+    <p>Create additional memory nodes for any factual context your agent needs:</p>
+    <div class="code-block"><pre>node ladybugdb/scripts/query.js --cypher \
+  <span class="string">"CREATE (m:Memory {
+     id: 'mem-openclaw-api-keys',
+     workspace: 'openclaw',
+     domain: 'API Keys',
+     content: 'Brave Search: \$BRAVE_API_KEY | xAI: \$XAI_API_KEY (env vars in shell profile)',
+     timestamp: '2026-01-01'
+   })"</span></pre></div>
+    <div class="callout"><p>Store API keys as <strong>environment variable references</strong>, not raw values. The agent reads them from the shell at runtime.</p></div>
+
+    <!-- STEP 5 -->
+    <div class="step-header" id="step-5">
+      <div class="step-num">5</div>
+      <h2>Restrict or expand tools</h2>
+    </div>
+    <p>Disable tools to create a restricted agent, or re-enable them for a capable one:</p>
+    <div class="code-block"><pre><span class="comment"># Disable sub-agent delegation for a restricted agent</span>
+node ladybugdb/scripts/query.js --cypher \
+  <span class="string">"MATCH (t:Tool {id:'tool-sessions-spawn'}) SET t.available = false, t.notes = 'BLOCKED &mdash; standalone agent'"</span>
+
+<span class="comment"># Re-enable it</span>
+node ladybugdb/scripts/query.js --cypher \
+  <span class="string">"MATCH (t:Tool {id:'tool-sessions-spawn'}) SET t.available = true"</span></pre></div>
+
+    <!-- FLEET -->
+    <h2 id="fleet">Running multiple workspaces (fleet setup)</h2>
+    <p>For an 8-agent fleet, give each agent its own workspace ID:</p>
+    <div class="code-block"><pre><span class="comment"># Seed separate workspaces from the default template</span>
+node ladybugdb/scripts/seed-default-workspace.mjs --workspace intel-agent
+node ladybugdb/scripts/seed-default-workspace.mjs --workspace code-agent
+node ladybugdb/scripts/seed-default-workspace.mjs --workspace ops-agent
+
+<span class="comment"># Each agent's workspace stubs point to its own workspace</span>
+<span class="comment"># ~/.openclaw/workspace-intel/SOUL.md:</span>
+<span class="comment">#   &lt;!-- GRAPH: MATCH (s:Soul) WHERE s.workspace = 'intel-agent' ... --&gt;</span></pre></div>
+    <p>See <a href="admin-guide.html#fleet">Fleet Management</a> in the Admin Guide for the full topology and per-workspace tool overrides.</p>
+
+    <!-- FORKING -->
+    <h2 id="forking">Forking the seed script</h2>
+    <p>For full control, fork <code>seed-default-workspace.mjs</code>:</p>
+    <div class="code-block"><pre>cp ladybugdb/scripts/seed-default-workspace.mjs ladybugdb/scripts/seed-myagent.mjs</pre></div>
+    <p>Edit the <code>SOUL</code>, <code>MEMORY</code>, <code>AGENT_CONFIG</code>, and <code>TOOLS</code> arrays at the top of the file, then:</p>
+    <div class="code-block"><pre>node ladybugdb/scripts/seed-myagent.mjs --workspace myagent --reset</pre></div>
+    <div class="callout warn"><p><code>--reset</code> drops and recreates the tables before seeding &mdash; use for a clean slate. Existing workspace nodes will be deleted.</p></div>
+
+    <!-- UPGRADES -->
+    <h2 id="upgrades">Keeping your customizations across DB upgrades</h2>
+    <p>When you upgrade to a new LadybugDB release (<code>install.sh</code>), the DB is <strong>replaced</strong>. Your workspace nodes live in the DB, so they'll be gone.</p>
+    <p>Two strategies:</p>
+    <ol>
+      <li><strong>Re-run your seed script after upgrade</strong> &mdash; keeps everything reproducible (recommended)</li>
+      <li><strong>Dump your workspace nodes before upgrading:</strong></li>
+    </ol>
+    <div class="code-block"><pre>node ladybugdb/scripts/query.js --cypher \
+  <span class="string">"MATCH (s:Soul {workspace:'openclaw'}) RETURN s.id, s.section, s.content, s.priority"</span> \
+  &gt; my-workspace-backup.json</pre></div>
+    <p>See <a href="admin-guide.html#upgrading">Upgrading</a> in the Admin Guide for the full workflow.</p>
+
+    <!-- NODE IDS -->
+    <h2 id="node-ids">Quick reference &mdash; node IDs shipped in default workspace</h2>
+    <table>
+      <tr><th>ID</th><th>Type</th><th>Section / Domain / Key</th></tr>
+      <tr><td><code>soul-openclaw-prime-directive</code></td><td><span class="node-badge soul">Soul</span></td><td>Prime Directive</td></tr>
+      <tr><td><code>soul-openclaw-identity</code></td><td><span class="node-badge soul">Soul</span></td><td>Identity</td></tr>
+      <tr><td><code>soul-openclaw-safety</code></td><td><span class="node-badge soul">Soul</span></td><td>Safety</td></tr>
+      <tr><td><code>soul-openclaw-heartbeat</code></td><td><span class="node-badge soul">Soul</span></td><td>Heartbeat Protocol</td></tr>
+      <tr><td><code>mem-openclaw-principal</code></td><td><span class="node-badge memory">Memory</span></td><td>Principal</td></tr>
+      <tr><td><code>mem-openclaw-infrastructure</code></td><td><span class="node-badge memory">Memory</span></td><td>Infrastructure</td></tr>
+      <tr><td><code>agentcfg-openclaw-every-session</code></td><td><span class="node-badge config">Config</span></td><td>Every Session</td></tr>
+      <tr><td><code>agentcfg-openclaw-delegation</code></td><td><span class="node-badge config">Config</span></td><td>Delegation</td></tr>
+      <tr><td><code>agentcfg-openclaw-safety</code></td><td><span class="node-badge config">Config</span></td><td>Safety</td></tr>
+      <tr><td><code>agentcfg-openclaw-heartbeats</code></td><td><span class="node-badge config">Config</span></td><td>Heartbeats</td></tr>
+      <tr><td><code>agentcfg-openclaw-memory</code></td><td><span class="node-badge config">Config</span></td><td>Memory</td></tr>
+      <tr><td><code>agentcfg-openclaw-toon</code></td><td><span class="node-badge config">Config</span></td><td>Token Optimization &mdash; TOON</td></tr>
+      <tr><td><code>agentcfg-openclaw-search-resilience</code></td><td><span class="node-badge config">Config</span></td><td>Search Resilience</td></tr>
+      <tr><td><code>agentcfg-openclaw-schema-rules</code></td><td><span class="node-badge config">Config</span></td><td>Schema Rules</td></tr>
+      <tr><td><code>agentcfg-openclaw-path-aliases</code></td><td><span class="node-badge config">Config</span></td><td>Path Aliases</td></tr>
+      <tr><td><code>tool-sessions-spawn</code></td><td><span class="node-badge tool">Tool</span></td><td>sessions_spawn (available=true)</td></tr>
+      <tr><td colspan="3" style="text-align:center; color:var(--text2); font-style:italic;">+ 25 other tool-* nodes &mdash; all standard OpenClaw tools</td></tr>
+    </table>
+
+  </main>
+</div>
+
+<footer>
+  openclaw-graph v1.2 &middot; MIT License &middot;
+  <a href="index.html">Home</a> &middot;
+  <a href="admin-guide.html">Admin Guide</a> &middot;
+  <a href="user-guide.html">User Guide</a> &middot;
+  <a href="https://github.com/alphaonedev/openclaw-graph">GitHub</a>
+</footer>
+
+</body>
+</html>
