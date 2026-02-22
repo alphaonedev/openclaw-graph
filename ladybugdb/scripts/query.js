@@ -3,8 +3,6 @@
  * Usage:
  *   node query.js "build a SwiftUI watchOS app"
  *   node query.js --skill cloudflare --hops 2
- *   node query.js --cluster redteam
- *   node query.js --cypher "MATCH (s:Skill {cluster: 'redteam'}) RETURN s.name, s.description"
  *   node query.js --stats
  */
 import { Database, Connection } from 'lbug';

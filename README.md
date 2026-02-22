@@ -214,7 +214,6 @@ export OPENCLAW_GRAPH_QUERY_SCRIPT=/path/to/openclaw-graph/ladybugdb/scripts/que
 | core-openclaw | 8 | OpenClaw skills, memory, compaction |
 | testing | 8 | Unit, integration, E2E, TDD |
 | ai-apis | 8 | OpenAI, Anthropic, xAI, Google AI |
-| redteam | 7 | 🔒 Auth-required offensive security |
 | existing | 6 | Existing OpenClaw built-in skills |
 | abtesting | 6 | Experimentation, feature flags |
 | linux | 5 | Shell, systemd, package management |
