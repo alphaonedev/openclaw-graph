@@ -27,8 +27,8 @@ NODE_BIN="${NODE_BIN:-node}"
 GITHUB_BASE="https://github.com/${REPO}/releases/download"
 
 # SHA256 checksums — updated each release
-LITE_SHA256="92b25e27d3c365e903fb0f4c3a7d4020d6b42f1bf1f9c3489865a32a6ece5a76"
-FULL_SHA256="00550e0cc9ba603f686b3b96f500bb0f42791b579ca339f179bcec58ce22f896"
+LITE_SHA256="2aeb2461e7cfdfa1ba48ed9fb8eeca1b170c53a0ffa5046b3bedd5cab5229e43"
+FULL_SHA256="1c663cece30175f680486f5875ad58d9c01ba58f239be0b83605793d6487745b"
 # ─────────────────────────────────────────────────────────────
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
@@ -121,7 +121,7 @@ fi
 if [ -z "$MODE" ]; then
   header "Choose database tier:"
   echo ""
-  echo "  [1] Lite  — 323 skills + 1536d embeddings             (~10 MB)"
+  echo "  [1] Lite  — 316 skills + 1536d embeddings             (~10 MB)"
   echo "  [2] Full  — Lite + 787 DevDocs docsets (~620k entries) (~500 MB)"
   echo ""
   read -rp "  Choice [1/2]: " CHOICE
