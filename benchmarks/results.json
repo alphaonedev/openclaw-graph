@@ -1,34 +1,160 @@
 {
   "run_date": "2026-02-22",
-  "run_time": "00:25 EST",
+  "run_time": "11:46 EST",
   "host": "Mac mini (Apple M-series, 32 GB RAM)",
   "db_path": "~/Downloads/alphaone-openclaw/ladybugdb/db/alphaone-skills.db",
   "db_stats": {
     "skill_nodes": 316,
     "clusters": 27,
     "reference_nodes": 545072,
-    "docsets": 718,
-    "soul_nodes": 20,
-    "memory_nodes": 5,
-    "agent_config_nodes": 6,
-    "tool_nodes": 25,
+    "docsets": 716,
+    "soul_nodes": 4,
+    "memory_nodes": 2,
+    "agent_config_nodes": 9,
+    "tool_nodes": 26,
     "query_metrics_nodes": 0
   },
   "results": [
-    { "label": "PK lookup — skill by id (warm)", "avg": 0.15, "p50": 0.15, "p95": 0.24, "min": 0.12, "max": 0.24, "iters": 20, "unit": "ms" },
-    { "label": "Cluster scan — devops-sre (10 skills)", "avg": 0.25, "p50": 0.25, "p95": 0.27, "min": 0.23, "max": 0.27, "iters": 20, "unit": "ms" },
-    { "label": "Full skill scan — 316 nodes", "avg": 2.19, "p50": 2.19, "p95": 2.32, "min": 2.10, "max": 2.32, "iters": 10, "unit": "ms" },
-    { "label": "Soul workspace query — default (15 nodes)", "avg": 0.47, "p50": 0.47, "p95": 0.53, "min": 0.42, "max": 0.53, "iters": 20, "unit": "ms" },
-    { "label": "Memory query — default (5 nodes)", "avg": 0.17, "p50": 0.17, "p95": 0.23, "min": 0.14, "max": 0.23, "iters": 20, "unit": "ms" },
-    { "label": "AgentConfig — default AGENTS.md hot path (6 nodes)", "avg": 0.26, "p50": 0.26, "p95": 0.31, "min": 0.22, "max": 0.31, "iters": 20, "unit": "ms" },
-    { "label": "Tool query — TOOLS.md hot path (25 nodes)", "avg": 0.38, "p50": 0.38, "p95": 0.52, "min": 0.33, "max": 0.52, "iters": 20, "unit": "ms" },
-    { "label": "Reference PK lookup (single node, 545k table)", "avg": 0.11, "p50": 0.11, "p95": 0.13, "min": 0.09, "max": 0.13, "iters": 20, "unit": "ms" },
-    { "label": "Reference count aggregate (545k nodes)", "avg": 0.26, "p50": 0.26, "p95": 0.29, "min": 0.24, "max": 0.29, "iters": 5, "unit": "ms" },
-    { "label": "Reference source scan — javascript (~12k nodes)", "avg": 1.35, "p50": 1.36, "p95": 1.40, "min": 1.32, "max": 1.40, "iters": 5, "unit": "ms" },
-    { "label": "CLI — text search (subprocess, cold)", "avg": 94.29, "p50": 89.89, "p95": 103.11, "min": 89.87, "max": 103.11, "iters": 3, "unit": "ms" },
-    { "label": "CLI — workspace AGENTS.md (subprocess)", "avg": 84.36, "p50": 84.35, "p95": 84.52, "min": 84.25, "max": 84.52, "iters": 5, "unit": "ms" },
-    { "label": "CLI — workspace TOOLS.md (subprocess)", "avg": 85.01, "p50": 84.57, "p95": 88.68, "min": 83.04, "max": 88.68, "iters": 5, "unit": "ms" },
-    { "label": "CLI — workspace Soul default (subprocess)", "avg": 83.23, "p50": 83.25, "p95": 84.04, "min": 82.46, "max": 84.04, "iters": 5, "unit": "ms" }
+    {
+      "label": "PK lookup — skill by id (warm)",
+      "avg": 0.18,
+      "p50": 0.14,
+      "p95": 0.44,
+      "min": 0.12,
+      "max": 0.46,
+      "iters": 20,
+      "unit": "ms"
+    },
+    {
+      "label": "Cluster scan — devops-sre (10 skills)",
+      "avg": 0.23,
+      "p50": 0.22,
+      "p95": 0.25,
+      "min": 0.2,
+      "max": 0.25,
+      "iters": 20,
+      "unit": "ms"
+    },
+    {
+      "label": "Full skill scan — 316 nodes",
+      "avg": 2.02,
+      "p50": 1.94,
+      "p95": 2.26,
+      "min": 1.83,
+      "max": 2.26,
+      "iters": 10,
+      "unit": "ms"
+    },
+    {
+      "label": "Soul workspace query — default (4 nodes)",
+      "avg": 0.3,
+      "p50": 0.26,
+      "p95": 0.5,
+      "min": 0.2,
+      "max": 0.67,
+      "iters": 20,
+      "unit": "ms"
+    },
+    {
+      "label": "Memory query — default (2 nodes)",
+      "avg": 0.16,
+      "p50": 0.16,
+      "p95": 0.17,
+      "min": 0.14,
+      "max": 0.18,
+      "iters": 20,
+      "unit": "ms"
+    },
+    {
+      "label": "AgentConfig — default AGENTS.md hot path (9 nodes)",
+      "avg": 0.33,
+      "p50": 0.29,
+      "p95": 0.41,
+      "min": 0.26,
+      "max": 0.67,
+      "iters": 20,
+      "unit": "ms"
+    },
+    {
+      "label": "Tool query — TOOLS.md hot path (26 nodes)",
+      "avg": 0.41,
+      "p50": 0.38,
+      "p95": 0.55,
+      "min": 0.3,
+      "max": 0.66,
+      "iters": 20,
+      "unit": "ms"
+    },
+    {
+      "label": "Reference PK lookup (single node, 545k table)",
+      "avg": 0.11,
+      "p50": 0.11,
+      "p95": 0.13,
+      "min": 0.1,
+      "max": 0.14,
+      "iters": 20,
+      "unit": "ms"
+    },
+    {
+      "label": "Reference count aggregate (545k nodes)",
+      "avg": 0.25,
+      "p50": 0.26,
+      "p95": 0.26,
+      "min": 0.25,
+      "max": 0.26,
+      "iters": 5,
+      "unit": "ms"
+    },
+    {
+      "label": "Reference source scan — javascript (~12k nodes)",
+      "avg": 13.41,
+      "p50": 13.25,
+      "p95": 14.16,
+      "min": 13.08,
+      "max": 14.16,
+      "iters": 5,
+      "unit": "ms"
+    },
+    {
+      "label": "CLI — text search (subprocess, cold)",
+      "avg": 110.62,
+      "p50": 111.06,
+      "p95": 112.49,
+      "min": 108.31,
+      "max": 112.49,
+      "iters": 3,
+      "unit": "ms"
+    },
+    {
+      "label": "CLI — workspace AGENTS.md (subprocess)",
+      "avg": 127.05,
+      "p50": 107.79,
+      "p95": 209.2,
+      "min": 102.8,
+      "max": 209.2,
+      "iters": 5,
+      "unit": "ms"
+    },
+    {
+      "label": "CLI — workspace TOOLS.md (subprocess)",
+      "avg": 106.08,
+      "p50": 105.73,
+      "p95": 110.83,
+      "min": 101,
+      "max": 110.83,
+      "iters": 5,
+      "unit": "ms"
+    },
+    {
+      "label": "CLI — workspace Soul default (subprocess)",
+      "avg": 103.96,
+      "p50": 103.96,
+      "p95": 107.06,
+      "min": 99.99,
+      "max": 107.06,
+      "iters": 5,
+      "unit": "ms"
+    }
   ],
   "notes": "In-process queries use lbug embedded engine (KuzuDB). CLI subprocess benchmarks represent workspace.ts GRAPH directive resolution cost (execFileAsync). 60s adaptive TTL cache means CLI cost is paid at most once per minute per unique Cypher query."
 }

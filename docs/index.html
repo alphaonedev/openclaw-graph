@@ -548,23 +548,23 @@ matters. Not a corporate drone...
       <div class="metric-label">Reference PK lookup<br><span style="font-size:0.72rem; opacity:0.7;">single row from 545,072-node table</span></div>
     </div>
     <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
-      <div class="metric-big green">0.15ms</div>
+      <div class="metric-big green">0.18ms</div>
       <div class="metric-label">Skill PK lookup<br><span style="font-size:0.72rem; opacity:0.7;">warm in-process, 316-skill corpus</span></div>
     </div>
     <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
-      <div class="metric-big green">0.26ms</div>
+      <div class="metric-big green">0.33ms</div>
       <div class="metric-label">AGENTS.md hot path<br><span style="font-size:0.72rem; opacity:0.7;">9-node AgentConfig result set</span></div>
     </div>
     <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
-      <div class="metric-big green">0.38ms</div>
-      <div class="metric-label">TOOLS.md hot path<br><span style="font-size:0.72rem; opacity:0.7;">25-node Tool result set</span></div>
+      <div class="metric-big green">0.41ms</div>
+      <div class="metric-label">TOOLS.md hot path<br><span style="font-size:0.72rem; opacity:0.7;">26-node Tool result set</span></div>
     </div>
     <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
-      <div class="metric-big green">0.26ms</div>
+      <div class="metric-big green">0.25ms</div>
       <div class="metric-label">Reference count aggregate<br><span style="font-size:0.72rem; opacity:0.7;">COUNT(*) over 545k nodes</span></div>
     </div>
     <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
-      <div class="metric-big green">2.19ms</div>
+      <div class="metric-big green">2.02ms</div>
       <div class="metric-label">Full skill scan<br><span style="font-size:0.72rem; opacity:0.7;">all 316 nodes, no filter</span></div>
     </div>
   </div>
@@ -572,18 +572,18 @@ matters. Not a corporate drone...
   <!-- Two-tier story -->
   <div style="margin-top:2rem; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.75rem;">
     <h3 style="font-size:0.95rem; font-weight:700; margin-bottom:0.75rem;">Two tiers: DB query vs. CLI subprocess startup</h3>
-    <p style="font-size:0.88rem; margin-bottom:1.25rem; color:var(--text2);">The 84ms CLI number is <strong>Node.js process launch + lbug init</strong> — not the query itself. In-process, the same query costs 0.26ms. The cache pays the subprocess tax once per TTL window, then serves 0ms hits.</p>
+    <p style="font-size:0.88rem; margin-bottom:1.25rem; color:var(--text2);">The ~104ms CLI number is <strong>Node.js process launch + lbug init</strong> — not the query itself. In-process, the same query costs 0.33ms. The cache pays the subprocess tax once per TTL window, then serves 0ms hits.</p>
 
     <div class="compare" style="margin-top:0;">
       <div class="compare-card">
         <div class="compare-header before" style="background:rgba(108,99,255,0.1); color:var(--accent);">First load — CLI subprocess (once per TTL)</div>
         <div class="compare-body">
 <pre style="color:var(--text2);">node query.js --cypher "..."
-├── Node.js init ......... ~60ms
-├── lbug open ............ ~20ms
+├── Node.js init ......... ~70ms
+├── lbug open ............ ~25ms
 └── query execute ........ ~0.3ms
                           ────────
-total                      ~84ms
+total                     ~104ms
 
 → result cached in graphQueryCache</pre>
         </div>
@@ -650,61 +650,61 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
             <td style="padding:0.45rem 0.75rem; color:var(--text);">Reference PK lookup (single, 545k table)</td>
             <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.11ms</td>
             <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.13ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.09ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.10ms</td>
           </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
             <td style="padding:0.45rem 0.75rem; color:var(--text);">Skill PK lookup (warm)</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.15ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.24ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.18ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.44ms</td>
             <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.12ms</td>
           </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
-            <td style="padding:0.45rem 0.75rem; color:var(--text);">Memory query — 5 nodes</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.17ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.23ms</td>
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">Memory query — 2 nodes</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.16ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.17ms</td>
             <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.14ms</td>
           </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
             <td style="padding:0.45rem 0.75rem; color:var(--text);">Reference count aggregate (545k nodes)</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.26ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.29ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.24ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.25ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.26ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.25ms</td>
           </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
             <td style="padding:0.45rem 0.75rem; color:var(--text);">AgentConfig — AGENTS.md hot path (9 nodes)</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.26ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.31ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.22ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.33ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.41ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.26ms</td>
           </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
-            <td style="padding:0.45rem 0.75rem; color:var(--text);">Tool query — TOOLS.md hot path (25 nodes)</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.38ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.52ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.33ms</td>
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">Tool query — TOOLS.md hot path (26 nodes)</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.41ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.55ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.30ms</td>
           </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
-            <td style="padding:0.45rem 0.75rem; color:var(--text);">Soul workspace query — 15 nodes</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.47ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.53ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.42ms</td>
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">Soul workspace query — 4 nodes</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.30ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.50ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.20ms</td>
           </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
             <td style="padding:0.45rem 0.75rem; color:var(--text);">Cluster scan — 10 skills</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.25ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.27ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.23ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.23ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.25ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.20ms</td>
           </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
             <td style="padding:0.45rem 0.75rem; color:var(--text);">Reference source scan — ~12k nodes</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">1.35ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">1.40ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">1.32ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">13.41ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">14.16ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">13.08ms</td>
           </tr>
           <tr>
             <td style="padding:0.45rem 0.75rem; color:var(--text);">Full skill scan — all 316 nodes</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">2.19ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">2.32ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">2.10ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">2.02ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">2.26ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">1.83ms</td>
           </tr>
         </tbody>
       </table>
@@ -724,27 +724,27 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
         <tbody>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
             <td style="padding:0.45rem 0.75rem; color:var(--text);">GRAPH directive — AGENTS.md</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">84ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">85ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">84ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">127ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">209ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">103ms</td>
           </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
             <td style="padding:0.45rem 0.75rem; color:var(--text);">GRAPH directive — TOOLS.md</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">85ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">89ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">83ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">106ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">111ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">101ms</td>
           </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
             <td style="padding:0.45rem 0.75rem; color:var(--text);">GRAPH directive — Soul/Memory</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">83ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">84ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">82ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">104ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">107ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">100ms</td>
           </tr>
           <tr>
             <td style="padding:0.45rem 0.75rem; color:var(--text);">Text search (cold process)</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">94ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">103ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">90ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">111ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">112ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">108ms</td>
           </tr>
         </tbody>
       </table>

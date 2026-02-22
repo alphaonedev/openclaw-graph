@@ -27,8 +27,8 @@ NODE_BIN="${NODE_BIN:-node}"
 GITHUB_BASE="https://github.com/${REPO}/releases/download"
 
 # SHA256 checksums — updated each release
-LITE_SHA256="244675608dae5d173f940bf0bbdffff830a4be1d12c95623f459831addc5eb70"
-FULL_SHA256="24d5607245e92d30cd8c287df792ab29928a567b367c26c5f68550f611066e96"
+LITE_SHA256="6da38b83a4cb7f865a55677386101d4745db146a7912042abc0e896357291e1b"
+FULL_SHA256="d8f9e8f16583e58b974c30f8c1b8eba0580fe3595e89a24bd03ee1ac7733ce56"
 # ─────────────────────────────────────────────────────────────
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
@@ -68,7 +68,7 @@ if [ "$RELEASE_VERSION" = "latest" ]; then
   info "Resolving latest release tag..."
   RELEASE_VERSION=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
     | python3 -c "import json,sys; print(json.load(sys.stdin)['tag_name'])" 2>/dev/null \
-    || echo "v1.1")
+    || echo "v1.2")
   info "Latest: $RELEASE_VERSION"
 fi
 
@@ -121,8 +121,8 @@ fi
 if [ -z "$MODE" ]; then
   header "Choose database tier:"
   echo ""
-  echo "  [1] Lite  — 316 skills + 1536d embeddings             (~10 MB)"
-  echo "  [2] Full  — Lite + 787 DevDocs docsets (~620k entries) (~500 MB)"
+  echo "  [1] Lite  — 316 skills + 9 AgentConfig + 1536d embeddings    (~300 MB)"
+  echo "  [2] Full  — Lite + 718 DevDocs docsets (~545k entries)      (~500 MB)"
   echo ""
   read -rp "  Choice [1/2]: " CHOICE
   case "$CHOICE" in
