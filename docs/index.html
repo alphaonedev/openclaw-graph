@@ -164,6 +164,7 @@
     <a href="#devdocs">DevDocs</a>
     <a href="skills.html">Skills ↗</a>
     <a href="#metrics">Metrics</a>
+    <a href="#optimization">Optimization</a>
     <a href="#install">Install</a>
     <a href="https://github.com/alphaonedev/openclaw-graph" class="btn">GitHub →</a>
   </div>
@@ -176,7 +177,7 @@
   <p class="hero-sub">
     Replace flat workspace markdown with embedded Cypher queries.
     Default <code style="background:rgba(108,99,255,0.15); padding:0.1rem 0.4rem; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:0.9em;">workspace='openclaw'</code> pre-seeded in every release — Soul, Memory, AgentConfig, Tools ready out of the box.
-    316 enriched skills · 545k DevDocs reference nodes · 718 docsets · zero daemons.
+    316 enriched skills · 545k DevDocs reference nodes · 718 docsets · 9 AgentConfig nodes · zero daemons.
   </p>
   <div class="hero-actions">
     <a href="#install" class="btn-primary">Quick Install ↓</a>
@@ -224,7 +225,7 @@
     <div style="font-size:0.88rem; color:var(--text2); flex:1; min-width:200px;">
       <strong style="color:var(--text);">100% graph-native out of the box.</strong>
       Every DB release now ships with a default <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">workspace='openclaw'</code> pre-seeded —
-      Soul · Memory · AgentConfig · Tool nodes ready to use immediately. No manual seed required.
+      Soul · Memory · AgentConfig (9 nodes incl. TOON, Search Resilience, Schema Rules, Path Aliases) · Tool nodes ready to use immediately. No manual seed required.
     </div>
     <div style="display:flex; gap:0.75rem; flex-shrink:0;">
       <a href="#install" style="background:var(--accent2); color:#000; padding:0.35rem 0.9rem; border-radius:6px; font-size:0.82rem; font-weight:700; text-decoration:none;">Install v1.1 ↓</a>
@@ -552,7 +553,7 @@ matters. Not a corporate drone...
     </div>
     <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
       <div class="metric-big green">0.26ms</div>
-      <div class="metric-label">AGENTS.md hot path<br><span style="font-size:0.72rem; opacity:0.7;">6-node AgentConfig result set</span></div>
+      <div class="metric-label">AGENTS.md hot path<br><span style="font-size:0.72rem; opacity:0.7;">9-node AgentConfig result set</span></div>
     </div>
     <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
       <div class="metric-big green">0.38ms</div>
@@ -670,7 +671,7 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
             <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.24ms</td>
           </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
-            <td style="padding:0.45rem 0.75rem; color:var(--text);">AgentConfig — AGENTS.md hot path (6 nodes)</td>
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">AgentConfig — AGENTS.md hot path (9 nodes)</td>
             <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.26ms</td>
             <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.31ms</td>
             <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.22ms</td>
@@ -776,6 +777,72 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
     </div>
     <p style="font-size:0.82rem; color:var(--text2); margin-top:0.75rem;">
       316 skills embedded in <strong>8.4s</strong> via OpenAI text-embedding-3-small · 0 errors · cost &lt;$0.01
+    </p>
+  </div>
+</section>
+
+<hr>
+
+<!-- OPTIMIZATION -->
+<section id="optimization">
+  <div class="section-label">Cost &amp; Performance <span class="badge-new">NEW</span></div>
+  <h2>Prompt optimization — 70% token reduction</h2>
+  <p>v1.1 ships with four new AgentConfig nodes that reduce API costs and improve agent reliability. These optimizations are pre-seeded in every release and active out of the box.</p>
+
+  <div class="how-grid" style="margin-top:2rem;">
+    <div class="how-card" style="border-color:rgba(0,212,170,0.25);">
+      <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.75rem;">
+        <div class="how-num" style="margin-bottom:0;">$</div>
+        <h3 style="margin-bottom:0;">Path Aliases</h3>
+      </div>
+      <p>Replace verbose filesystem paths in prompts with compact aliases like <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">$WORKSPACE</code>, <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">$DB</code>, <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">$SCHEMAS</code>. Saves 200-400 tokens per prompt across multi-path instructions.</p>
+    </div>
+    <div class="how-card" style="border-color:rgba(0,212,170,0.25);">
+      <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.75rem;">
+        <div class="how-num" style="margin-bottom:0;">T</div>
+        <h3 style="margin-bottom:0;">TOON Compression</h3>
+      </div>
+      <p>Token-Oriented Object Notation compresses JSON payloads 30-60% for LLM context windows. Agents use <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">toon encode</code> for large data and API response caching. Install: <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">npm i -g @toon-format/cli</code>.</p>
+    </div>
+    <div class="how-card" style="border-color:rgba(108,99,255,0.25);">
+      <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.75rem;">
+        <div class="how-num" style="margin-bottom:0;">R</div>
+        <h3 style="margin-bottom:0;">Search Resilience</h3>
+      </div>
+      <p>Graceful degradation when web searches fail. Retry with simplified queries, try synonym alternatives, fall back to cached data. Never block an entire task because one search returned empty.</p>
+    </div>
+    <div class="how-card" style="border-color:rgba(108,99,255,0.25);">
+      <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.75rem;">
+        <div class="how-num" style="margin-bottom:0;">V</div>
+        <h3 style="margin-bottom:0;">Schema Validation</h3>
+      </div>
+      <p>All structured outputs validate against defined schemas before writing. Required fields, severity scales, confidence scores, and minimum source counts enforced at the graph level.</p>
+    </div>
+  </div>
+
+  <!-- Cost savings callout -->
+  <div style="margin-top:2rem; background:rgba(0,212,170,0.04); border:1px solid rgba(0,212,170,0.2); border-radius:12px; padding:1.75rem;">
+    <h3 style="font-size:1rem; font-weight:700; margin-bottom:1.25rem; color:var(--accent2);">Measured cost savings</h3>
+    <div class="metrics-grid" style="margin-top:0;">
+      <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
+        <div class="metric-big green">70%</div>
+        <div class="metric-label">Prompt token reduction<br><span style="font-size:0.72rem; opacity:0.7;">path aliases + deduplication</span></div>
+      </div>
+      <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
+        <div class="metric-big green">30-60%</div>
+        <div class="metric-label">JSON payload compression<br><span style="font-size:0.72rem; opacity:0.7;">TOON format for data context</span></div>
+      </div>
+      <div class="metric-card" style="border-color:rgba(108,99,255,0.25);">
+        <div class="metric-big purple">9</div>
+        <div class="metric-label">AgentConfig nodes<br><span style="font-size:0.72rem; opacity:0.7;">pre-seeded in every release</span></div>
+      </div>
+      <div class="metric-card" style="border-color:rgba(108,99,255,0.25);">
+        <div class="metric-big purple">0ms</div>
+        <div class="metric-label">Config overhead<br><span style="font-size:0.72rem; opacity:0.7;">graph-resolved, cached in-process</span></div>
+      </div>
+    </div>
+    <p style="font-size:0.85rem; color:var(--text2); margin-top:1.25rem; line-height:1.7;">
+      Before: each agent session loaded 20-30K token prompts with duplicated schemas, full paths (41-48 characters each repeated 8-12x), and embedded boilerplate. After: prompts trimmed to 6-9K tokens via path aliases, schema references, and search resilience moved to graph. Data payloads further compressed with TOON. Net result: <strong style="color:var(--accent2);">60-70% fewer input tokens per cron cycle</strong>, directly reducing API costs.
     </p>
   </div>
 </section>

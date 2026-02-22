@@ -10,7 +10,7 @@ Every v1.1+ release includes these `workspace='openclaw'` nodes out of the box:
 |-------|-------|-------------|
 | Soul | 4 | Prime Directive · Identity (placeholder) · Safety · Heartbeat Protocol |
 | Memory | 2 | Principal (placeholder) · Infrastructure (placeholder) |
-| AgentConfig | 5 | Every Session · Delegation · Safety · Heartbeats · Memory |
+| AgentConfig | 9 | Every Session · Delegation · Safety · Heartbeats · Memory · TOON · Search Resilience · Schema Rules · Path Aliases |
 | Tool | 21 | All standard OpenClaw tools · `sessions_spawn=true` |
 | QueryMetrics | 0 | Schema only — populated automatically by workspace.ts |
 
@@ -151,5 +151,9 @@ node ladybugdb/scripts/query.js --cypher \
 | `agentcfg-openclaw-safety` | AgentConfig | Safety |
 | `agentcfg-openclaw-heartbeats` | AgentConfig | Heartbeats |
 | `agentcfg-openclaw-memory` | AgentConfig | Memory |
+| `agentcfg-openclaw-toon` | AgentConfig | Token Optimization — TOON |
+| `agentcfg-openclaw-search-resilience` | AgentConfig | Search Resilience |
+| `agentcfg-openclaw-schema-rules` | AgentConfig | Schema Rules |
+| `agentcfg-openclaw-path-aliases` | AgentConfig | Path Aliases |
 | `tool-sessions-spawn` | Tool | sessions_spawn (available=true) |
 | *(+ 20 other tool-* nodes)* | Tool | All standard OpenClaw tools |
