@@ -24,7 +24,6 @@
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    /* Nav */
     nav {
       display: flex; align-items: center; justify-content: space-between;
       padding: 1rem 2rem; border-bottom: 1px solid var(--border);
@@ -33,16 +32,12 @@
     }
     .nav-brand { font-weight: 700; font-size: 1.1rem; color: var(--text); }
     .nav-brand span { color: var(--accent); }
-    .nav-links { display: flex; gap: 1.5rem; font-size: 0.9rem; color: var(--text2); }
+    .nav-links { display: flex; gap: 1.5rem; font-size: 0.9rem; color: var(--text2); flex-wrap: wrap; }
     .nav-links a { color: var(--text2); }
     .nav-links a:hover { color: var(--text); text-decoration: none; }
-    .btn {
-      background: var(--accent); color: white; padding: 0.4rem 1rem;
-      border-radius: 6px; font-size: 0.85rem; font-weight: 600;
-    }
+    .btn { background: var(--accent); color: white; padding: 0.4rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
     .btn:hover { text-decoration: none; opacity: 0.9; }
 
-    /* Hero */
     .hero {
       text-align: center; padding: 5rem 1rem 4rem;
       background: radial-gradient(ellipse at 50% 0%, rgba(108,99,255,0.12) 0%, transparent 70%);
@@ -52,92 +47,59 @@
       color: var(--accent); padding: 0.25rem 0.75rem; border-radius: 20px;
       font-size: 0.8rem; font-weight: 600; margin-bottom: 1.5rem; letter-spacing: 0.5px;
     }
+    .badge-new {
+      display: inline-block; background: rgba(0,212,170,0.15); border: 1px solid rgba(0,212,170,0.3);
+      color: var(--accent2); padding: 0.2rem 0.6rem; border-radius: 6px;
+      font-size: 0.75rem; font-weight: 700; margin-left: 0.5rem; vertical-align: middle;
+    }
     h1 {
       font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.15;
       margin-bottom: 1rem; letter-spacing: -0.02em;
     }
     h1 span { color: var(--accent); }
-    .hero-sub {
-      font-size: 1.15rem; color: var(--text2); max-width: 600px;
-      margin: 0 auto 2rem; line-height: 1.7;
-    }
+    .hero-sub { font-size: 1.15rem; color: var(--text2); max-width: 640px; margin: 0 auto 2rem; line-height: 1.7; }
     .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-    .btn-primary {
-      background: var(--accent); color: white; padding: 0.75rem 1.75rem;
-      border-radius: 8px; font-weight: 600; font-size: 0.95rem;
-    }
-    .btn-secondary {
-      background: var(--bg3); color: var(--text); padding: 0.75rem 1.75rem;
-      border-radius: 8px; font-weight: 600; font-size: 0.95rem;
-      border: 1px solid var(--border);
-    }
+    .btn-primary { background: var(--accent); color: white; padding: 0.75rem 1.75rem; border-radius: 8px; font-weight: 600; font-size: 0.95rem; }
+    .btn-secondary { background: var(--bg3); color: var(--text); padding: 0.75rem 1.75rem; border-radius: 8px; font-weight: 600; font-size: 0.95rem; border: 1px solid var(--border); }
     .btn-primary:hover, .btn-secondary:hover { text-decoration: none; opacity: 0.9; }
 
-    /* Stats bar */
-    .stats-bar {
-      display: flex; gap: 0; border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border); background: var(--bg2);
-    }
-    .stat {
-      flex: 1; text-align: center; padding: 1.5rem 0.5rem;
-      border-right: 1px solid var(--border);
-    }
+    .stats-bar { display: flex; gap: 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--bg2); flex-wrap: wrap; }
+    .stat { flex: 1; min-width: 110px; text-align: center; padding: 1.5rem 0.5rem; border-right: 1px solid var(--border); }
     .stat:last-child { border-right: none; }
     .stat-num { font-size: 2rem; font-weight: 800; color: var(--accent); line-height: 1; }
-    .stat-label { font-size: 0.8rem; color: var(--text2); margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-num.green { color: var(--accent2); }
+    .stat-label { font-size: 0.78rem; color: var(--text2); margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* Sections */
     section { padding: 5rem 1rem; max-width: 1100px; margin: 0 auto; }
     .section-label { font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
     h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; margin-bottom: 1rem; line-height: 1.2; }
     p { color: var(--text2); line-height: 1.75; }
 
-    /* How it works */
     .how-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem; }
     @media (max-width: 700px) { .how-grid { grid-template-columns: 1fr; } }
-    .how-card {
-      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
-      padding: 1.75rem;
-    }
+    .how-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; }
     .how-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
     .how-card p { font-size: 0.9rem; }
     .how-num {
-      width: 32px; height: 32px; background: rgba(108,99,255,0.15);
-      border: 1px solid rgba(108,99,255,0.3); border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.85rem; font-weight: 700; color: var(--accent);
-      margin-bottom: 1rem;
+      width: 32px; height: 32px; background: rgba(108,99,255,0.15); border: 1px solid rgba(108,99,255,0.3);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 700; color: var(--accent); margin-bottom: 1rem;
     }
 
-    /* Architecture */
-    .arch-block {
-      background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px;
-      padding: 2rem; margin-top: 2rem; overflow-x: auto;
-    }
-    .arch-block pre {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
-      color: var(--text2); line-height: 1.7;
-    }
+    .arch-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin-top: 2rem; overflow-x: auto; }
+    .arch-block pre { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--text2); line-height: 1.7; }
     .arch-block pre .hl { color: var(--accent2); }
     .arch-block pre .hl2 { color: var(--accent); }
     .arch-block pre .hl3 { color: var(--accent3); }
 
-    /* Code blocks */
-    .code-block {
-      background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
-      padding: 1.25rem 1.5rem; margin: 1.5rem 0; overflow-x: auto;
-    }
-    .code-block pre {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.83rem;
-      line-height: 1.7; color: var(--text);
-    }
+    .code-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; overflow-x: auto; }
+    .code-block pre { font-family: 'JetBrains Mono', monospace; font-size: 0.83rem; line-height: 1.7; color: var(--text); }
     .code-block .comment { color: #525570; }
     .code-block .keyword { color: #c792ea; }
     .code-block .string { color: #c3e88d; }
     .code-block .fn { color: #82aaff; }
     .code-block .tag { color: #f78c6c; }
 
-    /* Before/after */
     .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
     @media (max-width: 700px) { .compare { grid-template-columns: 1fr; } }
     .compare-card { border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
@@ -146,56 +108,51 @@
     .compare-header.after { background: rgba(0,212,170,0.1); color: var(--accent2); }
     .compare-body { background: var(--code-bg); padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 1.7; color: var(--text2); }
 
-    /* Metrics */
     .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
-    .metric-card {
-      background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
-      padding: 1.5rem; text-align: center;
-    }
+    .metric-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; text-align: center; }
     .metric-big { font-size: 2.2rem; font-weight: 800; line-height: 1; }
     .metric-big.green { color: var(--accent2); }
     .metric-big.purple { color: var(--accent); }
     .metric-big.red { color: var(--accent3); }
     .metric-label { font-size: 0.8rem; color: var(--text2); margin-top: 0.4rem; }
 
-    /* Skills clusters */
-    .clusters-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; margin-top: 2rem; }
+    .clusters-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 0.75rem; margin-top: 2rem; }
     .cluster-chip {
       background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
-      padding: 0.6rem 0.9rem; display: flex; justify-content: space-between;
-      align-items: center; font-size: 0.82rem;
+      padding: 0.6rem 0.9rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem;
     }
     .cluster-chip .count { color: var(--accent); font-weight: 700; font-size: 0.85rem; }
-    .cluster-chip.auth { border-color: rgba(255,107,107,0.3); }
-    .cluster-chip.auth .name { color: var(--accent3); }
 
-    /* Install */
+    .tier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+    @media (max-width: 700px) { .tier-grid { grid-template-columns: 1fr; } }
+    .tier-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; }
+    .tier-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; }
+    .tier-card ul { list-style: none; margin-top: 0.75rem; }
+    .tier-card ul li { font-size: 0.87rem; color: var(--text2); padding: 0.25rem 0; }
+    .tier-card ul li::before { content: "✓ "; color: var(--accent2); }
+    .tier-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.75rem; }
+    .tier-badge.lite { background: rgba(108,99,255,0.15); color: var(--accent); border: 1px solid rgba(108,99,255,0.3); }
+    .tier-badge.full { background: rgba(0,212,170,0.15); color: var(--accent2); border: 1px solid rgba(0,212,170,0.3); }
+
+    .devdocs-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem; }
+    .tag-chip { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.78rem; color: var(--text2); font-family: 'JetBrains Mono', monospace; }
+
     .install-steps { margin-top: 2rem; }
     .step { display: flex; gap: 1.25rem; margin-bottom: 2rem; align-items: flex-start; }
-    .step-num {
-      width: 36px; height: 36px; min-width: 36px; background: var(--accent);
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 0.9rem; color: white;
-    }
+    .step-num { width: 36px; height: 36px; min-width: 36px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; color: white; }
     .step-body h4 { font-size: 0.95rem; margin-bottom: 0.4rem; }
     .step-body p { font-size: 0.88rem; margin-bottom: 0.5rem; }
 
-    /* CTA */
-    .cta-section {
-      text-align: center; padding: 5rem 1rem;
-      background: radial-gradient(ellipse at 50% 100%, rgba(108,99,255,0.1) 0%, transparent 70%);
-      border-top: 1px solid var(--border);
-    }
+    .cta-section { text-align: center; padding: 5rem 1rem; background: radial-gradient(ellipse at 50% 100%, rgba(108,99,255,0.1) 0%, transparent 70%); border-top: 1px solid var(--border); }
     .cta-section h2 { font-size: 2rem; margin-bottom: 1rem; }
 
-    /* Footer */
-    footer {
-      text-align: center; padding: 2rem; font-size: 0.82rem; color: var(--text2);
-      border-top: 1px solid var(--border);
-    }
-
-    /* Divider */
+    footer { text-align: center; padding: 2rem; font-size: 0.82rem; color: var(--text2); border-top: 1px solid var(--border); }
     hr { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+    .pill { display: inline-block; background: rgba(108,99,255,0.12); color: var(--accent); border: 1px solid rgba(108,99,255,0.25); border-radius: 4px; padding: 0.1rem 0.45rem; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; }
+    .info-row { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 1rem; }
+    .info-item { font-size: 0.85rem; color: var(--text2); }
+    .info-item strong { color: var(--text); }
   </style>
 </head>
 <body>
@@ -203,7 +160,8 @@
 <nav>
   <div class="nav-brand">openclaw<span>-graph</span></div>
   <div class="nav-links">
-    <a href="#how">How It Works</a>
+    <a href="#how">Architecture</a>
+    <a href="#devdocs">DevDocs</a>
     <a href="skills.html">Skills ↗</a>
     <a href="#metrics">Metrics</a>
     <a href="#install">Install</a>
@@ -211,40 +169,47 @@
   </div>
 </nav>
 
+<!-- HERO -->
 <div class="hero">
-  <div class="badge">⚡ Open Source Contribution</div>
+  <div class="badge">⚡ v1.0 Released — Open Source</div>
   <h1>Graph-Native Workspace<br>for <span>OpenClaw</span></h1>
   <p class="hero-sub">
-    Replace flat workspace markdown files with embedded Cypher queries.
-    322 fully-enriched skills across 28 clusters, 1536d vector embeddings,
-    zero daemons — powered by LadybugDB.
+    Replace flat workspace markdown with embedded Cypher queries.
+    316 enriched skills · 545k DevDocs reference nodes · 718 docsets ·
+    1536d vector embeddings · zero daemons — powered by LadybugDB.
   </p>
   <div class="hero-actions">
-    <a href="https://github.com/alphaonedev/openclaw-graph" class="btn-primary">View on GitHub</a>
-    <a href="#install" class="btn-secondary">Quick Start</a>
+    <a href="#install" class="btn-primary">Quick Install ↓</a>
+    <a href="https://github.com/alphaonedev/openclaw-graph" class="btn-secondary">View on GitHub</a>
+    <a href="skills.html" class="btn-secondary">Browse Skills →</a>
   </div>
 </div>
 
+<!-- STATS BAR -->
 <div class="stats-bar">
   <div class="stat">
-    <div class="stat-num">322</div>
+    <div class="stat-num">316</div>
     <div class="stat-label">Skills</div>
   </div>
   <div class="stat">
-    <div class="stat-num">28</div>
+    <div class="stat-num">27</div>
     <div class="stat-label">Clusters</div>
   </div>
   <div class="stat">
-    <div class="stat-num">96%</div>
-    <div class="stat-label">Stub Compression</div>
+    <div class="stat-num green">545k</div>
+    <div class="stat-label">Reference Nodes</div>
   </div>
   <div class="stat">
-    <div class="stat-num">&lt;2ms</div>
+    <div class="stat-num">718</div>
+    <div class="stat-label">DevDocs Docsets</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">&lt;0.2ms</div>
     <div class="stat-label">Query Latency</div>
   </div>
   <div class="stat">
     <div class="stat-num">1536d</div>
-    <div class="stat-label">Vector Embeddings</div>
+    <div class="stat-label">Embeddings</div>
   </div>
   <div class="stat">
     <div class="stat-num">0</div>
@@ -265,54 +230,38 @@
 <span class="hl2">OpenClaw Session</span>
 │
 ├── loadWorkspaceBootstrapFiles()
-│   ├── <span class="hl">SOUL.md</span>    <span style="color:#525570">(1 line: &lt;!-- GRAPH: MATCH (s:Soul) WHERE s.workspace = 'myapp' ... --&gt;)</span>
-│   ├── <span class="hl">MEMORY.md</span>  <span style="color:#525570">(1 line: &lt;!-- GRAPH: MATCH (m:Memory) WHERE m.workspace = 'myapp' ... --&gt;)</span>
-│   ├── <span class="hl">TOOLS.md</span>   <span style="color:#525570">(1 line: &lt;!-- GRAPH: MATCH (t:Tool) WHERE t.available = true ... --&gt;)</span>
-│   └── <span class="hl">AGENTS.md</span>  <span style="color:#525570">(1 line: &lt;!-- GRAPH: MATCH (s:Soul WHERE section STARTS WITH ...) --&gt;)</span>
+│   ├── <span class="hl">SOUL.md</span>    <span style="color:#525570">(1 line → GRAPH: MATCH (s:Soul) WHERE s.workspace = 'myapp' ...)</span>
+│   ├── <span class="hl">MEMORY.md</span>  <span style="color:#525570">(1 line → GRAPH: MATCH (m:Memory) WHERE m.workspace = 'myapp' ...)</span>
+│   ├── <span class="hl">TOOLS.md</span>   <span style="color:#525570">(1 line → GRAPH: MATCH (t:Tool) WHERE t.available = true ...)</span>
+│   └── <span class="hl">AGENTS.md</span>  <span style="color:#525570">(1 line → GRAPH: MATCH (a:AgentConfig) ...)</span>
 │       │
 │       └── readFileWithCache()  <span style="color:#525570">← patched workspace.ts</span>
 │           │
-│           ├── [1] workspaceFileCache  <span style="color:#525570">keyed: filePath+mtime — raw stub only</span>
-│           │       <span style="color:#525570">avoids repeated fs.readFile for unchanged stub files</span>
-│           │
-│           ├── [2] graphQueryCache     <span style="color:#525570">keyed: cypher — 60s TTL — resolved content</span>
-│           │       <span style="color:#525570">TTL fires correctly on every session load</span>
-│           │
-│           ├── [3] graphQueryInFlight  <span style="color:#525570">in-flight deduplication per cypher</span>
-│           │       <span style="color:#525570">concurrent cache misses share one Promise (no thundering herd)</span>
-│           │
-│           └── executeGraphQuery()     <span style="color:#525570">async execFileAsync — non-blocking</span>
-│               └── <span class="hl2">node query.js --workspace --cypher "..."</span>
+│           ├── [1] workspaceFileCache  <span style="color:#525570">mtime-keyed — raw stub, avoids fs.readFile</span>
+│           ├── [2] graphQueryCache     <span style="color:#525570">cypher-keyed — resolved content, 60s TTL</span>
+│           ├── [3] graphQueryInFlight  <span style="color:#525570">per-query Promise dedup (no thundering herd)</span>
+│           └── executeGraphQuery()     <span style="color:#525570">execFileAsync — non-blocking</span>
+│               └── <span class="hl2">node query.js --cypher "..."</span>
 │                   └── return <span class="hl">formatted markdown → system prompt</span>
 │
 └── buildAgentSystemPrompt()
-    └── injects graph-resolved markdown → agent context
+    └── injects graph-resolved markdown into agent context
 
-<span class="hl2">LadybugDB</span> (embedded graph DB, no daemon required)
-├── <span class="hl">Skill</span>       (322 nodes, 28 clusters, 247 edges, 1536d embeddings)
-├── <span class="hl">Reference</span>   (787 DevDocs docsets, ~620k entries)
-├── <span class="hl">Soul</span>        (identity, behavior, capabilities per workspace)
-├── <span class="hl">Memory</span>      (project context, state, infrastructure facts)
-├── <span class="hl">Tool</span>        (available tools + usage notes)
-└── <span class="hl">AgentConfig</span> (per-workspace agent behavior overrides)
+<span class="hl2">LadybugDB</span> (embedded graph DB — no daemon, no network)
+├── <span class="hl">Skill</span>        316 nodes · 27 clusters · 247 edges · 1536d embeddings
+├── <span class="hl">Reference</span>    545,072 nodes · 718 DevDocs docsets · full API docs
+├── <span class="hl">Soul</span>         identity, persona, capabilities per workspace
+├── <span class="hl">Memory</span>       project context, infrastructure facts, state
+├── <span class="hl">Tool</span>         available tools + usage notes per workspace
+└── <span class="hl">AgentConfig</span>  per-workspace agent behavior overrides
     </pre>
-  </div>
-
-  <div style="margin: 1.5rem 0; padding: 1rem 1.4rem; background: #12141a; border: 1px solid #2a2d3a; border-radius: 8px; font-size: 0.88rem;">
-    <span style="color:#7c6af7; font-weight:700;">workspace.ts patch</span>
-    <span style="color:#525570; margin: 0 0.5rem;">·</span>
-    Fixes cache layering, adds async queries + in-flight deduplication.
-    Apply to any OpenClaw install:
-    <span style="display:block; margin-top:0.6rem; font-family: monospace; color:#a8b5c8;">
-      git apply <a href="https://github.com/alphaonedev/openclaw-graph/raw/main/patches/workspace-cache-fix.patch" style="color:#7c6af7;">patches/workspace-cache-fix.patch</a>
-    </span>
   </div>
 
   <div class="how-grid">
     <div class="how-card">
       <div class="how-num">1</div>
       <h3>Workspace files become stubs</h3>
-      <p>SOUL.md, MEMORY.md, TOOLS.md, AGENTS.md each contain one line — a Cypher query directive. No content, no secrets, no growing files.</p>
+      <p>SOUL.md, MEMORY.md, TOOLS.md, AGENTS.md each shrink to one line — a Cypher query directive. No content bloat, no secrets in files, no manual sync.</p>
     </div>
     <div class="how-card">
       <div class="how-num">2</div>
@@ -321,14 +270,23 @@
     </div>
     <div class="how-card">
       <div class="how-num">3</div>
-      <h3>Non-blocking async queries</h3>
-      <p>Graph queries use execFileAsync instead of execSync. A slow or locked DB never stalls the event loop. Agents keep running while the query resolves.</p>
+      <h3>545k reference nodes on-demand</h3>
+      <p>Every DevDocs docset — Python, TypeScript, Rust, Go, C++, React, PostgreSQL and 710 more — is queryable by source, path, section, or full-text content search.</p>
     </div>
     <div class="how-card">
       <div class="how-num">4</div>
       <h3>Multi-instance, per-copy DB</h3>
-      <p>Each OpenClaw instance gets its own local DB copy via install.sh. Sub-millisecond queries, no network dependency, no lock contention across agents.</p>
+      <p>Each OpenClaw agent gets its own local DB via <code style="font-family:monospace;">install.sh --full</code>. Sub-millisecond queries, no network dependency, no lock contention across an 8-agent fleet.</p>
     </div>
+  </div>
+
+  <div style="margin: 1.5rem 0; padding: 1rem 1.4rem; background: #12141a; border: 1px solid #2a2d3a; border-radius: 8px; font-size: 0.88rem;">
+    <span style="color:#7c6af7; font-weight:700;">workspace.ts patch</span>
+    <span style="color:#525570; margin: 0 0.5rem;">·</span>
+    Three-layer cache, async query execution, in-flight deduplication. Apply to any OpenClaw install:
+    <span style="display:block; margin-top:0.6rem; font-family: monospace; color:#a8b5c8;">
+      git apply <a href="https://github.com/alphaonedev/openclaw-graph/raw/main/patches/workspace-cache-fix.patch" style="color:#7c6af7;">patches/workspace-cache-fix.patch</a>
+    </span>
   </div>
 </section>
 
@@ -336,26 +294,21 @@
 
 <!-- BEFORE / AFTER -->
 <section>
-  <div class="section-label">Before & After</div>
+  <div class="section-label">Before &amp; After</div>
   <h2>From flat files to graph stubs</h2>
-  <p>The same information — now queryable, filterable, and 97% smaller on disk.</p>
-
+  <p>The same information — now queryable, filterable, and 97% smaller in the system prompt.</p>
   <div class="compare">
     <div class="compare-card">
-      <div class="compare-header before">❌ Before — flat SOUL.md (~1,800 bytes)</div>
+      <div class="compare-header before">❌ Before — SOUL.md (~1,800 bytes, loaded every session)</div>
       <div class="compare-body"><pre># SOUL.md — Who You Are
 
 _You're not a chatbot. You're becoming someone._
 
 ## Core Truths
 
-Be genuinely helpful, not performatively helpful.
-Skip the "Great question!" and "I'd be happy to
-help!" — just help. Actions speak louder than
-filler words.
-
-Have opinions. You're allowed to disagree, prefer
-things, find stuff amusing or boring...
+Be genuinely helpful, not performatively
+helpful. Skip the filler words — just help.
+Have opinions. You're allowed to disagree...
 
 ## Boundaries
 
@@ -365,19 +318,14 @@ Never send half-baked replies...
 
 ## Vibe
 
-Be the assistant you'd actually want to talk to.
-Concise when needed, thorough when it matters.
-Not a corporate drone. Not a sycophant. Just good.
-
-## Continuity
-
-Each session, you wake up fresh. These files _are_
-your memory. Read them. Update them...
+Be the assistant you'd actually want to talk
+to. Concise when needed, thorough when it
+matters. Not a corporate drone...
 
 [... continues for many more sections ...]</pre></div>
     </div>
     <div class="compare-card">
-      <div class="compare-header after">✅ After — graph stub (~175 bytes)</div>
+      <div class="compare-header after">✅ After — graph stub (175 bytes, resolved at runtime)</div>
       <div class="compare-body"><pre>&lt;!-- GRAPH: MATCH (s:Soul)
   WHERE s.workspace = 'myapp'
     AND s.priority &lt;= 4
@@ -388,11 +336,119 @@ your memory. Read them. Update them...
   LIMIT 8
 --&gt;</pre>
 <br>
-<span style="color:#525570">→ Resolved at runtime from LadybugDB
+<span style="color:#525570">→ Resolved from LadybugDB at session start
 → Returns prioritized, structured markdown
-→ Cached 60s in-process
-→ Update content without touching files</span>
+→ Cached 60s in-process (0ms after first load)
+→ Update identity without touching files</span>
 </div>
+    </div>
+  </div>
+</section>
+
+<hr>
+
+<!-- DEVDOCS REFERENCE -->
+<section id="devdocs">
+  <div class="section-label">Reference Database <span class="badge-new">NEW in v1.0</span></div>
+  <h2>545,072 API reference nodes from 718 docsets</h2>
+  <p>Every major technology's official documentation is imported as <span class="pill">Reference</span> nodes in LadybugDB — queryable by source, path, section, title, or full-text content. Agents can pull precise API docs without leaving their context window.</p>
+
+  <div class="info-row" style="margin-bottom: 1.5rem;">
+    <div class="info-item"><strong>545,072</strong> Reference nodes</div>
+    <div class="info-item"><strong>718</strong> docsets imported</div>
+    <div class="info-item"><strong>295 MB</strong> compressed (zstd)</div>
+    <div class="info-item"><strong>3.2 GB</strong> raw on disk</div>
+  </div>
+
+  <div class="code-block">
+    <pre><span class="comment"># Find API docs by source + content</span>
+<span class="fn">node</span> ladybugdb/scripts/query.js --cypher <span class="string">"MATCH (r:Reference) WHERE r.source = 'python' AND r.content CONTAINS 'asyncio' RETURN r.path, r.title LIMIT 10"</span>
+
+<span class="comment"># All entries for a specific version</span>
+<span class="fn">node</span> ladybugdb/scripts/query.js --cypher <span class="string">"MATCH (r:Reference) WHERE r.source = 'postgresql~18' RETURN r.section, count(r) AS n ORDER BY n DESC"</span>
+
+<span class="comment"># Lookup a specific API path</span>
+<span class="fn">node</span> ladybugdb/scripts/query.js --cypher <span class="string">"MATCH (r:Reference {source:'react', path:'hooks/use-state'}) RETURN r.title, r.content"</span></pre>
+  </div>
+
+  <div style="background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.75rem; margin-top:1.5rem;">
+    <h3 style="font-size:1rem; font-weight:700; margin-bottom:1rem;">Coverage — technologies included</h3>
+    <div class="devdocs-tags">
+      <span class="tag-chip">Python 3.13</span>
+      <span class="tag-chip">TypeScript 5</span>
+      <span class="tag-chip">JavaScript</span>
+      <span class="tag-chip">React 18</span>
+      <span class="tag-chip">Vue 3</span>
+      <span class="tag-chip">Node.js 22 LTS</span>
+      <span class="tag-chip">Rust</span>
+      <span class="tag-chip">Go</span>
+      <span class="tag-chip">C++</span>
+      <span class="tag-chip">C</span>
+      <span class="tag-chip">Java</span>
+      <span class="tag-chip">OpenJDK 17</span>
+      <span class="tag-chip">Kotlin 1.8</span>
+      <span class="tag-chip">Swift</span>
+      <span class="tag-chip">Ruby on Rails 7.1</span>
+      <span class="tag-chip">Django 4.1</span>
+      <span class="tag-chip">Flask 2.0</span>
+      <span class="tag-chip">FastAPI</span>
+      <span class="tag-chip">Laravel 11</span>
+      <span class="tag-chip">PostgreSQL 18</span>
+      <span class="tag-chip">MySQL 8</span>
+      <span class="tag-chip">Redis</span>
+      <span class="tag-chip">MongoDB</span>
+      <span class="tag-chip">Elasticsearch</span>
+      <span class="tag-chip">Docker</span>
+      <span class="tag-chip">Kubernetes</span>
+      <span class="tag-chip">Terraform</span>
+      <span class="tag-chip">Ansible</span>
+      <span class="tag-chip">GNU/Linux man</span>
+      <span class="tag-chip">Nginx</span>
+      <span class="tag-chip">Apache HTTP</span>
+      <span class="tag-chip">PyTorch 2.3</span>
+      <span class="tag-chip">NumPy 1.21</span>
+      <span class="tag-chip">Tailwind CSS</span>
+      <span class="tag-chip">Sass</span>
+      <span class="tag-chip">GraphQL</span>
+      <span class="tag-chip">Socket.IO 4</span>
+      <span class="tag-chip">Webpack</span>
+      <span class="tag-chip">Vite</span>
+      <span class="tag-chip">SaltStack</span>
+      <span class="tag-chip">GNU Make</span>
+      <span class="tag-chip">Kubectl</span>
+      <span class="tag-chip">Scala</span>
+      <span class="tag-chip">Haskell</span>
+      <span class="tag-chip">Elixir</span>
+      <span class="tag-chip">Phoenix</span>
+      <span class="tag-chip">Qt 6</span>
+      <span class="tag-chip">+ 670 more</span>
+    </div>
+  </div>
+
+  <div class="tier-grid" style="margin-top:2rem;">
+    <div class="tier-card">
+      <div class="tier-badge lite">LITE</div>
+      <h3>Skills + Embeddings</h3>
+      <p style="font-size:0.87rem; margin-bottom:0.75rem;">For skill lookup, workspace stubs, and semantic search. Fast, lightweight, suitable for most deployments.</p>
+      <ul>
+        <li>316 Skill nodes across 27 clusters</li>
+        <li>1536d vector embeddings (all skills)</li>
+        <li>Workspace graph schema</li>
+        <li>247 skill relationship edges</li>
+      </ul>
+      <div style="margin-top:1rem; font-size:0.82rem; color:var(--text2);">295 MB compressed · ~65 MB uncompressed</div>
+    </div>
+    <div class="tier-card" style="border-color: rgba(0,212,170,0.25);">
+      <div class="tier-badge full">FULL</div>
+      <h3>Skills + DevDocs Reference</h3>
+      <p style="font-size:0.87rem; margin-bottom:0.75rem;">Includes all 545k DevDocs Reference nodes. Agents can query precise API documentation on demand.</p>
+      <ul>
+        <li>Everything in Lite</li>
+        <li>545,072 Reference nodes</li>
+        <li>718 DevDocs docsets</li>
+        <li>Full-text content search</li>
+      </ul>
+      <div style="margin-top:1rem; font-size:0.82rem; color:var(--text2);">295 MB compressed · 3.2 GB uncompressed</div>
     </div>
   </div>
 </section>
@@ -402,12 +458,13 @@ your memory. Read them. Update them...
 <!-- SKILLS -->
 <section id="skills">
   <div class="section-label">Skill Database</div>
-  <h2>322 skills across 28 clusters</h2>
-  <p>A comprehensive skill graph covering the full development surface. Query by text, cluster, or graph traversal.</p>
+  <h2>316 skills across 27 clusters</h2>
+  <p>Expert-level reference skills covering the full development and operations surface. Query by text, cluster, or graph traversal. All skills ship with 1536d vector embeddings for semantic search.</p>
 
-  <div style="text-align:right;margin-bottom:0.75rem;">
-    <a href="skills.html" style="font-size:0.85rem;color:var(--accent2);font-weight:600;">Browse full skills directory →</a>
+  <div style="text-align:right; margin-bottom:0.75rem;">
+    <a href="skills.html" style="font-size:0.85rem; color:var(--accent2); font-weight:600;">Browse full skills directory →</a>
   </div>
+
   <div class="clusters-grid">
     <a href="skills.html#community" class="cluster-chip" style="text-decoration:none;"><span class="name">community</span><span class="count">62</span></a>
     <a href="skills.html#coding" class="cluster-chip" style="text-decoration:none;"><span class="name">coding</span><span class="count">18</span></a>
@@ -430,12 +487,11 @@ your memory. Read them. Update them...
     <a href="skills.html#iot" class="cluster-chip" style="text-decoration:none;"><span class="name">iot</span><span class="count">10</span></a>
     <a href="skills.html#cloud-aws" class="cluster-chip" style="text-decoration:none;"><span class="name">cloud-aws</span><span class="count">10</span></a>
     <a href="skills.html#core-openclaw" class="cluster-chip" style="text-decoration:none;"><span class="name">core-openclaw</span><span class="count">8</span></a>
-    <a href="skills.html#testing" class="cluster-chip" style="text-decoration:none;"><span class="name">testing</span><span class="count">8</span></div>
+    <a href="skills.html#testing" class="cluster-chip" style="text-decoration:none;"><span class="name">testing</span><span class="count">8</span></a>
     <a href="skills.html#ai-apis" class="cluster-chip" style="text-decoration:none;"><span class="name">ai-apis</span><span class="count">8</span></a>
-    <a href="skills.html#redteam" class="cluster-chip auth" style="text-decoration:none;"><span class="name">redteam 🔒</span><span class="count">7</span></a>
     <a href="skills.html#existing" class="cluster-chip" style="text-decoration:none;"><span class="name">existing</span><span class="count">6</span></a>
     <a href="skills.html#abtesting" class="cluster-chip" style="text-decoration:none;"><span class="name">abtesting</span><span class="count">6</span></a>
-    <a href="skills.html#linux" class="cluster-chip" style="text-decoration:none;"><span class="name">linux</span><span class="count">5</span></a>
+    <a href="skills.html#linux" class="cluster-chip" style="text-decoration:none;"><span class="name">linux</span><span class="count">6</span></a>
     <a href="skills.html#distributed-comms" class="cluster-chip" style="text-decoration:none;"><span class="name">distributed-comms</span><span class="count">4</span></a>
   </div>
 
@@ -449,11 +505,11 @@ your memory. Read them. Update them...
 <span class="comment"># Graph traversal — skill + related (2 hops)</span>
 <span class="fn">node</span> ladybugdb/scripts/query.js --skill terraform --hops 2
 
-<span class="comment"># Raw Cypher</span>
-<span class="fn">node</span> ladybugdb/scripts/query.js --cypher <span class="string">"MATCH (s:Skill {cluster: 'ai-apis'}) RETURN s.name, s.description"</span>
+<span class="comment"># Semantic search (requires embeddings)</span>
+<span class="fn">node</span> ladybugdb/scripts/query.js --semantic <span class="string">"deploy containerized app with auto-scaling"</span>
 
-<span class="comment"># Stats</span>
-<span class="fn">node</span> ladybugdb/scripts/query.js --stats</pre>
+<span class="comment"># Raw Cypher</span>
+<span class="fn">node</span> ladybugdb/scripts/query.js --cypher <span class="string">"MATCH (s:Skill {cluster:'ai-apis'}) RETURN s.name, s.description"</span></pre>
   </div>
 </section>
 
@@ -463,16 +519,12 @@ your memory. Read them. Update them...
 <section id="metrics">
   <div class="section-label">Performance</div>
   <h2>Measured on Apple Silicon Mac mini</h2>
-  <p>Node.js v22.22.0 · LadybugDB 0.14.3 · 322 skills + 322/322 embeddings · macOS 15.3 arm64 · Feb 2026 · 10 runs each</p>
+  <p style="margin-bottom:0.5rem;">Node.js v22.22.0 · LadybugDB 0.14.3 · 316 skills + 545k Reference nodes · macOS 15.3 arm64 · Feb 2026 · 10 runs each</p>
 
   <div class="metrics-grid">
     <div class="metric-card">
-      <div class="metric-big green">96%</div>
-      <div class="metric-label">Workspace stub compression<br>(~13,800 → 604 bytes, 4 files)</div>
-    </div>
-    <div class="metric-card">
       <div class="metric-big purple">0.17ms</div>
-      <div class="metric-label">Skill text search — cold<br>(322 nodes, no cache)</div>
+      <div class="metric-label">Skill text search — cold<br>(316 nodes, no cache)</div>
     </div>
     <div class="metric-card">
       <div class="metric-big green">0ms</div>
@@ -480,43 +532,44 @@ your memory. Read them. Update them...
     </div>
     <div class="metric-card">
       <div class="metric-big purple">0.26ms</div>
-      <div class="metric-label">Workspace load — cold<br>(Soul / Memory / Tools)</div>
+      <div class="metric-label">Workspace load — cold<br>(Soul + Memory + Tools)</div>
     </div>
     <div class="metric-card">
-      <div class="metric-big green">~8,200</div>
-      <div class="metric-label">Tokens saved per session<br>(workspace + skill bodies)</div>
+      <div class="metric-big green">96%</div>
+      <div class="metric-label">Workspace stub compression<br>(~13,800 → 604 bytes)</div>
     </div>
     <div class="metric-card">
-      <div class="metric-big red">64 MB</div>
-      <div class="metric-label">Full DB on disk<br>(322 skills + 1536d embeddings + workspace)</div>
+      <div class="metric-big green">545k</div>
+      <div class="metric-label">Reference nodes<br>(718 DevDocs docsets)</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-big red">295 MB</div>
+      <div class="metric-label">Full DB compressed (zstd)<br>(3.2 GB uncompressed)</div>
     </div>
   </div>
 
-  <!-- Vector embeddings section -->
   <div style="margin-top:2rem; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.75rem;">
     <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
-      <div style="background:rgba(0,212,170,0.15);border:1px solid rgba(0,212,170,0.3);color:var(--accent2);padding:0.2rem 0.6rem;border-radius:6px;font-size:0.75rem;font-weight:700;">NEW</div>
-      <h3 style="font-size:1rem; font-weight:700;">Vector Embeddings — Semantic Skill Search</h3>
+      <div class="badge-new" style="margin-left:0;">EMBEDDINGS</div>
+      <h3 style="font-size:1rem; font-weight:700;">Vector Search — Semantic Skill Discovery</h3>
     </div>
-    <p style="font-size:0.88rem; margin-bottom:1rem;">All 322 skills ship with precomputed <strong>text-embedding-3-small</strong> vectors (1536 dimensions). Cosine similarity search finds semantically relevant skills — not just keyword matches.</p>
+    <p style="font-size:0.88rem; margin-bottom:1rem;">All 316 skills ship with precomputed <strong>text-embedding-3-small</strong> vectors (1536 dimensions). Cosine similarity search finds semantically relevant skills — not just keyword matches.</p>
     <div class="code-block" style="margin:0;">
-      <pre><span class="comment"># Semantic search — finds skills by meaning, not keywords</span>
+      <pre><span class="comment"># Finds skills by meaning, not exact keywords</span>
 <span class="fn">node</span> ladybugdb/scripts/query.js --semantic <span class="string">"deploy containerized app to cloud"</span>
-<span class="comment"># → devops-sre/docker, cloud-aws/aws-ecs, cloud-gcp/gcp-cloud-run, ...</span>
+<span class="comment"># → devops-sre/docker · cloud-aws/aws-ecs · cloud-gcp/gcp-cloud-run</span>
 
-<span class="comment"># Generate your own embeddings (OpenAI or local Ollama nomic-embed-text)</span>
+<span class="comment"># Generate embeddings for new skills (OpenAI or local Ollama)</span>
 <span class="fn">node</span> ladybugdb/scripts/gen-embeddings.js --missing</pre>
     </div>
     <p style="font-size:0.82rem; color:var(--text2); margin-top:0.75rem;">
-      Benchmarked: 322 skills embedded in <strong>8.4s</strong> via OpenAI API · 0 errors · cost &lt;$0.01
+      316 skills embedded in <strong>8.4s</strong> via OpenAI text-embedding-3-small · 0 errors · cost &lt;$0.01
     </p>
   </div>
 
   <div style="margin-top:1.5rem;">
     <p style="font-size:0.88rem;">
-      After the first workspace load per session, all results are served from an in-process JavaScript <code style="background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px;font-family:'JetBrains Mono',monospace;">Map</code> cache with a 60-second TTL. Subsequent prompt builds, tool calls, and compaction cycles cost <strong>0ms</strong> for workspace content.
-      <br><br>
-      For multi-instance deployments (e.g., a fleet of 8 AI agents sharing one DB), LadybugDB supports concurrent reads without blocking. Total token savings across an 8-instance fleet: <strong>~65,000+ tokens saved per hour</strong>.
+      After the first workspace load per session, all results are served from an in-process JavaScript <code style="background:var(--code-bg); padding:0.1rem 0.4rem; border-radius:4px; font-family:'JetBrains Mono',monospace;">Map</code> cache with a 60-second TTL. Subsequent prompt builds, tool calls, and compaction cycles cost <strong>0ms</strong> for workspace content. Across an 8-agent fleet: <strong>~65,000+ tokens saved per hour</strong>.
     </p>
   </div>
 </section>
@@ -526,69 +579,101 @@ your memory. Read them. Update them...
 <!-- INSTALL -->
 <section id="install">
   <div class="section-label">Quick Start</div>
-  <h2>Get running in 5 steps</h2>
+  <h2>One-line install</h2>
+  <p>The install script downloads a pre-built, SHA256-verified database from the GitHub Release. No build step required.</p>
 
-  <div class="install-steps">
+  <div class="code-block" style="margin-top:1.5rem;">
+    <pre><span class="comment"># Full install (skills + 545k DevDocs reference nodes) — recommended</span>
+<span class="fn">curl</span> -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh <span class="keyword">|</span> bash
+
+<span class="comment"># Lite install (skills + embeddings only, faster download)</span>
+<span class="fn">curl</span> -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh <span class="keyword">|</span> bash -s -- --lite
+
+<span class="comment"># Pin to a specific release</span>
+<span class="fn">curl</span> -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh <span class="keyword">|</span> bash -s -- --full --version v1.0</pre>
+  </div>
+
+  <div class="tier-grid" style="margin-top:1.5rem;">
+    <div class="tier-card">
+      <div class="tier-badge lite">--lite</div>
+      <h3>Skills + Embeddings</h3>
+      <p style="font-size:0.87rem; color:var(--text2);">316 skills · 1536d vectors · workspace schema</p>
+      <div style="margin-top:0.75rem; font-size:0.82rem; color:var(--text2);">Download: <strong>295 MB</strong></div>
+    </div>
+    <div class="tier-card" style="border-color:rgba(0,212,170,0.25);">
+      <div class="tier-badge full">--full (default)</div>
+      <h3>Skills + DevDocs Reference</h3>
+      <p style="font-size:0.87rem; color:var(--text2);">316 skills · 545k Reference nodes · 718 docsets</p>
+      <div style="margin-top:0.75rem; font-size:0.82rem; color:var(--text2);">Download: <strong>295 MB</strong></div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem; font-weight:700; margin-top:3rem; margin-bottom:0.5rem;">Manual setup (from source)</h3>
+  <div class="install-steps" style="margin-top:1rem;">
     <div class="step">
       <div class="step-num">1</div>
       <div class="step-body">
         <h4>Clone and install</h4>
         <div class="code-block">
           <pre><span class="fn">git</span> clone https://github.com/alphaonedev/openclaw-graph.git
-<span class="fn">cd</span> openclaw-graph
-<span class="fn">npm</span> install</pre>
+<span class="fn">cd</span> openclaw-graph && npm install</pre>
         </div>
       </div>
     </div>
-
     <div class="step">
       <div class="step-num">2</div>
       <div class="step-body">
         <h4>Load the skill database</h4>
         <div class="code-block">
           <pre><span class="fn">node</span> ladybugdb/scripts/loader.js
-<span class="comment"># → 322 skills | 28 clusters | 247 edges | 0 errors</span></pre>
+<span class="comment"># → 316 skills | 27 clusters | 247 edges | 0 errors</span></pre>
         </div>
       </div>
     </div>
-
     <div class="step">
       <div class="step-num">3</div>
       <div class="step-body">
-        <h4>Seed your workspace identity</h4>
-        <p>Edit <code style="background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px;font-family:'JetBrains Mono',monospace;">ladybugdb/scripts/seed-workspace.js</code> — set your <code style="background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px;font-family:'JetBrains Mono',monospace;">WORKSPACE_ID</code> and fill in Soul, Memory, Tool nodes. Then:</p>
+        <h4>Import DevDocs reference (optional)</h4>
         <div class="code-block">
-          <pre><span class="fn">node</span> ladybugdb/scripts/seed-workspace.js
-<span class="comment"># → Soul: 5  Memory: 3  Tool: 8  Skill: 322</span></pre>
+          <pre><span class="fn">node</span> ladybugdb/scripts/import-devdocs.mjs
+<span class="comment"># Checkpoint-based — safe to kill and resume</span>
+<span class="comment"># → 718 docsets | 545,072 Reference nodes</span></pre>
         </div>
       </div>
     </div>
-
     <div class="step">
       <div class="step-num">4</div>
       <div class="step-body">
-        <h4>Patch OpenClaw workspace.ts</h4>
-        <p>Add the graph backend block from <code style="background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px;font-family:'JetBrains Mono',monospace;">src/agents/workspace.graph.ts</code> into your OpenClaw's <code style="background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px;font-family:'JetBrains Mono',monospace;">src/agents/workspace.ts</code>. See the README for the exact patch points.</p>
+        <h4>Seed workspace identity</h4>
         <div class="code-block">
-          <pre><span class="fn">cd</span> path/to/openclaw
-<span class="fn">pnpm</span> build   <span class="comment"># recompile after patching</span></pre>
+          <pre><span class="comment"># Edit seed-workspace.js — set WORKSPACE_ID, fill Soul/Memory/Tool nodes</span>
+<span class="fn">node</span> ladybugdb/scripts/seed-workspace.js</pre>
         </div>
       </div>
     </div>
-
     <div class="step">
       <div class="step-num">5</div>
       <div class="step-body">
-        <h4>Deploy workspace stubs</h4>
+        <h4>Patch OpenClaw + deploy stubs</h4>
         <div class="code-block">
-          <pre><span class="fn">cp</span> workspace-stubs/SOUL.md    ~/.openclaw/workspace/SOUL.md
-<span class="fn">cp</span> workspace-stubs/MEMORY.md  ~/.openclaw/workspace/MEMORY.md
-<span class="fn">cp</span> workspace-stubs/TOOLS.md   ~/.openclaw/workspace/TOOLS.md
-<span class="fn">cp</span> workspace-stubs/AGENTS.md  ~/.openclaw/workspace/AGENTS.md
-<span class="comment"># Update 'myapp' in each file to your WORKSPACE_ID</span></pre>
+          <pre><span class="comment"># Apply the workspace.ts patch</span>
+<span class="fn">git</span> apply patches/workspace-cache-fix.patch
+<span class="fn">pnpm</span> build
+
+<span class="comment"># Deploy graph stubs</span>
+<span class="fn">cp</span> workspace-stubs/*.md ~/.openclaw/workspace/
+<span class="comment"># Update 'myapp' → your WORKSPACE_ID in each stub</span></pre>
         </div>
       </div>
     </div>
+  </div>
+
+  <div style="margin-top:2rem; padding:1.25rem 1.5rem; background:var(--bg2); border:1px solid var(--border); border-radius:10px; font-size:0.87rem;">
+    <strong>SHA256 checksums (v1.0)</strong><br>
+    <code style="font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--text2); display:block; margin-top:0.5rem; word-break:break-all;">
+      2aeb2461e7cfdfa1ba48ed9fb8eeca1b170c53a0ffa5046b3bedd5cab5229e43 &nbsp; alphaone-skills-lite.db.zst<br>
+      1c663cece30175f680486f5875ad58d9c01ba58f239be0b83605793d6487745b &nbsp; alphaone-skills.db.zst
+    </code>
   </div>
 </section>
 
@@ -597,18 +682,20 @@ your memory. Read them. Update them...
 <!-- CTA -->
 <div class="cta-section">
   <h2>Open source. Community-first.</h2>
-  <p style="color:var(--text2);max-width:500px;margin:0 auto 2rem;">
-    Built as a contribution back to the OpenClaw project. PRs welcome — add skills, improve queries, or extend the schema.
+  <p style="color:var(--text2); max-width:500px; margin:0 auto 2rem;">
+    Built as a contribution back to the OpenClaw project. PRs welcome — add skills, extend the DevDocs coverage, or improve the schema.
   </p>
-  <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+  <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
     <a href="https://github.com/alphaonedev/openclaw-graph" class="btn-primary">View Source on GitHub</a>
+    <a href="skills.html" class="btn-secondary">Browse 316 Skills →</a>
     <a href="https://github.com/openclaw/openclaw" class="btn-secondary">OpenClaw Project →</a>
   </div>
 </div>
 
 <footer>
-  openclaw-graph — MIT License · Built for the <a href="https://github.com/openclaw/openclaw">OpenClaw</a> open source community ·
-  <a href="https://www.npmjs.com/package/lbug">LadybugDB</a>
+  openclaw-graph v1.0 · MIT License · Built for the <a href="https://github.com/openclaw/openclaw">OpenClaw</a> community ·
+  <a href="https://www.npmjs.com/package/lbug">LadybugDB 0.14.3</a> ·
+  <a href="https://github.com/alphaonedev/openclaw-graph/releases/tag/v1.0">Release Notes</a>
 </footer>
 
 </body>
