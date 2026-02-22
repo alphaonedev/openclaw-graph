@@ -1,33 +1,34 @@
 #!/usr/bin/env bash
 # ============================================================
 # install.sh — LadybugDB Skill Graph Installer
-# alphaonedev/openclaw-graph
+# https://github.com/alphaonedev/openclaw-graph
 #
-# Downloads a pre-built LadybugDB database from Google Drive
+# Downloads a pre-built LadybugDB database from GitHub Releases
 # and places it at the configured path.
 #
 # Usage:
 #   ./install.sh              # interactive (prompts lite vs full)
 #   ./install.sh --lite       # skills only (~10 MB download)
-#   ./install.sh --full       # skills + all DevDocs (~1.8 GB download)
+#   ./install.sh --full       # skills + all DevDocs (~500 MB download)
 #   ./install.sh --verify     # verify existing DB without reinstalling
+#   ./install.sh --version v1.1  # install a specific release version
 # ============================================================
 
 set -euo pipefail
 
 # ── Config ───────────────────────────────────────────────────
+REPO="alphaonedev/openclaw-graph"
+RELEASE_VERSION="${RELEASE_VERSION:-latest}"
 DB_DIR="$(cd "$(dirname "$0")/ladybugdb/db" && pwd)"
 DB_FILE="$DB_DIR/alphaone-skills.db"
 TMP_DIR="$(mktemp -d)"
 NODE_BIN="${NODE_BIN:-node}"
 
-# Google Drive file IDs (set after upload)
-DRIVE_LITE_ID="PLACEHOLDER_LITE_FILE_ID"
-DRIVE_FULL_ID="PLACEHOLDER_FULL_FILE_ID"
-DRIVE_LITE_SHA256="PLACEHOLDER_LITE_SHA256"
-DRIVE_FULL_SHA256="PLACEHOLDER_FULL_SHA256"
+GITHUB_BASE="https://github.com/${REPO}/releases/download"
 
-DRIVE_BASE="https://drive.google.com/uc?export=download&confirm=t&id"
+# SHA256 checksums — updated each release
+LITE_SHA256="PLACEHOLDER_LITE_SHA256"
+FULL_SHA256="PLACEHOLDER_FULL_SHA256"
 # ─────────────────────────────────────────────────────────────
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
@@ -47,27 +48,40 @@ MODE=""
 VERIFY_ONLY=false
 for arg in "$@"; do
   case "$arg" in
-    --lite)   MODE="lite"  ;;
-    --full)   MODE="full"  ;;
-    --verify) VERIFY_ONLY=true ;;
+    --lite)        MODE="lite" ;;
+    --full)        MODE="full" ;;
+    --verify)      VERIFY_ONLY=true ;;
+    --version)     shift; RELEASE_VERSION="$1" ;;
     --help|-h)
-      echo "Usage: $0 [--lite|--full|--verify]"
+      echo "Usage: $0 [--lite|--full|--verify|--version <tag>]"
+      echo ""
+      echo "  --lite          Skills only (~10 MB)"
+      echo "  --full          Skills + all DevDocs (~500 MB)"
+      echo "  --verify        Verify existing DB"
+      echo "  --version <tag> Pin to a specific release (e.g. v1.0)"
       exit 0 ;;
   esac
 done
 
+# ── Resolve version ──────────────────────────────────────────
+if [ "$RELEASE_VERSION" = "latest" ]; then
+  info "Resolving latest release tag..."
+  RELEASE_VERSION=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
+    | python3 -c "import json,sys; print(json.load(sys.stdin)['tag_name'])" 2>/dev/null \
+    || echo "v1.0")
+  info "Latest: $RELEASE_VERSION"
+fi
+
 # ── Header ───────────────────────────────────────────────────
 echo ""
 echo -e "${BOLD}🐞 LadybugDB Skill Graph — Installer${RESET}"
-echo "   Skills + DevDocs reference graph for OpenClaw"
+echo "   ${REPO} @ ${RELEASE_VERSION}"
 echo ""
 
 # ── Verify-only mode ─────────────────────────────────────────
 if $VERIFY_ONLY; then
-  if [ ! -f "$DB_FILE" ]; then
-    error "No database found at $DB_FILE"
-  fi
-  info "Verifying database at $DB_FILE ..."
+  [ -f "$DB_FILE" ] || error "No database found at $DB_FILE"
+  info "Verifying $DB_FILE ..."
   SIZE=$(du -sh "$DB_FILE" | cut -f1)
   "$NODE_BIN" --input-type=module << EOF
 import { Database, Connection } from 'lbug';
@@ -75,9 +89,9 @@ const db = new Database('$DB_FILE');
 await db.init(); const c = new Connection(db); await c.init();
 const s = await (await c.query('MATCH (n:Skill) RETURN count(n) AS n')).getAll();
 const r = await (await c.query('MATCH (n:Reference) RETURN count(n) AS n')).getAll();
-console.log(\`  Skills:     \${s[0]?.n ?? 0}\`);
-console.log(\`  References: \${r[0]?.n ?? 0}\`);
-console.log(\`  DB size:    $SIZE\`);
+console.log('  Skills:     ' + (s[0]?.n ?? 0));
+console.log('  References: ' + (r[0]?.n ?? 0));
+console.log('  DB size:    $SIZE');
 EOF
   success "Database OK"
   exit 0
@@ -86,74 +100,48 @@ fi
 # ── Check dependencies ───────────────────────────────────────
 header "Checking dependencies..."
 
-check_cmd() {
-  if command -v "$1" &>/dev/null; then
-    success "$1 found ($(command -v "$1"))"
-    return 0
-  else
-    return 1
-  fi
-}
+check_cmd() { command -v "$1" &>/dev/null && success "$1 found" && return 0 || return 1; }
 
-check_cmd curl   || error "curl is required. Install: brew install curl"
-check_cmd "$NODE_BIN" || error "node is required. Install: https://nodejs.org"
+check_cmd curl   || error "curl required: brew install curl"
+check_cmd "$NODE_BIN" || error "node required: https://nodejs.org"
 
-# Prefer zstd, fall back to gzip
-DECOMP=""
-EXT=""
+DECOMP=""; EXT=""
 if check_cmd zstd; then
-  DECOMP="zstd"
-  EXT="zst"
+  DECOMP="zstd"; EXT="zst"
 elif check_cmd gzip; then
-  warn "zstd not found — falling back to gzip (slightly larger download)"
-  DECOMP="gzip"
-  EXT="gz"
+  warn "zstd not found — using gzip fallback"
+  DECOMP="gzip"; EXT="gz"
 else
-  error "zstd or gzip required. Install: brew install zstd"
+  error "zstd or gzip required: brew install zstd"
 fi
 
-# Check lbug is available
-if ! "$NODE_BIN" -e "require('lbug')" 2>/dev/null; then
-  error "lbug npm package not found. Run: npm install lbug  (or pnpm add lbug)"
-fi
+"$NODE_BIN" -e "require('lbug')" 2>/dev/null || error "lbug not found: npm install lbug"
 
 # ── Choose tier ──────────────────────────────────────────────
 if [ -z "$MODE" ]; then
   header "Choose database tier:"
   echo ""
-  echo "  [1] Lite  — 322 skills + embeddings           (~10 MB download, ~64 MB DB)"
-  echo "  [2] Full  — Lite + all DevDocs (787 docsets)  (~1.8 GB download, ~21 GB DB)"
+  echo "  [1] Lite  — 322 skills + 1536d embeddings             (~10 MB)"
+  echo "  [2] Full  — Lite + 787 DevDocs docsets (~620k entries) (~500 MB)"
   echo ""
   read -rp "  Choice [1/2]: " CHOICE
   case "$CHOICE" in
     1) MODE="lite" ;;
     2) MODE="full" ;;
-    *) error "Invalid choice. Use 1 or 2." ;;
+    *) error "Invalid choice." ;;
   esac
 fi
 
-if [ "$MODE" = "lite" ]; then
-  DRIVE_ID="$DRIVE_LITE_ID"
-  EXPECTED_SHA256="$DRIVE_LITE_SHA256"
-  LABEL="Lite (~10 MB)"
-else
-  DRIVE_ID="$DRIVE_FULL_ID"
-  EXPECTED_SHA256="$DRIVE_FULL_SHA256"
-  LABEL="Full (~1.8 GB)"
-fi
-
-if [ "$DRIVE_ID" = "PLACEHOLDER_LITE_FILE_ID" ] || [ "$DRIVE_ID" = "PLACEHOLDER_FULL_FILE_ID" ]; then
-  error "Database not yet published. File IDs are placeholders — check for a newer release."
-fi
+FILENAME="alphaone-skills-${MODE}.db.${EXT}"
+DOWNLOAD_URL="${GITHUB_BASE}/${RELEASE_VERSION}/${FILENAME}"
+EXPECTED_SHA256="${MODE}" # resolved below
+[ "$MODE" = "lite" ] && EXPECTED_SHA256="$LITE_SHA256" || EXPECTED_SHA256="$FULL_SHA256"
 
 # ── Check existing DB ────────────────────────────────────────
 if [ -f "$DB_FILE" ]; then
-  warn "Existing database found at $DB_FILE"
-  read -rp "  Overwrite? [y/N]: " OVERWRITE
-  if [[ "$OVERWRITE" != "y" && "$OVERWRITE" != "Y" ]]; then
-    info "Keeping existing database. Use --verify to check it."
-    exit 0
-  fi
+  warn "Existing DB found at $DB_FILE"
+  read -rp "  Overwrite? [y/N]: " OW
+  [[ "$OW" == "y" || "$OW" == "Y" ]] || { info "Keeping existing DB."; exit 0; }
   mv "$DB_FILE" "${DB_FILE}.bak-$(date +%H%M)"
   info "Backed up existing DB."
 fi
@@ -161,63 +149,46 @@ fi
 mkdir -p "$DB_DIR"
 
 # ── Download ─────────────────────────────────────────────────
-header "Downloading $LABEL database..."
-COMPRESSED_FILE="$TMP_DIR/alphaone-skills.db.$EXT"
-
+header "Downloading ${MODE} database (${RELEASE_VERSION})..."
 echo ""
-info "Source: Google Drive (Justin@alpha-one.mobi / openclaw-graph)"
-info "Destination: $DB_FILE"
+info "URL: $DOWNLOAD_URL"
 echo ""
 
-# Handle large file cookie confirmation from Google Drive
-CONFIRM_URL="${DRIVE_BASE}=${DRIVE_ID}"
+COMPRESSED_FILE="$TMP_DIR/$FILENAME"
 
 curl -L \
   --progress-bar \
-  --cookie-jar "$TMP_DIR/cookies.txt" \
-  --cookie "$TMP_DIR/cookies.txt" \
+  --fail \
   -o "$COMPRESSED_FILE" \
-  "$CONFIRM_URL"
+  "$DOWNLOAD_URL" \
+  || error "Download failed. Check https://github.com/${REPO}/releases for available versions."
 
-# Check we got actual data (not an HTML error page)
-FIRST_BYTES=$(head -c 4 "$COMPRESSED_FILE" | xxd -p 2>/dev/null || hexdump -n 4 -e '1/1 "%02x"' "$COMPRESSED_FILE" 2>/dev/null || echo "")
-if [[ "$FIRST_BYTES" == "3c68746d" || "$FIRST_BYTES" == "3c21444f" ]]; then
-  error "Download returned an HTML page — Drive link may be private or expired."
-fi
+success "Downloaded: $(du -sh "$COMPRESSED_FILE" | cut -f1)"
 
-DOWNLOAD_SIZE=$(du -sh "$COMPRESSED_FILE" | cut -f1)
-success "Downloaded: $DOWNLOAD_SIZE"
-
-# ── Checksum verify ──────────────────────────────────────────
+# ── Checksum ─────────────────────────────────────────────────
 header "Verifying checksum..."
-if command -v sha256sum &>/dev/null; then
-  ACTUAL_SHA=$(sha256sum "$COMPRESSED_FILE" | awk '{print $1}')
-elif command -v shasum &>/dev/null; then
-  ACTUAL_SHA=$(shasum -a 256 "$COMPRESSED_FILE" | awk '{print $1}')
+if [[ "$EXPECTED_SHA256" != "PLACEHOLDER"* ]]; then
+  if command -v sha256sum &>/dev/null; then
+    ACTUAL=$(sha256sum "$COMPRESSED_FILE" | awk '{print $1}')
+  else
+    ACTUAL=$(shasum -a 256 "$COMPRESSED_FILE" | awk '{print $1}')
+  fi
+  [ "$ACTUAL" = "$EXPECTED_SHA256" ] || error "Checksum mismatch!\n  Expected: $EXPECTED_SHA256\n  Got:      $ACTUAL"
+  success "Checksum OK"
 else
-  warn "No sha256 tool found — skipping checksum verification"
-  ACTUAL_SHA="$EXPECTED_SHA256"
+  warn "Checksums not yet set in this install.sh — skipping verification"
 fi
-
-if [ "$ACTUAL_SHA" != "$EXPECTED_SHA256" ]; then
-  error "Checksum mismatch!\n  Expected: $EXPECTED_SHA256\n  Got:      $ACTUAL_SHA"
-fi
-success "Checksum verified"
 
 # ── Decompress ───────────────────────────────────────────────
 header "Decompressing..."
-echo ""
-
 if [ "$DECOMP" = "zstd" ]; then
-  zstd -d "$COMPRESSED_FILE" -o "$DB_FILE" --progress
+  zstd -d "$COMPRESSED_FILE" -o "$DB_FILE"
 else
   gzip -dc "$COMPRESSED_FILE" > "$DB_FILE"
 fi
+success "Decompressed: $(du -sh "$DB_FILE" | cut -f1)"
 
-FINAL_SIZE=$(du -sh "$DB_FILE" | cut -f1)
-success "Decompressed: $FINAL_SIZE"
-
-# ── Quick verify ─────────────────────────────────────────────
+# ── Verify DB ────────────────────────────────────────────────
 header "Verifying database..."
 "$NODE_BIN" --input-type=module << EOF
 import { Database, Connection } from 'lbug';
@@ -228,19 +199,14 @@ try {
   const r = await (await c.query('MATCH (n:Reference) RETURN count(n) AS n')).getAll();
   console.log('  Skills:     ' + (s[0]?.n ?? 0));
   console.log('  References: ' + (r[0]?.n ?? 0));
-  console.log('  DB size:    $FINAL_SIZE');
-} catch(e) {
-  console.error('DB verify failed:', e.message);
-  process.exit(1);
-}
+} catch(e) { console.error('Verify failed:', e.message); process.exit(1); }
 EOF
 
 # ── Done ─────────────────────────────────────────────────────
 echo ""
 echo -e "${BOLD}${GREEN}🐞 Installation complete!${RESET}"
 echo ""
-echo "  Database: $DB_FILE"
-echo "  Size:     $FINAL_SIZE"
+echo "  DB: $DB_FILE ($(du -sh "$DB_FILE" | cut -f1))"
 echo ""
 echo "  Query the graph:"
 echo "    node ladybugdb/scripts/query.js --cluster python"
