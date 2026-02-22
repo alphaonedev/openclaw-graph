@@ -1,5 +1,5 @@
 From 5b0bfdc222f08dd91cec7fb3d22421119a494e05 Mon Sep 17 00:00:00 2001
-From: AlphaOne Dev <justin@alpha-one.mobi>
+From: AlphaOne Dev <dev@alphaonedev.github.com>
 Date: Sat, 21 Feb 2026 19:50:46 -0500
 Subject: [PATCH] fix: workspace.ts cache layering + async graph query
 MIME-Version: 1.0
