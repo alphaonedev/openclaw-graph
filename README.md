@@ -2,13 +2,31 @@
 
 **Graph-native workspace backend for [OpenClaw](https://github.com/openclaw/openclaw) using [LadybugDB](https://www.npmjs.com/package/lbug)**
 
-Replace flat workspace markdown files with a single embedded Cypher graph database. 312 skills across 27 clusters, queryable by text, cluster, or graph traversal. Zero daemons, zero servers, zero flat files.
+Replace flat workspace markdown files with an embedded Cypher graph database. 316 skills across 27 clusters · 545,072 DevDocs reference nodes · 718 docsets · 1536d vector embeddings. Zero daemons, zero servers, zero flat files. **100% graph-native from install.**
 
-[![Skills](https://img.shields.io/badge/skills-312-blue)](skills/)
+[![v1.1](https://img.shields.io/badge/release-v1.1-brightgreen)](https://github.com/alphaonedev/openclaw-graph/releases)
+[![Skills](https://img.shields.io/badge/skills-316-blue)](skills/)
 [![Clusters](https://img.shields.io/badge/clusters-27-green)](skills/)
 [![LadybugDB](https://img.shields.io/badge/LadybugDB-0.14.3-purple)](https://www.npmjs.com/package/lbug)
 [![License](https://img.shields.io/badge/license-MIT-orange)](LICENSE)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://alphaonedev.github.io/openclaw-graph)
+
+---
+
+## What's new in v1.1
+
+**100% graph-native workspace.** Every DB release now ships with a default `workspace='openclaw'` pre-seeded — Soul, Memory, AgentConfig, and Tool nodes ready to use out of the box. Install, deploy stubs, done.
+
+| | v1.0 | v1.1 |
+|--|------|------|
+| Skills | 316 | 316 |
+| Reference nodes | 545,072 | 545,072 |
+| Default workspace | ❌ | ✅ `workspace='openclaw'` |
+| Soul / Memory / AgentConfig / Tool | manual seed required | ✅ pre-seeded |
+| QueryMetrics schema | ❌ | ✅ |
+| `seed-default-workspace.mjs` | ❌ | ✅ |
+
+See [CUSTOMIZING.md](CUSTOMIZING.md) for how to personalize or fork the default workspace.
 
 ---
 
@@ -48,70 +66,71 @@ OpenClaw Session
 └── buildAgentSystemPrompt()
     └── injects graph-resolved markdown → system prompt
 
-Skills (312 nodes, 27 clusters)
+Skills (316 nodes, 27 clusters)
 │
 ├── loader.js        → parse SKILL.md files → insert into DB
 ├── query.js         → text search / cluster / graph traversal / Cypher
 └── seed-workspace.js → populate Soul / Memory / Tool / AgentConfig tables
 
 LadybugDB (embedded SQLite + Cypher, no daemon)
-└── ladybugdb/db/skills.db
+└── ladybugdb/db/alphaone-skills.db
 ```
 
 ---
 
 ## Quick Start
 
-### 1. Install
+### Option A — One-line install (recommended)
+
+```bash
+# Full install (skills + 545k DevDocs reference nodes)
+curl -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh | bash
+
+# Lite install (skills + embeddings only)
+curl -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh | bash -s -- --lite
+```
+
+The DB ships with `workspace='openclaw'` pre-seeded. Skip to step 3.
+
+### Option B — From source
 
 ```bash
 git clone https://github.com/alphaonedev/openclaw-graph.git
-cd openclaw-graph
-npm install
-```
+cd openclaw-graph && npm install
 
-### 2. Load the skill database
-
-```bash
+# Load skill database
 node ladybugdb/scripts/loader.js
-# → 312 skills, 27 clusters, 247 edges loaded
+# → 316 skills | 27 clusters | 247 edges
+
+# Seed default workspace (Soul, Memory, AgentConfig, Tool nodes)
+node ladybugdb/scripts/seed-default-workspace.mjs
+# → workspace='openclaw' seeded with agnostic defaults
 ```
 
-### 3. Seed your workspace identity
-
-Edit `ladybugdb/scripts/seed-workspace.js` — set `WORKSPACE_ID` and fill in your Soul, Memory, and Tool nodes. Then:
-
-```bash
-node ladybugdb/scripts/seed-workspace.js
-```
-
-### 4. Patch OpenClaw
-
-Apply the workspace patch to your OpenClaw installation:
-
-```bash
-# Copy the patch
-cp src/agents/workspace.graph.ts path/to/openclaw/src/agents/workspace.graph.ts
-
-# Apply changes to workspace.ts (see Integration section below)
-```
-
-### 5. Deploy workspace stubs
-
-```bash
-cp workspace-stubs/SOUL.md    ~/.openclaw/workspace/SOUL.md
-cp workspace-stubs/MEMORY.md  ~/.openclaw/workspace/MEMORY.md
-cp workspace-stubs/TOOLS.md   ~/.openclaw/workspace/TOOLS.md
-cp workspace-stubs/AGENTS.md  ~/.openclaw/workspace/AGENTS.md
-```
-
-Update the `workspace = 'myapp'` values in each stub to match your `WORKSPACE_ID`.
-
-### 6. Build OpenClaw
+### 3. Patch OpenClaw
 
 ```bash
 cd path/to/openclaw
+git apply path/to/openclaw-graph/patches/workspace-cache-fix.patch
 pnpm build
+```
+
+### 4. Deploy workspace stubs
+
+```bash
+cp workspace-stubs/*.md ~/.openclaw/workspace/
+# Stubs reference workspace='openclaw' by default — works immediately
+```
+
+### 5. Personalize
+
+```bash
+# Update your identity
+node ladybugdb/scripts/query.js --cypher \
+  "MATCH (s:Soul {id:'soul-openclaw-identity'}) SET s.content = 'Name: MyAgent | Role: ...'"
+
+# Add memory facts, restrict tools, create a custom workspace
+# See CUSTOMIZING.md for the full guide
 ```
 
 ---
@@ -188,7 +207,7 @@ export OPENCLAW_GRAPH_QUERY_SCRIPT=/path/to/openclaw-graph/ladybugdb/scripts/que
 
 ## Skill Database
 
-312 skills across 27 clusters, covering the full OpenClaw development surface:
+316 skills across 27 clusters, covering the full OpenClaw development surface:
 
 | Cluster | Skills | Description |
 |---------|--------|-------------|
@@ -242,16 +261,28 @@ node ladybugdb/scripts/query.js --stats
 
 ## Performance
 
+Measured on production data — 316 skills · 545,072 Reference nodes · Mac mini M-series 32 GB RAM.
+
+| Query | avg |
+|-------|-----|
+| Reference PK lookup (1 row, 545k table) | **0.11ms** |
+| Skill PK lookup (warm, in-process) | **0.15ms** |
+| AGENTS.md hot path (6 AgentConfig nodes) | **0.26ms** |
+| TOOLS.md hot path (25 Tool nodes) | **0.38ms** |
+| Full skill scan (316 nodes) | **2.19ms** |
+| GRAPH directive — first load (CLI subprocess) | **~84ms** |
+| GRAPH directive — cached hit | **0ms** |
+
+The ~84ms first-load cost is Node.js process spawn + lbug init — not the query itself. The three-layer cache (workspaceFileCache → graphQueryCache → graphQueryInFlight) amortizes this over a 60–180s adaptive TTL window. Top-20 queries are pre-warmed on startup.
+
 | Metric | Value |
 |--------|-------|
-| Workspace stub total size | ~660 bytes (4 files) |
-| Flat-file workspace size | ~25,000+ bytes |
-| **Size reduction** | **97%** |
-| Graph query latency (cold) | ~95–105ms |
-| Graph query latency (warm) | 0ms (60s cache) |
-| Skill text search (312 nodes) | ~101ms |
+| Workspace stub total size | ~513 bytes (4 files) |
+| Flat-file workspace size | ~9,000–25,000+ bytes |
+| **Size reduction** | **94–98%** |
 | Token savings per session | ~2,200–6,200 tokens |
-| DB file size (312 skills) | 10 MB |
+| DB compressed (full) | 295 MB (zstd) |
+| DB raw (full) | 3.2 GB |
 
 See [benchmarks/results.md](benchmarks/results.md) for full measurements.
 

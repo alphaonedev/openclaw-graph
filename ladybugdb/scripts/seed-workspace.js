@@ -1,30 +1,32 @@
 /**
- * openclaw-graph — Workspace Seed Script
+ * openclaw-graph — Workspace Seed Script (full customization template)
  *
- * Creates Soul, Memory, Tool, AgentConfig tables in LadybugDB
- * and seeds them with your workspace identity, memory, and tool config.
+ * ── Quick start ──────────────────────────────────────────────────────────────
+ * The default workspace ('openclaw') is already seeded in every DB release.
+ * For quick customization of the defaults, use seed-default-workspace.mjs:
  *
- * Usage:
+ *   node ladybugdb/scripts/seed-default-workspace.mjs
+ *   node ladybugdb/scripts/seed-default-workspace.mjs --workspace myagent
+ *
+ * ── This script ──────────────────────────────────────────────────────────────
+ * Use this for a fully custom workspace with your own Soul/Memory/Tool nodes.
+ * Edit WORKSPACE_ID and the node arrays below, then run:
+ *
  *   node seed-workspace.js           # Seed (skips existing nodes)
  *   node seed-workspace.js --reset   # Drop tables + re-seed from scratch
  *
- * After seeding, update your workspace stub files:
- *   ~/.openclaw/workspace/SOUL.md
- *   ~/.openclaw/workspace/MEMORY.md
- *   ~/.openclaw/workspace/TOOLS.md
- *   ~/.openclaw/workspace/AGENTS.md
+ * After seeding, deploy workspace stubs:
+ *   cp workspace-stubs/*.md ~/.openclaw/workspace/
+ *   # Edit each stub's GRAPH directive: change 'openclaw' → your WORKSPACE_ID
  *
- * Each file should contain ONLY a GRAPH directive line, e.g.:
- *   <!-- GRAPH: MATCH (s:Soul) WHERE s.workspace = 'myapp' RETURN s.section AS section, s.content AS content ORDER BY s.priority ASC -->
- *
- * OpenClaw + workspace.graph.ts will resolve these on every workspace load.
+ * See CUSTOMIZING.md for the full guide.
  */
 import { Database, Connection } from 'lbug';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DB_PATH = resolve(__dirname, '../db/skills.db');
+const DB_PATH = resolve(__dirname, '../db/alphaone-skills.db');
 const RESET = process.argv.includes('--reset');
 
 // ── CONFIGURE YOUR WORKSPACE IDENTITY ────────────────────────────────────────

@@ -1,51 +1,93 @@
 # Workspace Stubs
 
-These 4 files replace your full `~/.openclaw/workspace/*.md` files.
+Four files that replace your full `~/.openclaw/workspace/*.md` flat files.
+Each contains one `<!-- GRAPH: ... -->` directive — OpenClaw resolves it against LadybugDB at session start.
 
-Each file contains a single `<!-- GRAPH: ... -->` directive. OpenClaw's patched `workspace.ts` resolves these directives by querying LadybugDB and returning formatted markdown — which gets injected into the agent's system prompt.
+Default workspace ID: **`openclaw`** — seeded into every DB release via `seed-default-workspace.mjs`.
 
-## Before (flat files)
+## Before → After
+
+| File | Before (flat) | After (stub) |
+|------|--------------|--------------|
+| SOUL.md    | ~1,800 bytes | 144 bytes |
+| MEMORY.md  | ~5,000+ bytes | 130 bytes |
+| TOOLS.md   | ~2,000 bytes | 112 bytes |
+| AGENTS.md  | ~500 bytes   | 127 bytes |
+| **Total**  | **~9,000+ bytes** | **~513 bytes** |
+
+Content is resolved at runtime from LadybugDB → injected into the agent system prompt.
+
+## Quick Deploy
+
+```bash
+# 1. Install DB (already has workspace='openclaw' nodes)
+curl -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh | bash
+
+# 2. Deploy stubs
+cp workspace-stubs/*.md ~/.openclaw/workspace/
+
+# 3. Apply workspace.ts patch
+cd ~/Downloads/openclaw && git apply path/to/patches/workspace-cache-fix.patch && pnpm build
+
+# 4. Done. OpenClaw resolves all stubs from LadybugDB on next session start.
+```
+
+## Customizing Your Workspace
+
+**Option A — Edit nodes directly with Cypher:**
+```bash
+# Update your identity
+node ladybugdb/scripts/query.js --cypher \
+  "MATCH (s:Soul {id:'soul-openclaw-identity'}) SET s.content = 'Name: MyAgent | Role: Ops agent | Emoji: 🛡️'"
+
+# Add a memory fact
+node ladybugdb/scripts/query.js --cypher \
+  "CREATE (m:Memory {id:'mem-openclaw-infra', workspace:'openclaw', domain:'Infrastructure', content:'DB: ~/myapp/db.db | Node: /usr/local/bin/node', timestamp:'2026-01-01'})"
+
+# Disable a tool
+node ladybugdb/scripts/query.js --cypher \
+  "MATCH (t:Tool {id:'tool-sessions-spawn'}) SET t.available = false"
+```
+
+**Option B — Fork the seed script:**
+```bash
+cp ladybugdb/scripts/seed-default-workspace.mjs ladybugdb/scripts/seed-myagent.mjs
+# Edit WORKSPACE constant, SOUL/MEMORY/AGENT_CONFIG arrays
+node ladybugdb/scripts/seed-myagent.mjs
+
+# Update stubs to point to your workspace
+sed -i "s/workspace = 'openclaw'/workspace = 'myagent'/g" workspace-stubs/*.md
+```
+
+**Option C — Multiple workspaces (8-instance fleet):**
+```bash
+# Each agent gets its own workspace ID
+# Instance A: workspace='intel-agent'
+# Instance B: workspace='code-agent'
+# etc.
+node ladybugdb/scripts/seed-default-workspace.mjs --workspace intel-agent
+node ladybugdb/scripts/seed-default-workspace.mjs --workspace code-agent
+```
+
+## Stub Format
 
 ```
-SOUL.md    → 1,800 bytes of markdown
-MEMORY.md  → 5,000–20,000 bytes of markdown
-TOOLS.md   → 2,000 bytes of markdown
-AGENTS.md  → 500 bytes of markdown
+<!-- GRAPH: <cypher query> -->
 ```
 
-## After (graph stubs)
+- Must be the **first line** of the file
+- Cypher must be a single line (no multi-line literals)
+- `workspace.ts` resolves it via `execFileAsync(node, [query.js, '--cypher', '...'])`
+- Result is cached with adaptive TTL: `60s × log₁₀(hit_count + 10)`
+- Three-layer cache: disk stub → graph query cache → in-flight dedup
 
-```
-SOUL.md    → 175 bytes (1 line)
-MEMORY.md  → 185 bytes (1 line)
-TOOLS.md   → 155 bytes (1 line)
-AGENTS.md  → 145 bytes (1 line)
-```
+## AGENTS.md vs SOUL.md
 
-**Total stub footprint: ~660 bytes** vs **~25,000+ bytes** for flat files.
+| File | Table | Filter | Used for |
+|------|-------|--------|----------|
+| AGENTS.md | AgentConfig | `workspace = 'X'` | Delegation, heartbeats, session config |
+| SOUL.md   | Soul        | `workspace = 'X'` | Identity, prime directive, vibe |
+| MEMORY.md | Memory      | `workspace = 'X'` | Project facts, infrastructure, state |
+| TOOLS.md  | Tool        | `available = true` | Available tools + usage notes |
 
-## How to deploy
-
-1. Run `node ladybugdb/scripts/seed-workspace.js` (edit workspace ID first)
-2. Copy these 4 files to `~/.openclaw/workspace/`
-3. Ensure `workspace.ts` is patched (see `src/agents/workspace.graph.ts`)
-4. Start OpenClaw — it will resolve graph content on first workspace load
-
-## Customizing queries
-
-Edit the Cypher in each stub to filter/sort differently:
-
-```sql
--- Load only high-priority soul sections
-MATCH (s:Soul) WHERE s.workspace = 'myapp' AND s.priority <= 3
-RETURN s.section AS section, s.content AS content
-ORDER BY s.priority ASC
-
--- Load memory for a specific domain
-MATCH (m:Memory) WHERE m.workspace = 'myapp' AND m.domain = 'Infrastructure'
-RETURN m.domain AS domain, m.content AS content
-
--- Load only available tools
-MATCH (t:Tool) WHERE t.available = true
-RETURN t.name AS name, t.notes AS notes ORDER BY t.name
-```
+Session filtering in OpenClaw: cron/subagent sessions only load AGENTS.md + TOOLS.md (`MINIMAL_BOOTSTRAP_ALLOWLIST`).
