@@ -64,7 +64,7 @@ node ladybugdb/scripts/query.js --cypher \
      id: 'mem-openclaw-api-keys',
      workspace: 'openclaw',
      domain: 'API Keys',
-     content: 'Brave Search: BSA... | xAI: stored in ~/.zshrc as XAI_API_KEY',
+     content: 'Brave Search: $BRAVE_API_KEY | xAI: $XAI_API_KEY (env vars in shell profile)',
      timestamp: '2026-01-01'
    })"
 ```

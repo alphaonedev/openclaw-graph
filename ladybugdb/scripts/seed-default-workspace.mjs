@@ -117,6 +117,26 @@ const AGENT_CONFIG = [
     key:   'Memory',
     value: 'Wake up fresh each session. Continuity files: memory/YYYY-MM-DD.md (daily logs), MEMORY.md (curated long-term). Write significant events, decisions, things to remember. No mental notes — write to files. memory/ dir: create if needed.',
   },
+  {
+    id:    `agentcfg-${WORKSPACE}-toon`,
+    key:   'Token Optimization — TOON',
+    value: 'TOON (Token-Oriented Object Notation) compresses JSON 30-60% for LLM context. CLI: toon encode <file.json> | toon decode <file.toon>. Use for: large data payloads, API response caching, context window optimization. Do NOT use for: config files humans edit, small payloads <1KB. Install: npm install -g @toon-format/cli.',
+  },
+  {
+    id:    `agentcfg-${WORKSPACE}-search-resilience`,
+    key:   'Search Resilience',
+    value: 'When web_search returns errors/empty: 1) Retry once with simplified query. 2) Try alternative search terms (synonyms, broader scope). 3) If still empty, use cached data or note "search unavailable" in output. 4) Never block an entire task because one search failed. 5) Log failures to memory for pattern detection. Rate limits: back off 5s between retries, max 3 retries per domain per session.',
+  },
+  {
+    id:    `agentcfg-${WORKSPACE}-schema-rules`,
+    key:   'Schema Rules',
+    value: 'All structured outputs MUST validate against defined schemas. Required fields: title, summary, severity, confidence, sources, timestamp. Severity scale: low/moderate/elevated/high/critical. Confidence: 0.0-1.0 float. Sources: minimum 2 per item. Schema violations block output — fix before proceeding.',
+  },
+  {
+    id:    `agentcfg-${WORKSPACE}-path-aliases`,
+    key:   'Path Aliases',
+    value: 'Define workspace path aliases to keep prompts compact. Example: $WORKSPACE = ~/.openclaw/workspace/ | $DB = path/to/your.db | $SCHEMAS = path/to/schemas/. Replace full paths in prompts with aliases to reduce token usage.',
+  },
 ];
 
 // ── Tool nodes ────────────────────────────────────────────────────────────────

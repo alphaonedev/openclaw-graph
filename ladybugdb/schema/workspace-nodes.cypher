@@ -4,7 +4,7 @@
 
 CREATE NODE TABLE Soul(
   id STRING,
-  workspace STRING DEFAULT 'sentinel',
+  workspace STRING DEFAULT 'openclaw',
   section STRING,
   content STRING,
   priority INT64 DEFAULT 5,
@@ -14,7 +14,7 @@ CREATE NODE TABLE Soul(
 
 CREATE NODE TABLE Memory(
   id STRING,
-  workspace STRING DEFAULT 'sentinel',
+  workspace STRING DEFAULT 'openclaw',
   domain STRING,
   content STRING,
   timestamp STRING DEFAULT '',
@@ -31,7 +31,7 @@ CREATE NODE TABLE Tool(
 
 CREATE NODE TABLE AgentConfig(
   id STRING,
-  workspace STRING DEFAULT 'sentinel',
+  workspace STRING DEFAULT 'openclaw',
   key STRING,
   value STRING,
   PRIMARY KEY(id)

@@ -30,7 +30,7 @@
 | Text search (cold process) | 94.29ms | 89.89ms | 103.11ms | 89.87ms |
 | Workspace AGENTS.md | 84.36ms | 84.35ms | 84.52ms | 84.25ms |
 | Workspace TOOLS.md | 85.01ms | 84.57ms | 88.68ms | 83.04ms |
-| Workspace Soul cron-lite | 83.23ms | 83.25ms | 84.04ms | 82.46ms |
+| Workspace Soul default | 83.23ms | 83.25ms | 84.04ms | 82.46ms |
 
 ## Key Takeaways
 
