@@ -27,8 +27,8 @@ NODE_BIN="${NODE_BIN:-node}"
 GITHUB_BASE="https://github.com/${REPO}/releases/download"
 
 # SHA256 checksums — updated each release
-LITE_SHA256="2aeb2461e7cfdfa1ba48ed9fb8eeca1b170c53a0ffa5046b3bedd5cab5229e43"
-FULL_SHA256="1c663cece30175f680486f5875ad58d9c01ba58f239be0b83605793d6487745b"
+LITE_SHA256="244675608dae5d173f940bf0bbdffff830a4be1d12c95623f459831addc5eb70"
+FULL_SHA256="24d5607245e92d30cd8c287df792ab29928a567b367c26c5f68550f611066e96"
 # ─────────────────────────────────────────────────────────────
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
@@ -68,7 +68,7 @@ if [ "$RELEASE_VERSION" = "latest" ]; then
   info "Resolving latest release tag..."
   RELEASE_VERSION=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
     | python3 -c "import json,sys; print(json.load(sys.stdin)['tag_name'])" 2>/dev/null \
-    || echo "v1.0")
+    || echo "v1.1")
   info "Latest: $RELEASE_VERSION"
 fi
 
