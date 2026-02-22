@@ -204,8 +204,8 @@
     <div class="stat-label">DevDocs Docsets</div>
   </div>
   <div class="stat">
-    <div class="stat-num">&lt;0.2ms</div>
-    <div class="stat-label">Query Latency</div>
+    <div class="stat-num">0.15ms</div>
+    <div class="stat-label">Skill Query Latency</div>
   </div>
   <div class="stat">
     <div class="stat-num">1536d</div>
@@ -238,7 +238,7 @@
 │       └── readFileWithCache()  <span style="color:#525570">← patched workspace.ts</span>
 │           │
 │           ├── [1] workspaceFileCache  <span style="color:#525570">mtime-keyed — raw stub, avoids fs.readFile</span>
-│           ├── [2] graphQueryCache     <span style="color:#525570">cypher-keyed — resolved content, 60s TTL</span>
+│           ├── [2] graphQueryCache     <span style="color:#525570">cypher-keyed — resolved content, adaptive TTL (60s × log₁₀(hits+10))</span>
 │           ├── [3] graphQueryInFlight  <span style="color:#525570">per-query Promise dedup (no thundering herd)</span>
 │           └── executeGraphQuery()     <span style="color:#525570">execFileAsync — non-blocking</span>
 │               └── <span class="hl2">node query.js --cypher "..."</span>
@@ -266,7 +266,7 @@
     <div class="how-card">
       <div class="how-num">2</div>
       <h3>Three-layer cache — correctly ordered</h3>
-      <p>workspaceFileCache stores raw stubs (mtime). graphQueryCache owns resolved content (60s TTL). graphQueryInFlight deduplicates concurrent misses. Each layer does exactly one job.</p>
+      <p>workspaceFileCache stores raw stubs (mtime). graphQueryCache owns resolved content (adaptive TTL: base 60s × log₁₀(hit_count+10)). graphQueryInFlight deduplicates concurrent misses. Each layer does exactly one job.</p>
     </div>
     <div class="how-card">
       <div class="how-num">3</div>
@@ -338,7 +338,7 @@ matters. Not a corporate drone...
 <br>
 <span style="color:#525570">→ Resolved from LadybugDB at session start
 → Returns prioritized, structured markdown
-→ Cached 60s in-process (0ms after first load)
+→ Adaptive TTL cache (60s–180s based on query frequency · 0ms after first load)
 → Update identity without touching files</span>
 </div>
     </div>
@@ -519,33 +519,106 @@ matters. Not a corporate drone...
 <section id="metrics">
   <div class="section-label">Performance</div>
   <h2>Measured on Apple Silicon Mac mini</h2>
-  <p style="margin-bottom:0.5rem;">Node.js v22.22.0 · LadybugDB 0.14.3 · 316 skills + 545k Reference nodes · macOS 15.3 arm64 · Feb 2026 · 10 runs each</p>
+  <p style="margin-bottom:0.5rem;">Node.js v22.22.0 · LadybugDB 0.14.3 · 316 skills + 545,072 Reference nodes · macOS 15.3 arm64 · Feb 22, 2026 · 5–20 iterations each</p>
 
   <div class="metrics-grid">
     <div class="metric-card">
-      <div class="metric-big purple">0.17ms</div>
-      <div class="metric-label">Skill text search — cold<br>(316 nodes, no cache)</div>
+      <div class="metric-big purple">0.15ms</div>
+      <div class="metric-label">Skill PK lookup — warm<br>(in-process, no cache)</div>
     </div>
     <div class="metric-card">
       <div class="metric-big green">0ms</div>
-      <div class="metric-label">Cached query latency<br>(60s TTL, in-process Map)</div>
+      <div class="metric-label">Cache hit latency<br>(adaptive TTL · in-process Map)</div>
     </div>
     <div class="metric-card">
-      <div class="metric-big purple">0.26ms</div>
-      <div class="metric-label">Workspace load — cold<br>(Soul + Memory + Tools)</div>
+      <div class="metric-big purple">0.11ms</div>
+      <div class="metric-label">Reference PK lookup<br>(single node · 545k table)</div>
     </div>
     <div class="metric-card">
-      <div class="metric-big green">96%</div>
-      <div class="metric-label">Workspace stub compression<br>(~13,800 → 604 bytes)</div>
+      <div class="metric-big purple">0.38ms</div>
+      <div class="metric-label">TOOLS.md hot path<br>(25 Tool nodes · workspace query)</div>
     </div>
     <div class="metric-card">
       <div class="metric-big green">545k</div>
-      <div class="metric-label">Reference nodes<br>(718 DevDocs docsets)</div>
+      <div class="metric-label">Reference nodes<br>(718 DevDocs docsets indexed)</div>
     </div>
     <div class="metric-card">
-      <div class="metric-big red">295 MB</div>
-      <div class="metric-label">Full DB compressed (zstd)<br>(3.2 GB uncompressed)</div>
+      <div class="metric-big red">~84ms</div>
+      <div class="metric-label">GRAPH directive — CLI subprocess<br>(Node.js startup · amortized by 60s cache)</div>
     </div>
+  </div>
+
+  <!-- Full benchmark table -->
+  <div style="margin-top:2rem; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.75rem; overflow-x:auto;">
+    <h3 style="font-size:0.95rem; font-weight:700; margin-bottom:1rem;">Full Benchmark Results — Feb 22, 2026</h3>
+    <table style="width:100%; border-collapse:collapse; font-size:0.82rem; font-family:'JetBrains Mono',monospace;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--border); text-align:left;">
+          <th style="padding:0.4rem 0.75rem; color:var(--text2);">Query</th>
+          <th style="padding:0.4rem 0.75rem; color:var(--text2);">avg</th>
+          <th style="padding:0.4rem 0.75rem; color:var(--text2);">p50</th>
+          <th style="padding:0.4rem 0.75rem; color:var(--text2);">p95</th>
+          <th style="padding:0.4rem 0.75rem; color:var(--text2);">min</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4rem 0.75rem; color:var(--accent);">PK lookup — skill by id</td>
+          <td style="padding:0.4rem 0.75rem;">0.15ms</td><td style="padding:0.4rem 0.75rem;">0.15ms</td><td style="padding:0.4rem 0.75rem;">0.24ms</td><td style="padding:0.4rem 0.75rem;">0.12ms</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4rem 0.75rem; color:var(--accent);">Cluster scan (10 skills)</td>
+          <td style="padding:0.4rem 0.75rem;">0.25ms</td><td style="padding:0.4rem 0.75rem;">0.25ms</td><td style="padding:0.4rem 0.75rem;">0.27ms</td><td style="padding:0.4rem 0.75rem;">0.23ms</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4rem 0.75rem; color:var(--accent);">Full skill scan (316 nodes)</td>
+          <td style="padding:0.4rem 0.75rem;">2.19ms</td><td style="padding:0.4rem 0.75rem;">2.19ms</td><td style="padding:0.4rem 0.75rem;">2.32ms</td><td style="padding:0.4rem 0.75rem;">2.10ms</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4rem 0.75rem; color:var(--accent);">Soul workspace query (15 nodes)</td>
+          <td style="padding:0.4rem 0.75rem;">0.47ms</td><td style="padding:0.4rem 0.75rem;">0.47ms</td><td style="padding:0.4rem 0.75rem;">0.53ms</td><td style="padding:0.4rem 0.75rem;">0.42ms</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4rem 0.75rem; color:var(--accent);">AgentConfig/Memory queries (5–6 nodes)</td>
+          <td style="padding:0.4rem 0.75rem;">0.17–0.26ms</td><td style="padding:0.4rem 0.75rem;">—</td><td style="padding:0.4rem 0.75rem;">—</td><td style="padding:0.4rem 0.75rem;">0.14ms</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4rem 0.75rem; color:var(--accent);">Tool query / TOOLS.md hot path (25 nodes)</td>
+          <td style="padding:0.4rem 0.75rem;">0.38ms</td><td style="padding:0.4rem 0.75rem;">0.38ms</td><td style="padding:0.4rem 0.75rem;">0.52ms</td><td style="padding:0.4rem 0.75rem;">0.33ms</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4rem 0.75rem; color:var(--accent);">Reference PK lookup (single, 545k table)</td>
+          <td style="padding:0.4rem 0.75rem; font-weight:600;">0.11ms</td><td style="padding:0.4rem 0.75rem;">0.11ms</td><td style="padding:0.4rem 0.75rem;">0.13ms</td><td style="padding:0.4rem 0.75rem;">0.09ms</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4rem 0.75rem; color:var(--accent);">Reference count aggregate (545k nodes)</td>
+          <td style="padding:0.4rem 0.75rem;">0.26ms</td><td style="padding:0.4rem 0.75rem;">0.26ms</td><td style="padding:0.4rem 0.75rem;">0.29ms</td><td style="padding:0.4rem 0.75rem;">0.24ms</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4rem 0.75rem; color:var(--accent);">Reference source scan (~12k nodes)</td>
+          <td style="padding:0.4rem 0.75rem;">1.35ms</td><td style="padding:0.4rem 0.75rem;">1.36ms</td><td style="padding:0.4rem 0.75rem;">1.40ms</td><td style="padding:0.4rem 0.75rem;">1.32ms</td>
+        </tr>
+        <tr style="border-bottom:2px solid var(--border); background:rgba(127,127,127,0.05);">
+          <td colspan="5" style="padding:0.35rem 0.75rem; font-size:0.78rem; color:var(--text2);">CLI subprocess (workspace.ts GRAPH directive · execFileAsync · Node.js startup amortized by 60s adaptive TTL cache)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4rem 0.75rem; color:#a78bfa;">GRAPH directive — AGENTS.md</td>
+          <td style="padding:0.4rem 0.75rem;">84.36ms</td><td style="padding:0.4rem 0.75rem;">84.35ms</td><td style="padding:0.4rem 0.75rem;">84.52ms</td><td style="padding:0.4rem 0.75rem;">84.25ms</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4rem 0.75rem; color:#a78bfa;">GRAPH directive — TOOLS.md</td>
+          <td style="padding:0.4rem 0.75rem;">85.01ms</td><td style="padding:0.4rem 0.75rem;">84.57ms</td><td style="padding:0.4rem 0.75rem;">88.68ms</td><td style="padding:0.4rem 0.75rem;">83.04ms</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4rem 0.75rem; color:#a78bfa;">GRAPH directive — Soul/Memory</td>
+          <td style="padding:0.4rem 0.75rem;">83.23ms</td><td style="padding:0.4rem 0.75rem;">83.25ms</td><td style="padding:0.4rem 0.75rem;">84.04ms</td><td style="padding:0.4rem 0.75rem;">82.46ms</td>
+        </tr>
+        <tr>
+          <td style="padding:0.4rem 0.75rem; color:#a78bfa;">CLI text search (cold process)</td>
+          <td style="padding:0.4rem 0.75rem;">94.29ms</td><td style="padding:0.4rem 0.75rem;">89.89ms</td><td style="padding:0.4rem 0.75rem;">103.11ms</td><td style="padding:0.4rem 0.75rem;">89.87ms</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <div style="margin-top:2rem; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.75rem;">
@@ -569,7 +642,7 @@ matters. Not a corporate drone...
 
   <div style="margin-top:1.5rem;">
     <p style="font-size:0.88rem;">
-      After the first workspace load per session, all results are served from an in-process JavaScript <code style="background:var(--code-bg); padding:0.1rem 0.4rem; border-radius:4px; font-family:'JetBrains Mono',monospace;">Map</code> cache with a 60-second TTL. Subsequent prompt builds, tool calls, and compaction cycles cost <strong>0ms</strong> for workspace content. Across an 8-agent fleet: <strong>~65,000+ tokens saved per hour</strong>.
+      After the first workspace load per session, all results are served from an in-process JavaScript <code style="background:var(--code-bg); padding:0.1rem 0.4rem; border-radius:4px; font-family:'JetBrains Mono',monospace;">Map</code> cache with an <strong>adaptive TTL</strong> (base 60s × log₁₀(hit_count + 10) — hot queries stay warm longer). Subsequent prompt builds, tool calls, and compaction cycles cost <strong>0ms</strong> for workspace content. Across an 8-agent fleet: <strong>~65,000+ tokens saved per hour</strong>.
     </p>
   </div>
 </section>
