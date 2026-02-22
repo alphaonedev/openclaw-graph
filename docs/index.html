@@ -204,8 +204,8 @@
     <div class="stat-label">DevDocs Docsets</div>
   </div>
   <div class="stat">
-    <div class="stat-num">0ms</div>
-    <div class="stat-label">Cached Query Latency</div>
+    <div class="stat-num green">&lt;0.5ms</div>
+    <div class="stat-label">Workspace Query (in-process)</div>
   </div>
   <div class="stat">
     <div class="stat-num">1536d</div>
@@ -518,55 +518,82 @@ matters. Not a corporate drone...
 <!-- METRICS -->
 <section id="metrics">
   <div class="section-label">Performance</div>
-  <h2>Cached workspace queries — measured cost: 0ms</h2>
-  <p style="margin-bottom:1.5rem; color:var(--text2); font-size:0.9rem;">After the first load, every workspace query is served from an in-process <code style="background:var(--code-bg); padding:0.1rem 0.4rem; border-radius:4px; font-family:'JetBrains Mono',monospace;">Map</code> cache. No DB. No subprocess. No I/O. Zero milliseconds.</p>
+  <h2>Measured on production data — 545k nodes, Mac mini M-series</h2>
+  <p style="margin-bottom:2rem; color:var(--text2); font-size:0.9rem;">All numbers are real benchmark averages. In-process queries run against the live embedded engine. CLI subprocess numbers include full Node.js + lbug init overhead — the cost paid once per TTL window.</p>
 
-  <div class="metrics-grid">
-    <div class="metric-card">
-      <div class="metric-big green">0ms</div>
-      <div class="metric-label">Cached query latency<br>(SOUL · MEMORY · AGENTS · TOOLS)</div>
+  <!-- Tier 1: In-process hero numbers -->
+  <div style="margin-bottom:0.5rem;">
+    <div style="font-size:0.75rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--accent2); margin-bottom:0.75rem;">In-process · embedded engine (lbug)</div>
+  </div>
+  <div class="metrics-grid" style="margin-top:0;">
+    <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
+      <div class="metric-big green">0.11ms</div>
+      <div class="metric-label">Reference PK lookup<br><span style="font-size:0.72rem; opacity:0.7;">single row from 545,072-node table</span></div>
     </div>
-    <div class="metric-card">
-      <div class="metric-big green">60s–3min</div>
-      <div class="metric-label">Adaptive TTL window<br>(hot queries stay warm longer)</div>
+    <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
+      <div class="metric-big green">0.15ms</div>
+      <div class="metric-label">Skill PK lookup<br><span style="font-size:0.72rem; opacity:0.7;">warm in-process, 316-skill corpus</span></div>
     </div>
-    <div class="metric-card">
-      <div class="metric-big purple">top-20</div>
-      <div class="metric-label">Queries pre-warmed on startup<br>(0ms from first agent request)</div>
+    <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
+      <div class="metric-big green">0.26ms</div>
+      <div class="metric-label">AGENTS.md hot path<br><span style="font-size:0.72rem; opacity:0.7;">6-node AgentConfig result set</span></div>
     </div>
-    <div class="metric-card">
-      <div class="metric-big green">545k</div>
-      <div class="metric-label">Reference nodes indexed<br>(718 DevDocs docsets)</div>
+    <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
+      <div class="metric-big green">0.38ms</div>
+      <div class="metric-label">TOOLS.md hot path<br><span style="font-size:0.72rem; opacity:0.7;">25-node Tool result set</span></div>
     </div>
-    <div class="metric-card">
-      <div class="metric-big green">316</div>
-      <div class="metric-label">Skills · 27 clusters<br>1536d vector embeddings</div>
+    <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
+      <div class="metric-big green">0.26ms</div>
+      <div class="metric-label">Reference count aggregate<br><span style="font-size:0.72rem; opacity:0.7;">COUNT(*) over 545k nodes</span></div>
     </div>
-    <div class="metric-card">
-      <div class="metric-big red">295 MB</div>
-      <div class="metric-label">Full DB compressed (zstd)<br>3.2 GB uncompressed</div>
+    <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
+      <div class="metric-big green">2.19ms</div>
+      <div class="metric-label">Full skill scan<br><span style="font-size:0.72rem; opacity:0.7;">all 316 nodes, no filter</span></div>
     </div>
   </div>
 
-  <!-- Cache architecture callout -->
+  <!-- Two-tier story -->
   <div style="margin-top:2rem; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.75rem;">
-    <h3 style="font-size:0.95rem; font-weight:700; margin-bottom:0.75rem;">How the cache works</h3>
-    <p style="font-size:0.88rem; margin-bottom:1rem; color:var(--text2);">Three layers. Each does exactly one job.</p>
-    <div class="code-block" style="margin:0 0 1rem 0;">
-      <pre><span class="comment"># First load — pays once per TTL window</span>
-GRAPH directive detected → execFileAsync(query.js) → ~84ms (Node.js startup)
-result stored in graphQueryCache <span class="comment"># keyed by Cypher string</span>
+    <h3 style="font-size:0.95rem; font-weight:700; margin-bottom:0.75rem;">Two tiers: DB query vs. CLI subprocess startup</h3>
+    <p style="font-size:0.88rem; margin-bottom:1.25rem; color:var(--text2);">The 84ms CLI number is <strong>Node.js process launch + lbug init</strong> — not the query itself. In-process, the same query costs 0.26ms. The cache pays the subprocess tax once per TTL window, then serves 0ms hits.</p>
 
-<span class="comment"># Every subsequent load within TTL — free</span>
-GRAPH directive detected → graphQueryCache.get(cypher) → <span class="string">0ms</span>
+    <div class="compare" style="margin-top:0;">
+      <div class="compare-card">
+        <div class="compare-header before" style="background:rgba(108,99,255,0.1); color:var(--accent);">First load — CLI subprocess (once per TTL)</div>
+        <div class="compare-body">
+<pre style="color:var(--text2);">node query.js --cypher "..."
+├── Node.js init ......... ~60ms
+├── lbug open ............ ~20ms
+└── query execute ........ ~0.3ms
+                          ────────
+total                      ~84ms
 
-<span class="comment"># Adaptive TTL: hot queries stay warm longer</span>
+→ result cached in graphQueryCache</pre>
+        </div>
+      </div>
+      <div class="compare-card">
+        <div class="compare-header after">Every subsequent hit (within TTL window)</div>
+        <div class="compare-body">
+<pre style="color:var(--text2);">graphQueryCache.get(cypher)
+├── Map lookup ........... &lt;0.01ms
+└── return cached string . &lt;0.01ms
+                          ────────
+total                        ~0ms
+
+→ no subprocess, no DB, no I/O</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block" style="margin:1.25rem 0 1rem 0;">
+      <pre><span class="comment"># Adaptive TTL: hot queries stay warm longer</span>
 TTL = 60s × log₁₀(hit_count + 10)
 <span class="comment"># hit_count=0  →  60s  |  hit_count=90  →  120s  |  hit_count=900  →  180s</span>
 
 <span class="comment"># Pre-warm on startup — top-20 by hit_count seeded before first request</span>
-preWarmFromMetrics() → graphQueryCache pre-populated → first request: 0ms</pre>
+preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">first request: 0ms</span></pre>
     </div>
+
     <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; font-size:0.82rem;">
       <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.85rem;">
         <div style="font-weight:700; margin-bottom:0.35rem; color:var(--accent);">workspaceFileCache</div>
@@ -583,6 +610,140 @@ preWarmFromMetrics() → graphQueryCache pre-populated → first request: 0ms</p
     </div>
   </div>
 
+  <!-- Full benchmark table -->
+  <div style="margin-top:2rem; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.75rem;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.75rem;">
+      <h3 style="font-size:0.95rem; font-weight:700;">Full benchmark results</h3>
+      <div style="font-size:0.75rem; color:var(--text2); font-family:'JetBrains Mono',monospace;">Mac mini · Apple M-series · 32 GB RAM · 316 skills · 545,072 Reference nodes</div>
+    </div>
+
+    <div style="font-size:0.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--accent2); margin-bottom:0.6rem;">In-process (lbug embedded engine)</div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:0.82rem; font-family:'JetBrains Mono',monospace;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border);">
+            <th style="text-align:left; padding:0.4rem 0.75rem; color:var(--text2); font-weight:600;">Query</th>
+            <th style="text-align:right; padding:0.4rem 0.75rem; color:var(--text2); font-weight:600;">avg</th>
+            <th style="text-align:right; padding:0.4rem 0.75rem; color:var(--text2); font-weight:600;">p95</th>
+            <th style="text-align:right; padding:0.4rem 0.75rem; color:var(--text2); font-weight:600;">min</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">Reference PK lookup (single, 545k table)</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.11ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.13ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.09ms</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">Skill PK lookup (warm)</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.15ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.24ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.12ms</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">Memory query — 5 nodes</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.17ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.23ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.14ms</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">Reference count aggregate (545k nodes)</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.26ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.29ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.24ms</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">AgentConfig — AGENTS.md hot path (6 nodes)</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.26ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.31ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.22ms</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">Tool query — TOOLS.md hot path (25 nodes)</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.38ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.52ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.33ms</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">Soul workspace query — 15 nodes</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.47ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.53ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.42ms</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">Cluster scan — 10 skills</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.25ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.27ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.23ms</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">Reference source scan — ~12k nodes</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">1.35ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">1.40ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">1.32ms</td>
+          </tr>
+          <tr>
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">Full skill scan — all 316 nodes</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">2.19ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">2.32ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">2.10ms</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="font-size:0.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--accent); margin-top:1.5rem; margin-bottom:0.6rem;">CLI subprocess (workspace.ts GRAPH directive — first load)</div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:0.82rem; font-family:'JetBrains Mono',monospace;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border);">
+            <th style="text-align:left; padding:0.4rem 0.75rem; color:var(--text2); font-weight:600;">Query</th>
+            <th style="text-align:right; padding:0.4rem 0.75rem; color:var(--text2); font-weight:600;">avg</th>
+            <th style="text-align:right; padding:0.4rem 0.75rem; color:var(--text2); font-weight:600;">p95</th>
+            <th style="text-align:right; padding:0.4rem 0.75rem; color:var(--text2); font-weight:600;">min</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">GRAPH directive — AGENTS.md</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">84ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">85ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">84ms</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">GRAPH directive — TOOLS.md</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">85ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">89ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">83ms</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">GRAPH directive — Soul/Memory</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">83ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">84ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">82ms</td>
+          </tr>
+          <tr>
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">Text search (cold process)</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">94ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">103ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">90ms</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:0.85rem; font-size:0.78rem; color:var(--text2); line-height:1.6;">
+      ⚠ CLI numbers include full <code style="background:var(--code-bg); padding:0.1rem 0.3rem; border-radius:3px;">node</code> process spawn + lbug init (~80ms). The actual query inside the subprocess costs &lt;1ms — identical to in-process. This cost is amortized by the <strong>adaptive TTL cache</strong>: paid once per 60–180s window, then 0ms on every hit.
+    </div>
+  </div>
+
+  <!-- System76 projection -->
+  <div style="margin-top:1.5rem; padding:1.1rem 1.4rem; background:rgba(0,212,170,0.04); border:1px solid rgba(0,212,170,0.2); border-radius:10px; font-size:0.85rem;">
+    <span style="color:var(--accent2); font-weight:700;">System76 projection</span> — 96 GB RAM, PCIe 5 NVMe, 8-instance fleet:
+    DB permanently resident in OS page cache after first load. In-process queries expected &lt;0.05ms avg. CLI subprocess spawn cost unchanged (~80ms first load, then cached).
+  </div>
+
+  <!-- Embeddings callout -->
   <div style="margin-top:2rem; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.75rem;">
     <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
       <div class="badge-new" style="margin-left:0;">EMBEDDINGS</div>
