@@ -1,0 +1,186 @@
+From 5b0bfdc222f08dd91cec7fb3d22421119a494e05 Mon Sep 17 00:00:00 2001
+From: AlphaOne Dev <justin@alpha-one.mobi>
+Date: Sat, 21 Feb 2026 19:50:46 -0500
+Subject: [PATCH] fix: workspace.ts cache layering + async graph query
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Three fixes:
+1. Cache layering: workspaceFileCache now stores raw stub content only
+   (not resolved graph content). graphQueryCache now owns resolved content
+   with 60s TTL that actually fires on every session load. Previously, stub
+   files with unchanging mtime caused workspaceFileCache to return stale
+   graph data indefinitely — TTL was effectively infinite.
+
+2. execSync → execFileAsync: graph queries no longer block the Node.js
+   event loop. An 8s timeout on a blocked DB no longer stalls all agents.
+
+3. In-flight deduplication via graphQueryInFlight Map: concurrent cache
+   misses for the same cypher (e.g., process restart with multiple sessions)
+   share one Promise instead of each spawning an independent DB process.
+
+Cache flow after fix:
+  readFileWithCache → workspaceFileCache (raw, mtime) → graphQueryCache (60s TTL)
+    → if miss + no in-flight → executeGraphQuery (async, non-blocking)
+    → if miss + in-flight → await shared Promise (zero extra DB reads)
+---
+ src/agents/workspace.ts | 85 ++++++++++++++++++++++++++++++-----------
+ 1 file changed, 62 insertions(+), 23 deletions(-)
+
+diff --git a/src/agents/workspace.ts b/src/agents/workspace.ts
+index a119d02d7..de92161d7 100644
+--- a/src/agents/workspace.ts
++++ b/src/agents/workspace.ts
+@@ -1,8 +1,11 @@
+ import fs from "node:fs/promises";
+ import os from "node:os";
+ import path from "node:path";
+-import { execSync } from "node:child_process";
++import { execFile } from "node:child_process";
++import { promisify } from "node:util";
+ import { resolveRequiredHomeDir } from "../infra/home-dir.js";
++
++const execFileAsync = promisify(execFile);
+ import { runCommandWithTimeout } from "../process/exec.js";
+ import { isCronSessionKey, isSubagentSessionKey } from "../routing/session-key.js";
+ import { resolveUserPath } from "../utils.js";
+@@ -12,6 +15,16 @@ import { resolveWorkspaceTemplateDir } from "./workspace-templates.js";
+ // When a workspace file contains <!-- GRAPH: <cypher> --> as its first line,
+ // the content is resolved by querying LadybugDB instead of returning the raw stub.
+ // This enables 100% graph-native workspace files with zero flat-file content.
++//
++// Cache architecture (three layers, fixed ordering):
++//   workspaceFileCache  — raw disk content, mtime-invalidated (fast disk read cache)
++//   graphQueryCache     — resolved graph content, 60s TTL (query result cache)
++//   graphQueryInFlight  — in-flight deduplication (prevents thundering herd)
++//
++// Fix from v1: workspaceFileCache previously stored RESOLVED content, making
++// the 60s graphQueryCache TTL irrelevant for stub files that never change on disk.
++// Now workspaceFileCache stores RAW stub content only. graphQueryCache owns
++// the resolved content and its 60s TTL fires correctly on every session load.
+ 
+ const GRAPH_DIRECTIVE_PREFIX = "<!-- GRAPH:";
+ const GRAPH_NODE_BIN = "/opt/homebrew/Cellar/node@22/22.22.0/bin/node";
+@@ -28,32 +41,53 @@ function extractGraphDirective(content: string): string | null {
+   return trimmed.slice(GRAPH_DIRECTIVE_PREFIX.length, end).trim();
+ }
+ 
+-function executeGraphQuery(cypher: string): string {
++// Async query — non-blocking, does not stall the event loop
++async function executeGraphQuery(cypher: string): Promise<string> {
+   try {
+-    const result = execSync(
+-      `${GRAPH_NODE_BIN} ${GRAPH_QUERY_SCRIPT} --cypher ${JSON.stringify(cypher)}`,
++    const { stdout } = await execFileAsync(
++      GRAPH_NODE_BIN,
++      [GRAPH_QUERY_SCRIPT, "--workspace", "--cypher", cypher],
+       { encoding: "utf-8", timeout: 8000 },
+     );
+-    return result.trim();
+-  } catch (err) {
++    return stdout.trim();
++  } catch {
+     // Graceful degradation: return empty string if graph is unavailable
+     return "";
+   }
+ }
+ 
+-// Cache for graph query results — keyed by cypher query, invalidated every 60s
++// Cache for graph query results — keyed by cypher query, 60s TTL
+ const graphQueryCache = new Map<string, { content: string; fetchedAt: number }>();
+ const GRAPH_CACHE_TTL_MS = 60_000;
+ 
+-function resolveGraphContent(cypher: string): string {
++// In-flight deduplication — concurrent requests for the same cypher share one Promise
++const graphQueryInFlight = new Map<string, Promise<string>>();
++
++async function resolveGraphContent(cypher: string): Promise<string> {
+   const now = Date.now();
+   const cached = graphQueryCache.get(cypher);
+   if (cached && now - cached.fetchedAt < GRAPH_CACHE_TTL_MS) {
+     return cached.content;
+   }
+-  const content = executeGraphQuery(cypher);
+-  graphQueryCache.set(cypher, { content, fetchedAt: now });
+-  return content;
++
++  // Return existing in-flight promise if one is already running for this cypher
++  const inFlight = graphQueryInFlight.get(cypher);
++  if (inFlight) return inFlight;
++
++  // Launch query and register in-flight promise
++  const promise = executeGraphQuery(cypher)
++    .then((content) => {
++      graphQueryCache.set(cypher, { content, fetchedAt: Date.now() });
++      graphQueryInFlight.delete(cypher);
++      return content;
++    })
++    .catch(() => {
++      graphQueryInFlight.delete(cypher);
++      return "";
++    });
++
++  graphQueryInFlight.set(cypher, promise);
++  return promise;
+ }
+ // ─────────────────────────────────────────────────────────────────────────────
+ 
+@@ -86,8 +120,10 @@ const WORKSPACE_STATE_VERSION = 1;
+ const workspaceTemplateCache = new Map<string, Promise<string>>();
+ let gitAvailabilityPromise: Promise<boolean> | null = null;
+ 
+-// File content cache with mtime invalidation to avoid redundant reads
+-const workspaceFileCache = new Map<string, { content: string; mtimeMs: number }>();
++// File content cache — stores RAW disk content only, mtime-invalidated.
++// Resolved graph content is NOT stored here; graphQueryCache owns that with its 60s TTL.
++// Separating the two caches ensures graphQueryCache TTL fires correctly on every call.
++const workspaceFileCache = new Map<string, { raw: string; mtimeMs: number }>();
+ 
+ /**
+  * Read file with caching based on mtime. Returns cached content if file
+@@ -97,6 +133,11 @@ const workspaceFileCache = new Map<string, { content: string; mtimeMs: number }>
+  * <!-- GRAPH: <cypher> --> directive, the content is resolved by querying
+  * LadybugDB and returned as structured text. The stub file on disk acts
+  * purely as a pointer — no markdown content is stored in flat files.
++ *
++ * Cache behaviour:
++ *   workspaceFileCache  → raw stub text, never re-read until mtime changes
++ *   graphQueryCache     → resolved graph content, refreshed every 60s
++ *   graphQueryInFlight  → concurrent requests for same cypher share one Promise
+  */
+ async function readFileWithCache(filePath: string): Promise<string> {
+   try {
+@@ -104,21 +145,19 @@ async function readFileWithCache(filePath: string): Promise<string> {
+     const mtimeMs = stats.mtimeMs;
+     const cached = workspaceFileCache.get(filePath);
+ 
+-    // Return cached content if mtime matches
++    // Raw content cache — avoids repeated fs.readFile for unchanged stub files
++    let raw: string;
+     if (cached && cached.mtimeMs === mtimeMs) {
+-      return cached.content;
++      raw = cached.raw;
++    } else {
++      raw = await fs.readFile(filePath, "utf-8");
++      workspaceFileCache.set(filePath, { raw, mtimeMs });
+     }
+ 
+-    // Read from disk
+-    const raw = await fs.readFile(filePath, "utf-8");
+-
+-    // ── Graph directive resolution ────────────────────────────────────────
++    // ── Graph directive resolution (60s TTL via graphQueryCache) ──────────
+     const cypher = extractGraphDirective(raw);
+-    const content = cypher ? resolveGraphContent(cypher) : raw;
++    return cypher ? await resolveGraphContent(cypher) : raw;
+     // ─────────────────────────────────────────────────────────────────────
+-
+-    workspaceFileCache.set(filePath, { content, mtimeMs });
+-    return content;
+   } catch (error) {
+     // Remove from cache if file doesn't exist or is unreadable
+     workspaceFileCache.delete(filePath);
+-- 
+2.50.1 (Apple Git-155)
+

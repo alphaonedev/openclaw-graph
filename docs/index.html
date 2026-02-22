@@ -270,22 +270,42 @@
 │   ├── <span class="hl">TOOLS.md</span>   <span style="color:#525570">(1 line: &lt;!-- GRAPH: MATCH (t:Tool) WHERE t.available = true ... --&gt;)</span>
 │   └── <span class="hl">AGENTS.md</span>  <span style="color:#525570">(1 line: &lt;!-- GRAPH: MATCH (s:Soul WHERE section STARTS WITH ...) --&gt;)</span>
 │       │
-│       └── readFileWithCache()
-│           ├── detect GRAPH directive
-│           ├── execute: <span class="hl2">node query.js --workspace --cypher "..."</span>
-│           ├── cache result <span class="hl3">60s</span> (in-process Map, 0ms subsequent hits)
-│           └── return <span class="hl">formatted markdown → system prompt</span>
+│       └── readFileWithCache()  <span style="color:#525570">← patched workspace.ts</span>
+│           │
+│           ├── [1] workspaceFileCache  <span style="color:#525570">keyed: filePath+mtime — raw stub only</span>
+│           │       <span style="color:#525570">avoids repeated fs.readFile for unchanged stub files</span>
+│           │
+│           ├── [2] graphQueryCache     <span style="color:#525570">keyed: cypher — 60s TTL — resolved content</span>
+│           │       <span style="color:#525570">TTL fires correctly on every session load</span>
+│           │
+│           ├── [3] graphQueryInFlight  <span style="color:#525570">in-flight deduplication per cypher</span>
+│           │       <span style="color:#525570">concurrent cache misses share one Promise (no thundering herd)</span>
+│           │
+│           └── executeGraphQuery()     <span style="color:#525570">async execFileAsync — non-blocking</span>
+│               └── <span class="hl2">node query.js --workspace --cypher "..."</span>
+│                   └── return <span class="hl">formatted markdown → system prompt</span>
 │
 └── buildAgentSystemPrompt()
     └── injects graph-resolved markdown → agent context
 
-<span class="hl2">LadybugDB</span> (embedded SQLite + Cypher, no daemon required)
-├── <span class="hl">Skill</span>       (322 nodes, 28 clusters, 247 edges)
+<span class="hl2">LadybugDB</span> (embedded graph DB, no daemon required)
+├── <span class="hl">Skill</span>       (322 nodes, 28 clusters, 247 edges, 1536d embeddings)
+├── <span class="hl">Reference</span>   (787 DevDocs docsets, ~620k entries)
 ├── <span class="hl">Soul</span>        (identity, behavior, capabilities per workspace)
 ├── <span class="hl">Memory</span>      (project context, state, infrastructure facts)
 ├── <span class="hl">Tool</span>        (available tools + usage notes)
 └── <span class="hl">AgentConfig</span> (per-workspace agent behavior overrides)
     </pre>
+  </div>
+
+  <div style="margin: 1.5rem 0; padding: 1rem 1.4rem; background: #12141a; border: 1px solid #2a2d3a; border-radius: 8px; font-size: 0.88rem;">
+    <span style="color:#7c6af7; font-weight:700;">workspace.ts patch</span>
+    <span style="color:#525570; margin: 0 0.5rem;">·</span>
+    Fixes cache layering, adds async queries + in-flight deduplication.
+    Apply to any OpenClaw install:
+    <span style="display:block; margin-top:0.6rem; font-family: monospace; color:#a8b5c8;">
+      git apply <a href="https://github.com/alphaonedev/openclaw-graph/raw/main/patches/workspace-cache-fix.patch" style="color:#7c6af7;">patches/workspace-cache-fix.patch</a>
+    </span>
   </div>
 
   <div class="how-grid">
@@ -296,18 +316,18 @@
     </div>
     <div class="how-card">
       <div class="how-num">2</div>
-      <h3>Graph resolves content dynamically</h3>
-      <p>On workspace load, the patched workspace.ts intercepts the directive and queries LadybugDB. Results are formatted as structured markdown sections.</p>
+      <h3>Three-layer cache — correctly ordered</h3>
+      <p>workspaceFileCache stores raw stubs (mtime). graphQueryCache owns resolved content (60s TTL). graphQueryInFlight deduplicates concurrent misses. Each layer does exactly one job.</p>
     </div>
     <div class="how-card">
       <div class="how-num">3</div>
-      <h3>60-second in-process cache</h3>
-      <p>Query results are cached in a JavaScript Map for 60 seconds. Repeated workspace loads (tool calls, compaction) cost zero additional latency.</p>
+      <h3>Non-blocking async queries</h3>
+      <p>Graph queries use execFileAsync instead of execSync. A slow or locked DB never stalls the event loop. Agents keep running while the query resolves.</p>
     </div>
     <div class="how-card">
       <div class="how-num">4</div>
-      <h3>Multi-instance, one database</h3>
-      <p>Multiple OpenClaw agents share one graph DB, differentiated by workspace ID. Each gets its own identity, memory, and tool config from a single source of truth.</p>
+      <h3>Multi-instance, per-copy DB</h3>
+      <p>Each OpenClaw instance gets its own local DB copy via install.sh. Sub-millisecond queries, no network dependency, no lock contention across agents.</p>
     </div>
   </div>
 </section>
