@@ -166,13 +166,14 @@
     <a href="#metrics">Metrics</a>
     <a href="#optimization">Optimization</a>
     <a href="#install">Install</a>
+    <a href="#docs">Docs</a>
     <a href="https://github.com/alphaonedev/openclaw-graph" class="btn">GitHub →</a>
   </div>
 </nav>
 
 <!-- HERO -->
 <div class="hero">
-  <div class="badge">⚡ v1.1 Released — 100% Graph-Native</div>
+  <div class="badge">⚡ v1.2 Released — 100% Graph-Native</div>
   <h1>Graph-Native Workspace<br>for <span>OpenClaw</span></h1>
   <p class="hero-sub">
     Replace flat workspace markdown with embedded Cypher queries.
@@ -218,17 +219,17 @@
   </div>
 </div>
 
-<!-- v1.1 CALLOUT -->
+<!-- v1.2 CALLOUT -->
 <div style="background:rgba(0,212,170,0.04); border-top:1px solid rgba(0,212,170,0.15); border-bottom:1px solid rgba(0,212,170,0.15); padding:1.25rem 2rem;">
   <div style="max-width:1100px; margin:0 auto; display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
-    <div style="background:rgba(0,212,170,0.15); border:1px solid rgba(0,212,170,0.3); color:var(--accent2); padding:0.25rem 0.7rem; border-radius:6px; font-size:0.78rem; font-weight:700; white-space:nowrap;">NEW IN v1.1</div>
+    <div style="background:rgba(0,212,170,0.15); border:1px solid rgba(0,212,170,0.3); color:var(--accent2); padding:0.25rem 0.7rem; border-radius:6px; font-size:0.78rem; font-weight:700; white-space:nowrap;">NEW IN v1.2</div>
     <div style="font-size:0.88rem; color:var(--text2); flex:1; min-width:200px;">
       <strong style="color:var(--text);">100% graph-native out of the box.</strong>
       Every DB release now ships with a default <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">workspace='openclaw'</code> pre-seeded —
       Soul · Memory · AgentConfig (9 nodes incl. TOON, Search Resilience, Schema Rules, Path Aliases) · Tool nodes ready to use immediately. No manual seed required.
     </div>
     <div style="display:flex; gap:0.75rem; flex-shrink:0;">
-      <a href="#install" style="background:var(--accent2); color:#000; padding:0.35rem 0.9rem; border-radius:6px; font-size:0.82rem; font-weight:700; text-decoration:none;">Install v1.1 ↓</a>
+      <a href="#install" style="background:var(--accent2); color:#000; padding:0.35rem 0.9rem; border-radius:6px; font-size:0.82rem; font-weight:700; text-decoration:none;">Install v1.2 ↓</a>
       <a href="https://github.com/alphaonedev/openclaw-graph/blob/main/CUSTOMIZING.md" style="background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:0.35rem 0.9rem; border-radius:6px; font-size:0.82rem; font-weight:600; text-decoration:none;">Customize →</a>
     </div>
   </div>
@@ -787,7 +788,7 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
 <section id="optimization">
   <div class="section-label">Cost &amp; Performance <span class="badge-new">NEW</span></div>
   <h2>Prompt optimization — 70% token reduction</h2>
-  <p>v1.1 ships with four new AgentConfig nodes that reduce API costs and improve agent reliability. These optimizations are pre-seeded in every release and active out of the box.</p>
+  <p>v1.2 ships with four new AgentConfig nodes that reduce API costs and improve agent reliability. These optimizations are pre-seeded in every release and active out of the box.</p>
 
   <div class="how-grid" style="margin-top:2rem;">
     <div class="how-card" style="border-color:rgba(0,212,170,0.25);">
@@ -863,7 +864,7 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
 <span class="fn">curl</span> -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh <span class="keyword">|</span> bash -s -- --lite
 
 <span class="comment"># Pin to a specific release</span>
-<span class="fn">curl</span> -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh <span class="keyword">|</span> bash -s -- --full --version v1.1</pre>
+<span class="fn">curl</span> -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh <span class="keyword">|</span> bash -s -- --full --version v1.2</pre>
   </div>
 
   <div class="tier-grid" style="margin-top:1.5rem;">
@@ -942,11 +943,41 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
   </div>
 
   <div style="margin-top:2rem; padding:1.25rem 1.5rem; background:var(--bg2); border:1px solid var(--border); border-radius:10px; font-size:0.87rem;">
-    <strong>SHA256 checksums (v1.1)</strong><br>
+    <strong>SHA256 checksums (v1.2)</strong><br>
     <code style="font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--text2); display:block; margin-top:0.5rem; word-break:break-all;">
-      244675608dae5d173f940bf0bbdffff830a4be1d12c95623f459831addc5eb70 &nbsp; alphaone-skills-lite.db.zst<br>
-      24d5607245e92d30cd8c287df792ab29928a567b367c26c5f68550f611066e96 &nbsp; alphaone-skills.db.zst
+      6da38b83a4cb7f865a55677386101d4745db146a7912042abc0e896357291e1b &nbsp; alphaone-skills-lite.db.zst<br>
+      d8f9e8f16583e58b974c30f8c1b8eba0580fe3595e89a24bd03ee1ac7733ce56 &nbsp; alphaone-skills-full.db.zst
     </code>
+  </div>
+</section>
+
+<!-- DOCUMENTATION -->
+<section id="docs">
+  <div class="section-label">Documentation</div>
+  <h2>Guides</h2>
+  <p style="margin-bottom:2rem;">Everything you need to install, configure, and customize openclaw-graph.</p>
+
+  <div class="how-grid">
+    <a href="ADMIN-GUIDE.md" class="how-card" style="text-decoration:none; transition:border-color 0.2s;">
+      <div class="how-num" style="background:rgba(0,212,170,0.15); border-color:rgba(0,212,170,0.3); color:var(--accent2);">A</div>
+      <h3 style="color:var(--text);">Admin Guide</h3>
+      <p>Installation, database layout, CLI reference, cron job integration, fleet management, upgrading, backup/restore, troubleshooting, and performance reference.</p>
+    </a>
+    <a href="USER-GUIDE.md" class="how-card" style="text-decoration:none; transition:border-color 0.2s;">
+      <div class="how-num">U</div>
+      <h3 style="color:var(--text);">User Guide</h3>
+      <p>How workspace stubs work, GRAPH directive specification, node type schemas (Soul, Memory, AgentConfig, Tool, Skill, Reference), workspace loading flow, and customization.</p>
+    </a>
+    <a href="../CUSTOMIZING.md" class="how-card" style="text-decoration:none; transition:border-color 0.2s;">
+      <div class="how-num" style="background:rgba(255,107,107,0.15); border-color:rgba(255,107,107,0.3); color:var(--accent3);">C</div>
+      <h3 style="color:var(--text);">Customizing Your Workspace</h3>
+      <p>Step-by-step personalization — identity, memory domains, tool management, multi-workspace fleet setup, and seed script forking.</p>
+    </a>
+    <a href="../README.md" class="how-card" style="text-decoration:none; transition:border-color 0.2s;">
+      <div class="how-num" style="background:rgba(108,99,255,0.15); border-color:rgba(108,99,255,0.3); color:var(--accent);">R</div>
+      <h3 style="color:var(--text);">README</h3>
+      <p>Project overview, quick start, database tiers, workspace architecture, and what's new in v1.2.</p>
+    </a>
   </div>
 </section>
 
@@ -961,14 +992,17 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
   <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
     <a href="https://github.com/alphaonedev/openclaw-graph" class="btn-primary">View Source on GitHub</a>
     <a href="skills.html" class="btn-secondary">Browse 316 Skills →</a>
+    <a href="#docs" class="btn-secondary">Read the Docs →</a>
     <a href="https://github.com/openclaw/openclaw" class="btn-secondary">OpenClaw Project →</a>
   </div>
 </div>
 
 <footer>
-  openclaw-graph v1.1 · MIT License · Built for the <a href="https://github.com/openclaw/openclaw">OpenClaw</a> community ·
+  openclaw-graph v1.2 · MIT License · Built for the <a href="https://github.com/openclaw/openclaw">OpenClaw</a> community ·
+  <a href="ADMIN-GUIDE.md">Admin Guide</a> ·
+  <a href="USER-GUIDE.md">User Guide</a> ·
   <a href="https://www.npmjs.com/package/lbug">LadybugDB 0.14.3</a> ·
-  <a href="https://github.com/alphaonedev/openclaw-graph/releases/tag/v1.1">Release Notes</a>
+  <a href="https://github.com/alphaonedev/openclaw-graph/releases/tag/v1.2">Release Notes</a>
 </footer>
 
 </body>

@@ -11,7 +11,7 @@
 #   ./install.sh --lite       # skills only (~10 MB download)
 #   ./install.sh --full       # skills + all DevDocs (~500 MB download)
 #   ./install.sh --verify     # verify existing DB without reinstalling
-#   ./install.sh --version v1.1  # install a specific release version
+#   ./install.sh --version v1.2  # install a specific release version
 # ============================================================
 
 set -euo pipefail

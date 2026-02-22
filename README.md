@@ -4,7 +4,7 @@
 
 Replace flat workspace markdown files with an embedded Cypher graph database. 316 skills across 27 clusters · 545,072 DevDocs reference nodes · 718 docsets · 1536d vector embeddings. Zero daemons, zero servers, zero flat files. **100% graph-native from install.**
 
-[![v1.1](https://img.shields.io/badge/release-v1.1-brightgreen)](https://github.com/alphaonedev/openclaw-graph/releases)
+[![v1.2](https://img.shields.io/badge/release-v1.2-brightgreen)](https://github.com/alphaonedev/openclaw-graph/releases)
 [![Skills](https://img.shields.io/badge/skills-316-blue)](skills/)
 [![Clusters](https://img.shields.io/badge/clusters-27-green)](skills/)
 [![LadybugDB](https://img.shields.io/badge/LadybugDB-0.14.3-purple)](https://www.npmjs.com/package/lbug)
@@ -13,17 +13,18 @@ Replace flat workspace markdown files with an embedded Cypher graph database. 31
 
 ---
 
-## What's new in v1.1
+## What's new in v1.2
 
-**100% graph-native workspace.** Every DB release now ships with a default `workspace='openclaw'` pre-seeded — Soul, Memory, AgentConfig, and Tool nodes ready to use out of the box. Install, deploy stubs, done.
+**9 AgentConfig nodes out of the box.** Every DB release now ships with a default `workspace='openclaw'` pre-seeded — Soul, Memory, AgentConfig (9 nodes incl. TOON, Search Resilience, Schema Rules, Path Aliases), and Tool nodes ready to use. Install, deploy stubs, done.
 
-| | v1.0 | v1.1 |
+| | v1.0 | v1.2 |
 |--|------|------|
 | Skills | 316 | 316 |
 | Reference nodes | 545,072 | 545,072 |
 | Default workspace | ❌ | ✅ `workspace='openclaw'` |
-| Soul / Memory / AgentConfig / Tool | manual seed required | ✅ pre-seeded |
+| Soul / Memory / AgentConfig / Tool | manual seed | ✅ pre-seeded (4 + 2 + 9 + 26) |
 | QueryMetrics schema | ❌ | ✅ |
+| Prompt optimization (Path Aliases, TOON) | ❌ | ✅ 70% token reduction |
 | `seed-default-workspace.mjs` | ❌ | ✅ |
 
 See [CUSTOMIZING.md](CUSTOMIZING.md) for how to personalize or fork the default workspace.
@@ -266,14 +267,14 @@ Measured on production data — 316 skills · 545,072 Reference nodes · Mac min
 | Query | avg |
 |-------|-----|
 | Reference PK lookup (1 row, 545k table) | **0.11ms** |
-| Skill PK lookup (warm, in-process) | **0.15ms** |
-| AGENTS.md hot path (6 AgentConfig nodes) | **0.26ms** |
-| TOOLS.md hot path (25 Tool nodes) | **0.38ms** |
-| Full skill scan (316 nodes) | **2.19ms** |
-| GRAPH directive — first load (CLI subprocess) | **~84ms** |
+| Skill PK lookup (warm, in-process) | **0.18ms** |
+| AGENTS.md hot path (9 AgentConfig nodes) | **0.33ms** |
+| TOOLS.md hot path (26 Tool nodes) | **0.41ms** |
+| Full skill scan (316 nodes) | **2.02ms** |
+| GRAPH directive — first load (CLI subprocess) | **~104ms** |
 | GRAPH directive — cached hit | **0ms** |
 
-The ~84ms first-load cost is Node.js process spawn + lbug init — not the query itself. The three-layer cache (workspaceFileCache → graphQueryCache → graphQueryInFlight) amortizes this over a 60–180s adaptive TTL window. Top-20 queries are pre-warmed on startup.
+The ~104ms first-load cost is Node.js process spawn + lbug init — not the query itself. The three-layer cache (workspaceFileCache → graphQueryCache → graphQueryInFlight) amortizes this over a 60–180s adaptive TTL window.
 
 | Metric | Value |
 |--------|-------|
@@ -353,6 +354,18 @@ What the agent can do with this skill.
 - Capability 1
 - Capability 2
 ```
+
+---
+
+## Documentation
+
+| Guide | Description |
+|-------|-------------|
+| **[Admin Guide](docs/ADMIN-GUIDE.md)** | Installation, database layout, CLI reference, cron jobs, fleet management, upgrading, troubleshooting |
+| **[User Guide](docs/USER-GUIDE.md)** | Workspace stubs, GRAPH directives, node schemas (Soul/Memory/AgentConfig/Tool/Skill/Reference), loading flow |
+| **[Customizing](CUSTOMIZING.md)** | Step-by-step workspace personalization — identity, memory, tools, multi-workspace setup |
+| **[Benchmarks](benchmarks/results.md)** | Full performance measurements with methodology |
+| **[GitHub Pages](https://alphaonedev.github.io/openclaw-graph/)** | Interactive documentation site |
 
 ---
 
