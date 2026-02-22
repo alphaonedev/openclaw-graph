@@ -361,8 +361,8 @@ What the agent can do with this skill.
 
 | Guide | Description |
 |-------|-------------|
-| **[Admin Guide](docs/ADMIN-GUIDE.md)** | Installation, database layout, CLI reference, cron jobs, fleet management, upgrading, troubleshooting |
-| **[User Guide](docs/USER-GUIDE.md)** | Workspace stubs, GRAPH directives, node schemas (Soul/Memory/AgentConfig/Tool/Skill/Reference), loading flow |
+| **[Admin Guide](https://alphaonedev.github.io/openclaw-graph/admin-guide.html)** | Installation, database layout, CLI reference, cron jobs, fleet management, upgrading, troubleshooting |
+| **[User Guide](https://alphaonedev.github.io/openclaw-graph/user-guide.html)** | Workspace stubs, GRAPH directives, node schemas (Soul/Memory/AgentConfig/Tool/Skill/Reference), loading flow |
 | **[Customizing](CUSTOMIZING.md)** | Step-by-step workspace personalization — identity, memory, tools, multi-workspace setup |
 | **[Benchmarks](benchmarks/results.md)** | Full performance measurements with methodology |
 | **[GitHub Pages](https://alphaonedev.github.io/openclaw-graph/)** | Interactive documentation site |

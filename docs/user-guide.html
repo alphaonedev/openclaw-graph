@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Guide — openclaw-graph</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --bg2: #13161f;
+      --bg3: #1a1d28;
+      --border: #252836;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --accent3: #ff6b6b;
+      --text: #e8eaf0;
+      --text2: #9a9db0;
+      --code-bg: #0a0c10;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; line-height: 1.6; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: rgba(13,15,20,0.95);
+      backdrop-filter: blur(8px); z-index: 100;
+    }
+    .nav-brand { font-weight: 700; font-size: 1.1rem; color: var(--text); }
+    .nav-brand span { color: var(--accent); }
+    .nav-links { display: flex; gap: 1.5rem; font-size: 0.9rem; color: var(--text2); flex-wrap: wrap; }
+    .nav-links a { color: var(--text2); }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .nav-links a.active { color: var(--accent); font-weight: 600; }
+    .btn { background: var(--accent); color: white; padding: 0.4rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
+    .btn:hover { text-decoration: none; opacity: 0.9; }
+
+    .doc-hero {
+      text-align: center; padding: 3.5rem 1rem 2.5rem;
+      background: radial-gradient(ellipse at 50% 0%, rgba(108,99,255,0.1) 0%, transparent 70%);
+      border-bottom: 1px solid var(--border);
+    }
+    .doc-hero h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 0.5rem; }
+    .doc-hero h1 span { color: var(--accent); }
+    .doc-hero p { color: var(--text2); font-size: 1.05rem; max-width: 600px; margin: 0 auto; }
+
+    .doc-layout { display: flex; max-width: 1200px; margin: 0 auto; min-height: calc(100vh - 200px); }
+
+    .doc-sidebar {
+      width: 260px; min-width: 260px; padding: 2rem 1.5rem; border-right: 1px solid var(--border);
+      position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto;
+    }
+    .doc-sidebar h4 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text2); margin-bottom: 0.75rem; }
+    .doc-sidebar a {
+      display: block; padding: 0.35rem 0.75rem; margin-bottom: 0.15rem; font-size: 0.85rem;
+      color: var(--text2); border-radius: 6px; transition: all 0.15s;
+    }
+    .doc-sidebar a:hover { color: var(--text); background: var(--bg3); text-decoration: none; }
+    .doc-sidebar a.sub { padding-left: 1.5rem; font-size: 0.82rem; }
+    .doc-sidebar hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+
+    .doc-content { flex: 1; padding: 3rem 3rem 5rem; max-width: 860px; overflow-x: hidden; }
+    @media (max-width: 900px) {
+      .doc-layout { flex-direction: column; }
+      .doc-sidebar { width: 100%; min-width: 100%; position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+      .doc-content { padding: 2rem 1.25rem 4rem; }
+    }
+
+    .doc-content h2 {
+      font-size: 1.6rem; font-weight: 700; margin: 3rem 0 1rem; padding-top: 1rem;
+      border-top: 1px solid var(--border); color: var(--text);
+    }
+    .doc-content h2:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+    .doc-content h3 { font-size: 1.15rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .doc-content h4 { font-size: 1rem; font-weight: 600; margin: 1.5rem 0 0.5rem; color: var(--text); }
+    .doc-content p { color: var(--text2); margin-bottom: 1rem; line-height: 1.75; }
+    .doc-content strong { color: var(--text); }
+    .doc-content ul, .doc-content ol { color: var(--text2); margin: 0.5rem 0 1rem 1.5rem; line-height: 1.8; }
+    .doc-content li { margin-bottom: 0.25rem; }
+
+    .doc-content table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: 0.88rem; }
+    .doc-content th {
+      text-align: left; padding: 0.6rem 0.75rem; background: var(--bg3);
+      border: 1px solid var(--border); font-weight: 600; color: var(--text); font-size: 0.82rem;
+      text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .doc-content td { padding: 0.5rem 0.75rem; border: 1px solid var(--border); color: var(--text2); }
+    .doc-content td code {
+      background: rgba(108,99,255,0.12); color: var(--accent); padding: 0.1rem 0.35rem;
+      border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+    }
+
+    .code-block {
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 1.25rem 1.5rem; margin: 1rem 0 1.5rem; overflow-x: auto;
+    }
+    .code-block pre {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; line-height: 1.7; color: var(--text);
+      white-space: pre; word-wrap: normal;
+    }
+    .code-block .comment { color: #525570; }
+    .code-block .keyword { color: #c792ea; }
+    .code-block .string { color: #c3e88d; }
+    .code-block .fn { color: #82aaff; }
+
+    .arch-block {
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1.5rem; margin: 1rem 0 1.5rem; overflow-x: auto;
+    }
+    .arch-block pre {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--text2); line-height: 1.7;
+      white-space: pre; word-wrap: normal;
+    }
+    .arch-block pre .hl { color: var(--accent2); }
+    .arch-block pre .hl2 { color: var(--accent); }
+
+    code {
+      background: rgba(108,99,255,0.12); color: var(--accent); padding: 0.1rem 0.35rem;
+      border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 0.88em;
+    }
+
+    .callout {
+      background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid var(--accent2);
+      border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0 1.5rem; font-size: 0.9rem;
+    }
+    .callout p { margin-bottom: 0; }
+    .callout.warn { border-left-color: var(--accent3); }
+
+    .node-badge {
+      display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.3px;
+    }
+    .node-badge.soul { background: rgba(108,99,255,0.15); color: var(--accent); }
+    .node-badge.memory { background: rgba(0,212,170,0.15); color: var(--accent2); }
+    .node-badge.config { background: rgba(255,107,107,0.15); color: var(--accent3); }
+    .node-badge.tool { background: rgba(255,183,77,0.15); color: #ffb74d; }
+
+    footer {
+      text-align: center; padding: 2rem; font-size: 0.82rem; color: var(--text2);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-brand" style="text-decoration:none;">openclaw<span>-graph</span></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="admin-guide.html">Admin Guide</a>
+    <a href="user-guide.html" class="active">User Guide</a>
+    <a href="skills.html">Skills</a>
+    <a href="https://github.com/alphaonedev/openclaw-graph" class="btn">GitHub</a>
+  </div>
+</nav>
+
+<div class="doc-hero">
+  <h1><span>User</span> Guide</h1>
+  <p>How workspace stubs work, what each node type does, and how to personalize your agent.</p>
+</div>
+
+<div class="doc-layout">
+  <aside class="doc-sidebar">
+    <h4>Concepts</h4>
+    <a href="#overview">Overview</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="#workspace-files">Workspace Files</a>
+    <hr>
+    <h4>Node Types</h4>
+    <a href="#soul">Soul</a>
+    <a href="#memory">Memory</a>
+    <a href="#agentconfig">AgentConfig</a>
+    <a href="#tool">Tool</a>
+    <a href="#skill">Skill</a>
+    <a href="#reference">Reference</a>
+    <hr>
+    <h4>Specification</h4>
+    <a href="#graph-directive">GRAPH Directive</a>
+    <a href="#directive-format" class="sub">Format &amp; Rules</a>
+    <a href="#return-columns" class="sub">Return columns</a>
+    <a href="#caching" class="sub">Caching</a>
+    <a href="#loading-flow">Loading Flow</a>
+    <hr>
+    <h4>Personalization</h4>
+    <a href="#customizing">Customizing</a>
+    <a href="#node-ids">Default Node IDs</a>
+    <a href="#faq">FAQ</a>
+  </aside>
+
+  <main class="doc-content">
+
+    <!-- OVERVIEW -->
+    <h2 id="overview">Overview</h2>
+    <p>openclaw-graph replaces OpenClaw's flat workspace files (<code>SOUL.md</code>, <code>MEMORY.md</code>, <code>TOOLS.md</code>, <code>AGENTS.md</code>) with single-line <strong>stubs</strong> that resolve against an embedded graph database at session start.</p>
+    <table>
+      <tr><th></th><th>Before (flat files)</th><th>After (graph stubs)</th></tr>
+      <tr><td>SOUL.md</td><td>~1,800 bytes of markdown</td><td>144 bytes &mdash; one GRAPH directive</td></tr>
+      <tr><td>MEMORY.md</td><td>~5,000+ bytes</td><td>130 bytes</td></tr>
+      <tr><td>TOOLS.md</td><td>~2,000 bytes</td><td>112 bytes</td></tr>
+      <tr><td>AGENTS.md</td><td>~500 bytes</td><td>127 bytes</td></tr>
+      <tr><td><strong>Total</strong></td><td><strong>~9,000+ bytes</strong></td><td><strong>~513 bytes</strong></td></tr>
+    </table>
+    <p>Content is stored as <strong>nodes</strong> in LadybugDB (an embedded graph database). Stubs query the database at runtime and inject the resolved content into your agent's system prompt &mdash; exactly as if you'd written it by hand.</p>
+
+    <!-- HOW IT WORKS -->
+    <h2 id="how-it-works">How It Works</h2>
+    <div class="arch-block"><pre><span class="hl2">OpenClaw Session Start</span>
+
+  1. Read ~/.openclaw/workspace/SOUL.md
+  2. Detect <span class="hl">&lt;!-- GRAPH: ... --&gt;</span> directive on first line
+  3. Execute Cypher query against LadybugDB
+  4. Format result as markdown
+  5. Inject into system prompt (as if SOUL.md was flat)
+
+  Same for MEMORY.md, AGENTS.md, TOOLS.md</pre></div>
+    <p>From the agent's perspective, nothing changes &mdash; it sees the same markdown it always did. The difference is that the content now lives in a queryable graph database instead of hand-maintained files.</p>
+
+    <!-- WORKSPACE FILES -->
+    <h2 id="workspace-files">Workspace Files</h2>
+    <p>After deploying stubs, your workspace directory looks like this:</p>
+    <div class="arch-block"><pre>~/.openclaw/workspace/
+&#9500;&#9472;&#9472; SOUL.md      &#8594; resolves <span class="hl2">Soul</span> nodes (identity, prime directive, safety)
+&#9500;&#9472;&#9472; MEMORY.md    &#8594; resolves <span class="hl">Memory</span> nodes (project facts, infrastructure)
+&#9500;&#9472;&#9472; AGENTS.md    &#8594; resolves <span class="hl">AgentConfig</span> nodes (session behavior, delegation)
+&#9492;&#9472;&#9472; TOOLS.md     &#8594; resolves <span class="hl">Tool</span> nodes (available tools and usage notes)</pre></div>
+    <p>Each file is a single line:</p>
+
+    <h4>SOUL.md</h4>
+    <div class="code-block"><pre>&lt;!-- GRAPH: MATCH (s:Soul) WHERE s.workspace = 'openclaw' RETURN s.section AS section, s.content AS content ORDER BY s.priority ASC LIMIT 8 --&gt;</pre></div>
+
+    <h4>MEMORY.md</h4>
+    <div class="code-block"><pre>&lt;!-- GRAPH: MATCH (m:Memory) WHERE m.workspace = 'openclaw' RETURN m.domain AS domain, m.content AS content ORDER BY m.domain --&gt;</pre></div>
+
+    <h4>AGENTS.md</h4>
+    <div class="code-block"><pre>&lt;!-- GRAPH: MATCH (a:AgentConfig) WHERE a.workspace = 'openclaw' RETURN a.key AS section, a.value AS content ORDER BY a.id --&gt;</pre></div>
+
+    <h4>TOOLS.md</h4>
+    <div class="code-block"><pre>&lt;!-- GRAPH: MATCH (t:Tool) WHERE t.available = true RETURN t.name AS name, t.notes AS notes ORDER BY t.name --&gt;</pre></div>
+
+    <!-- NODE TYPES -->
+    <h2 id="soul">Node Types &mdash; Soul <span class="node-badge soul">SOUL</span></h2>
+    <p><strong>Purpose:</strong> Defines your agent's identity, core directives, and behavioral boundaries.</p>
+
+    <h3>Schema</h3>
+    <table>
+      <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>id</code></td><td>STRING</td><td>Unique identifier (e.g., <code>soul-openclaw-identity</code>)</td></tr>
+      <tr><td><code>workspace</code></td><td>STRING</td><td>Workspace this node belongs to (default: <code>openclaw</code>)</td></tr>
+      <tr><td><code>section</code></td><td>STRING</td><td>Section heading (e.g., "Prime Directive", "Identity")</td></tr>
+      <tr><td><code>content</code></td><td>STRING</td><td>Markdown content for this section</td></tr>
+      <tr><td><code>priority</code></td><td>INT64</td><td>Sort order &mdash; lower numbers load first (default: 5)</td></tr>
+      <tr><td><code>protected</code></td><td>BOOLEAN</td><td>If <code>true</code>, cannot be overwritten by <code>--reset</code> (default: <code>false</code>)</td></tr>
+    </table>
+
+    <h3>Default nodes (4)</h3>
+    <table>
+      <tr><th>Priority</th><th>Section</th><th>Purpose</th></tr>
+      <tr><td>1</td><td>Prime Directive</td><td>Core mission statement &mdash; what the agent exists to do</td></tr>
+      <tr><td>2</td><td>Identity</td><td>Agent name, role, emoji, workspace ID</td></tr>
+      <tr><td>3</td><td>Safety</td><td>Behavioral guardrails and constraints</td></tr>
+      <tr><td>4</td><td>Heartbeat Protocol</td><td>Periodic self-check and health reporting format</td></tr>
+    </table>
+    <p><strong>Resolved output format:</strong> <code>## Section\n\nContent</code> (standard markdown headings)</p>
+
+    <!-- MEMORY -->
+    <h2 id="memory">Memory <span class="node-badge memory">MEMORY</span></h2>
+    <p><strong>Purpose:</strong> Stores factual knowledge the agent needs across sessions &mdash; who it works for, what infrastructure exists, API keys (as env var references), project state.</p>
+
+    <h3>Schema</h3>
+    <table>
+      <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>id</code></td><td>STRING</td><td>Unique identifier (e.g., <code>mem-openclaw-principal</code>)</td></tr>
+      <tr><td><code>workspace</code></td><td>STRING</td><td>Workspace this node belongs to (default: <code>openclaw</code>)</td></tr>
+      <tr><td><code>domain</code></td><td>STRING</td><td>Category label (e.g., "Principal", "Infrastructure")</td></tr>
+      <tr><td><code>content</code></td><td>STRING</td><td>Factual content for this domain</td></tr>
+      <tr><td><code>timestamp</code></td><td>STRING</td><td>When this memory was last updated (ISO format)</td></tr>
+    </table>
+
+    <h3>Default nodes (2)</h3>
+    <table>
+      <tr><th>Domain</th><th>Purpose</th></tr>
+      <tr><td>Principal</td><td>Who the agent serves &mdash; name, timezone, preferred contact channel</td></tr>
+      <tr><td>Infrastructure</td><td>Environment facts &mdash; DB paths, Node.js location, workspace directory</td></tr>
+    </table>
+    <div class="callout"><p>Both ship as <strong>placeholders</strong> &mdash; you fill in your own details. See <a href="#customizing">Customizing</a> below.</p></div>
+    <p><strong>Resolved output format:</strong> <code>## Domain\n\nContent</code></p>
+
+    <!-- AGENTCONFIG -->
+    <h2 id="agentconfig">AgentConfig <span class="node-badge config">CONFIG</span></h2>
+    <p><strong>Purpose:</strong> Controls agent session behavior &mdash; how it delegates tasks, handles errors, compresses output, validates schemas, and resolves paths.</p>
+
+    <h3>Schema</h3>
+    <table>
+      <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>id</code></td><td>STRING</td><td>Unique identifier (e.g., <code>agentcfg-openclaw-delegation</code>)</td></tr>
+      <tr><td><code>workspace</code></td><td>STRING</td><td>Workspace this node belongs to (default: <code>openclaw</code>)</td></tr>
+      <tr><td><code>key</code></td><td>STRING</td><td>Configuration key (displayed as section heading)</td></tr>
+      <tr><td><code>value</code></td><td>STRING</td><td>Configuration value (displayed as content)</td></tr>
+    </table>
+
+    <h3>Default nodes (9)</h3>
+    <table>
+      <tr><th>Key</th><th>Purpose</th></tr>
+      <tr><td>Every Session</td><td>Bootstrap instructions &mdash; what to read on every session start</td></tr>
+      <tr><td>Delegation</td><td>Rules for spawning sub-agents (when to delegate, how many)</td></tr>
+      <tr><td>Safety</td><td>Session-level safety behaviors (confirmation thresholds, etc.)</td></tr>
+      <tr><td>Heartbeats</td><td>Periodic health check format and interval</td></tr>
+      <tr><td>Memory</td><td>How to persist and retrieve memories across sessions</td></tr>
+      <tr><td>Token Optimization &mdash; TOON</td><td>JSON compression rules for large payloads (30-60% token savings)</td></tr>
+      <tr><td>Search Resilience</td><td>Retry and fallback strategies when web_search fails</td></tr>
+      <tr><td>Schema Rules</td><td>Output validation requirements for structured data</td></tr>
+      <tr><td>Path Aliases</td><td>Compact path notation ($PY, $DB, $WS, etc.) for prompt efficiency</td></tr>
+    </table>
+    <p><strong>Resolved output format:</strong> <code>- **Key**: Value</code> (markdown list items)</p>
+    <div class="callout"><p><strong>Session loading:</strong> In cron/sub-agent sessions, OpenClaw's <code>MINIMAL_BOOTSTRAP_ALLOWLIST</code> loads <strong>only</strong> AGENTS.md + TOOLS.md. SOUL.md and MEMORY.md are skipped to reduce prompt size.</p></div>
+
+    <!-- TOOL -->
+    <h2 id="tool">Tool <span class="node-badge tool">TOOL</span></h2>
+    <p><strong>Purpose:</strong> Declares which tools the agent can use, with usage notes.</p>
+
+    <h3>Schema</h3>
+    <table>
+      <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>id</code></td><td>STRING</td><td>Unique identifier (e.g., <code>tool-web-search</code>)</td></tr>
+      <tr><td><code>name</code></td><td>STRING</td><td>Tool name as the agent sees it</td></tr>
+      <tr><td><code>available</code></td><td>BOOLEAN</td><td>Whether the tool is currently enabled (default: <code>true</code>)</td></tr>
+      <tr><td><code>notes</code></td><td>STRING</td><td>Usage notes, restrictions, or tips</td></tr>
+    </table>
+    <p><strong>Default nodes:</strong> 26 tools covering all standard OpenClaw capabilities.</p>
+    <p>Set <code>available = false</code> to disable a tool for a specific agent (e.g., disable <code>sessions_spawn</code> for a standalone agent that shouldn't delegate).</p>
+    <p><strong>Resolved output format:</strong> <code>- **Name**: Notes</code> (markdown list items)</p>
+
+    <!-- SKILL -->
+    <h2 id="skill">Skill</h2>
+    <p><strong>Purpose:</strong> The skill graph &mdash; 316 skills across 27 clusters representing capabilities an agent can be asked to perform.</p>
+
+    <h3>Schema</h3>
+    <table>
+      <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>id</code></td><td>STRING</td><td>Unique identifier (e.g., <code>skill-kubernetes-ops</code>)</td></tr>
+      <tr><td><code>name</code></td><td>STRING</td><td>Human-readable skill name</td></tr>
+      <tr><td><code>cluster</code></td><td>STRING</td><td>Skill cluster (e.g., <code>devops-sre</code>, <code>financial</code>, <code>python</code>)</td></tr>
+      <tr><td><code>description</code></td><td>STRING</td><td>What this skill does</td></tr>
+      <tr><td><code>tags</code></td><td>STRING[]</td><td>Searchable tags</td></tr>
+      <tr><td><code>authorization_required</code></td><td>BOOLEAN</td><td>Whether this skill needs explicit user approval</td></tr>
+      <tr><td><code>scope</code></td><td>STRING</td><td>Scope category (default: <code>general</code>)</td></tr>
+      <tr><td><code>model_hint</code></td><td>STRING</td><td>Suggested model for this skill</td></tr>
+      <tr><td><code>embedding_hint</code></td><td>STRING</td><td>Semantic search hint text</td></tr>
+      <tr><td><code>skill_path</code></td><td>STRING</td><td>Path to skill definition file (if installed)</td></tr>
+      <tr><td><code>clawhub_install</code></td><td>STRING</td><td>ClawHub install command (if available)</td></tr>
+    </table>
+    <p>Skills are queried via the CLI &mdash; they're not loaded into workspace stubs:</p>
+    <div class="code-block"><pre><span class="comment"># Search by natural language</span>
+node ladybugdb/scripts/query.js <span class="string">"build a SwiftUI watchOS app"</span>
+
+<span class="comment"># Filter by cluster</span>
+node ladybugdb/scripts/query.js --cluster devops-sre
+
+<span class="comment"># Traverse relationships</span>
+node ladybugdb/scripts/query.js --skill cloudflare --hops 2</pre></div>
+
+    <!-- REFERENCE -->
+    <h2 id="reference">Reference</h2>
+    <p><strong>Purpose:</strong> 545,072 entries from 718 DevDocs docsets &mdash; programming language documentation, framework APIs, library references. Available in the <strong>Full</strong> tier only.</p>
+    <p>References are queried on-demand, not loaded into workspace stubs:</p>
+    <div class="code-block"><pre><span class="comment"># Find Python standard library docs</span>
+node ladybugdb/scripts/query.js --cypher \
+  <span class="string">"MATCH (r:Reference) WHERE r.source = 'python~3.12' AND r.path STARTS WITH 'library/' RETURN r.title, r.path LIMIT 20"</span></pre></div>
+
+    <!-- GRAPH DIRECTIVE SPECIFICATION -->
+    <h2 id="graph-directive">GRAPH Directive Specification</h2>
+
+    <h3 id="directive-format">Format &amp; Rules</h3>
+    <div class="code-block"><pre>&lt;!-- GRAPH: &lt;cypher-query&gt; --&gt;</pre></div>
+    <ol>
+      <li><strong>Must be the first line</strong> of the workspace file</li>
+      <li><strong>Must be a single line</strong> &mdash; no multi-line Cypher</li>
+      <li><strong>Must start with</strong> <code>&lt;!-- GRAPH:</code> and end with <code>--&gt;</code></li>
+      <li>The Cypher query is extracted and executed via <code>execFileAsync(node, [query.js, '--workspace', '--cypher', ...])</code></li>
+    </ol>
+
+    <h3 id="return-columns">Return column conventions</h3>
+    <p>The output format is determined by the column names returned by your Cypher query:</p>
+    <table>
+      <tr><th>Return columns</th><th>Output format</th><th>Used by</th></tr>
+      <tr><td><code>section</code> + <code>content</code></td><td><code>## Section\n\nContent</code></td><td>SOUL.md</td></tr>
+      <tr><td><code>domain</code> + <code>content</code></td><td><code>## Domain\n\nContent</code></td><td>MEMORY.md</td></tr>
+      <tr><td><code>key</code> + <code>value</code></td><td><code>- **Key**: Value</code></td><td>AGENTS.md</td></tr>
+      <tr><td><code>name</code> + <code>notes</code></td><td><code>- **Name**: Notes</code></td><td>TOOLS.md</td></tr>
+      <tr><td>Other columns</td><td>JSON (debug/dev use)</td><td>Custom queries</td></tr>
+    </table>
+
+    <h3 id="caching">Caching</h3>
+    <p>Resolved results are cached with a three-layer strategy:</p>
+    <ol>
+      <li><strong>Disk stub cache</strong> &mdash; <code>workspaceFileCache</code> keyed by file mtime (if file hasn't changed, skip re-read)</li>
+      <li><strong>Graph query cache</strong> &mdash; <code>graphQueryCache</code> with adaptive TTL: <code>60s &times; log&#8321;&#8320;(hit_count + 10)</code></li>
+      <li><strong>In-flight deduplication</strong> &mdash; <code>graphQueryInFlight</code> prevents thundering herd when multiple files resolve simultaneously</li>
+    </ol>
+    <div class="callout"><p>In practice, the Cypher query is executed <strong>at most once per 60 seconds</strong> per unique query. Subsequent reads return cached markdown instantly.</p></div>
+
+    <!-- WORKSPACE LOADING FLOW -->
+    <h2 id="loading-flow">Workspace Loading Flow</h2>
+
+    <h3>Interactive sessions</h3>
+    <div class="arch-block"><pre><span class="hl2">Session Start</span>
+  &#9500;&#9472;&#9472; Load SOUL.md     &#8594; GRAPH directive &#8594; <span class="hl2">Soul</span> nodes &#8594; system prompt
+  &#9500;&#9472;&#9472; Load MEMORY.md   &#8594; GRAPH directive &#8594; <span class="hl">Memory</span> nodes &#8594; system prompt
+  &#9500;&#9472;&#9472; Load AGENTS.md   &#8594; GRAPH directive &#8594; <span class="hl">AgentConfig</span> nodes &#8594; system prompt
+  &#9492;&#9472;&#9472; Load TOOLS.md    &#8594; GRAPH directive &#8594; <span class="hl">Tool</span> nodes &#8594; system prompt</pre></div>
+    <p>All four files are loaded. The agent receives the full context.</p>
+
+    <h3>Cron / sub-agent sessions</h3>
+    <div class="arch-block"><pre><span class="hl2">Session Start</span> (minimal bootstrap)
+  &#9500;&#9472;&#9472; Load AGENTS.md   &#8594; GRAPH directive &#8594; <span class="hl">AgentConfig</span> nodes &#8594; system prompt
+  &#9492;&#9472;&#9472; Load TOOLS.md    &#8594; GRAPH directive &#8594; <span class="hl">Tool</span> nodes &#8594; system prompt</pre></div>
+    <p>Only AGENTS.md and TOOLS.md are loaded (<code>MINIMAL_BOOTSTRAP_ALLOWLIST</code>). This reduces prompt size for automated tasks that don't need identity or memory context.</p>
+
+    <!-- CUSTOMIZING YOUR WORKSPACE -->
+    <h2 id="customizing">Customizing Your Workspace</h2>
+
+    <h3>Option A &mdash; Edit nodes with Cypher</h3>
+    <p>Best for quick changes to individual nodes.</p>
+    <div class="code-block"><pre><span class="comment"># Update your agent's identity</span>
+node ladybugdb/scripts/query.js --cypher \
+  <span class="string">"MATCH (s:Soul {id:'soul-openclaw-identity'}) \
+   SET s.content = 'Name: Aria | Role: DevOps agent | Emoji: &#x1f6e1;&#xfe0f;'"</span>
+
+<span class="comment"># Fill in the Principal memory (who you are)</span>
+node ladybugdb/scripts/query.js --cypher \
+  <span class="string">"MATCH (m:Memory {id:'mem-openclaw-principal'}) \
+   SET m.content = 'Name: Alice | Timezone: America/Chicago | Channel: signal'"</span>
+
+<span class="comment"># Fill in Infrastructure memory</span>
+node ladybugdb/scripts/query.js --cypher \
+  <span class="string">"MATCH (m:Memory {id:'mem-openclaw-infrastructure'}) \
+   SET m.content = 'DB: ~/myapp/ladybugdb/db/alphaone-skills.db | Node: /usr/local/bin/node'"</span>
+
+<span class="comment"># Add a new memory domain</span>
+node ladybugdb/scripts/query.js --cypher \
+  <span class="string">"CREATE (m:Memory { \
+     id: 'mem-openclaw-api-keys', \
+     workspace: 'openclaw', \
+     domain: 'API Keys', \
+     content: 'Brave Search: \$BRAVE_API_KEY | xAI: \$XAI_API_KEY', \
+     timestamp: '2026-01-01' \
+   })"</span></pre></div>
+
+    <h3>Option B &mdash; Fork the seed script</h3>
+    <p>Best for reproducible, version-controlled workspace definitions.</p>
+    <div class="code-block"><pre>cp ladybugdb/scripts/seed-default-workspace.mjs ladybugdb/scripts/seed-myagent.mjs
+<span class="comment"># Edit SOUL, MEMORY, AGENT_CONFIG, TOOLS arrays</span>
+node ladybugdb/scripts/seed-myagent.mjs --workspace myagent --reset</pre></div>
+    <p>Then update your stubs to point to your workspace:</p>
+    <div class="code-block"><pre><span class="comment"># In each stub, change workspace = 'openclaw' to workspace = 'myagent'</span>
+sed -i '' <span class="string">"s/workspace = 'openclaw'/workspace = 'myagent'/g"</span> ~/.openclaw/workspace/*.md</pre></div>
+
+    <h3>Option C &mdash; Multiple workspaces</h3>
+    <p>For running several agents with different personalities or capabilities. See <a href="admin-guide.html#fleet">Fleet Management</a> in the Admin Guide.</p>
+
+    <h3>Keeping customizations across upgrades</h3>
+    <p>When the DB is replaced during an upgrade, workspace nodes are lost. Two strategies:</p>
+    <ol>
+      <li><strong>Re-run your seed script</strong> after every <code>install.sh</code> run (recommended)</li>
+      <li><strong>Export nodes before upgrading:</strong></li>
+    </ol>
+    <div class="code-block"><pre>node ladybugdb/scripts/query.js --cypher \
+  <span class="string">"MATCH (s:Soul {workspace:'openclaw'}) RETURN s.id, s.section, s.content, s.priority"</span> \
+  &gt; workspace-backup.json</pre></div>
+    <p>See <a href="admin-guide.html#upgrading">Upgrading</a> in the Admin Guide for the full workflow.</p>
+
+    <!-- QUICK REFERENCE -->
+    <h2 id="node-ids">Default Node IDs</h2>
+    <table>
+      <tr><th>ID</th><th>Type</th><th>Section / Domain / Key</th></tr>
+      <tr><td><code>soul-openclaw-prime-directive</code></td><td><span class="node-badge soul">Soul</span></td><td>Prime Directive</td></tr>
+      <tr><td><code>soul-openclaw-identity</code></td><td><span class="node-badge soul">Soul</span></td><td>Identity</td></tr>
+      <tr><td><code>soul-openclaw-safety</code></td><td><span class="node-badge soul">Soul</span></td><td>Safety</td></tr>
+      <tr><td><code>soul-openclaw-heartbeat</code></td><td><span class="node-badge soul">Soul</span></td><td>Heartbeat Protocol</td></tr>
+      <tr><td><code>mem-openclaw-principal</code></td><td><span class="node-badge memory">Memory</span></td><td>Principal</td></tr>
+      <tr><td><code>mem-openclaw-infrastructure</code></td><td><span class="node-badge memory">Memory</span></td><td>Infrastructure</td></tr>
+      <tr><td><code>agentcfg-openclaw-every-session</code></td><td><span class="node-badge config">Config</span></td><td>Every Session</td></tr>
+      <tr><td><code>agentcfg-openclaw-delegation</code></td><td><span class="node-badge config">Config</span></td><td>Delegation</td></tr>
+      <tr><td><code>agentcfg-openclaw-safety</code></td><td><span class="node-badge config">Config</span></td><td>Safety</td></tr>
+      <tr><td><code>agentcfg-openclaw-heartbeats</code></td><td><span class="node-badge config">Config</span></td><td>Heartbeats</td></tr>
+      <tr><td><code>agentcfg-openclaw-memory</code></td><td><span class="node-badge config">Config</span></td><td>Memory</td></tr>
+      <tr><td><code>agentcfg-openclaw-toon</code></td><td><span class="node-badge config">Config</span></td><td>Token Optimization &mdash; TOON</td></tr>
+      <tr><td><code>agentcfg-openclaw-search-resilience</code></td><td><span class="node-badge config">Config</span></td><td>Search Resilience</td></tr>
+      <tr><td><code>agentcfg-openclaw-schema-rules</code></td><td><span class="node-badge config">Config</span></td><td>Schema Rules</td></tr>
+      <tr><td><code>agentcfg-openclaw-path-aliases</code></td><td><span class="node-badge config">Config</span></td><td>Path Aliases</td></tr>
+    </table>
+    <p>Plus 26 Tool nodes (<code>tool-web-search</code>, <code>tool-sessions-spawn</code>, etc.).</p>
+
+    <!-- FAQ -->
+    <h2 id="faq">FAQ</h2>
+
+    <h3>Do I need to change my prompts or workflows?</h3>
+    <p>No. The agent sees the same markdown content it always did. The graph database is transparent &mdash; it's a storage and delivery mechanism, not a new interface.</p>
+
+    <h3>What happens if the database is missing?</h3>
+    <p>The GRAPH directive returns empty content. Your agent will start with blank workspace sections. Run <code>install.sh</code> to download the database, then <code>seed-default-workspace.mjs</code> if workspace nodes are missing.</p>
+
+    <h3>Can I mix flat files and graph stubs?</h3>
+    <p>Yes. Any workspace file without a <code>&lt;!-- GRAPH: ... --&gt;</code> directive on line 1 is loaded as a normal flat file. You can migrate one file at a time.</p>
+
+    <h3>How do I see what my agent actually receives?</h3>
+    <p>Run the same query the stub uses:</p>
+    <div class="code-block"><pre><span class="comment"># See exactly what SOUL.md resolves to</span>
+node ladybugdb/scripts/query.js --workspace --cypher \
+  <span class="string">"MATCH (s:Soul {workspace:'openclaw'}) RETURN s.section AS section, s.content AS content ORDER BY s.priority"</span>
+
+<span class="comment"># See what AGENTS.md resolves to</span>
+node ladybugdb/scripts/query.js --workspace --cypher \
+  <span class="string">"MATCH (a:AgentConfig {workspace:'openclaw'}) RETURN a.key AS section, a.value AS content ORDER BY a.id"</span></pre></div>
+    <p>The <code>--workspace</code> flag produces the same clean markdown output that gets injected into the system prompt.</p>
+
+    <h3>What's the performance impact?</h3>
+    <p>Negligible. In-process queries are sub-millisecond (0.11&ndash;0.41ms). CLI subprocess calls take ~100ms but are cached for 60+ seconds. See <a href="admin-guide.html#performance">Performance Reference</a> in the Admin Guide.</p>
+
+    <h3>Can I query the skill graph from my agent's prompts?</h3>
+    <p>Yes. Agents can run CLI queries as part of their task execution:</p>
+    <div class="code-block"><pre>node ladybugdb/scripts/query.js <span class="string">"kubernetes monitoring"</span>
+node ladybugdb/scripts/query.js --skill cloudflare --hops 2</pre></div>
+    <p>This is how cron jobs and automated workflows discover relevant skills at runtime.</p>
+
+  </main>
+</div>
+
+<footer>
+  openclaw-graph v1.2 &middot; MIT License &middot;
+  <a href="index.html">Home</a> &middot;
+  <a href="admin-guide.html">Admin Guide</a> &middot;
+  <a href="https://github.com/alphaonedev/openclaw-graph">GitHub</a>
+</footer>
+
+</body>
+</html>
