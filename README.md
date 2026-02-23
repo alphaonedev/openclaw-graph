@@ -156,6 +156,42 @@ sudo dnf install -y zstd
 
 ---
 
+## Importing Your Existing Workspace
+
+Already running OpenClaw with flat `SOUL.md`, `MEMORY.md`, `USER.md`, `TOOLS.md`, `AGENTS.md` files? One command loads them into LadybugDB:
+
+```bash
+# From your openclaw-graph directory:
+node ladybugdb/scripts/import-workspace.mjs
+```
+
+The importer reads `~/.openclaw/workspace/` by default, parses each file by `##` headings, and creates the appropriate graph nodes. Then optionally replaces the flat files with single-line GRAPH stubs:
+
+```bash
+# Preview what will be imported (no writes)
+node ladybugdb/scripts/import-workspace.mjs --dry-run
+
+# Import + automatically replace flat files with GRAPH stubs (backs up originals to *.bak)
+node ladybugdb/scripts/import-workspace.mjs --write-stubs
+
+# Custom workspace directory or name
+node ladybugdb/scripts/import-workspace.mjs --workspace-dir ~/my/workspace --workspace-name myagent
+```
+
+**File → Node mapping:**
+
+| File | Node type | Section format |
+|------|-----------|----------------|
+| `SOUL.md` | `Soul` | Each `##` heading → one node |
+| `MEMORY.md` | `Memory` | Each `##` heading → one domain |
+| `USER.md` | `Memory` | Each `##` heading → `User: <section>` domain |
+| `TOOLS.md` | `Tool` | Each `##` heading → one tool entry |
+| `AGENTS.md` | `AgentConfig` | Each `##` heading → one config key |
+
+> **Format your files with `##` headings** — each `##` section becomes one graph node. Files with no `##` headings are imported as a single node.
+
+---
+
 ## Quick Start
 
 ### Option A — One-line install (recommended)

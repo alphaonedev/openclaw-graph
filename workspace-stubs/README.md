@@ -1,19 +1,20 @@
 # Workspace Stubs
 
-Four files that replace your full `~/.openclaw/workspace/*.md` flat files.
+Five files that replace your full `~/.openclaw/workspace/*.md` flat files.
 Each contains one `<!-- GRAPH: ... -->` directive — OpenClaw resolves it against LadybugDB at session start.
 
 Default workspace ID: **`openclaw`** — seeded into every DB release via `seed-default-workspace.mjs`.
 
 ## Before → After
 
-| File | Before (flat) | After (stub) |
-|------|--------------|--------------|
-| SOUL.md    | ~1,800 bytes | 144 bytes |
-| MEMORY.md  | ~5,000+ bytes | 130 bytes |
-| TOOLS.md   | ~2,000 bytes | 112 bytes |
-| AGENTS.md  | ~500 bytes   | 127 bytes |
-| **Total**  | **~9,000+ bytes** | **~513 bytes** |
+| File | Before (flat) | After (stub) | Node type |
+|------|--------------|--------------|-----------|
+| SOUL.md    | ~1,800 bytes | 144 bytes | Soul |
+| MEMORY.md  | ~5,000+ bytes | 130 bytes | Memory |
+| USER.md    | ~800+ bytes  | 142 bytes | Memory (prefix: `User:`) |
+| TOOLS.md   | ~2,000 bytes | 112 bytes | Tool |
+| AGENTS.md  | ~500 bytes   | 127 bytes | AgentConfig |
+| **Total**  | **~11,000+ bytes** | **~655 bytes** | |
 
 Content is resolved at runtime from LadybugDB → injected into the agent system prompt.
 

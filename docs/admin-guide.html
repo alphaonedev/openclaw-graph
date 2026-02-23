@@ -158,6 +158,7 @@
     <h4>Getting Started</h4>
     <a href="#prerequisites">Prerequisites</a>
     <a href="#installation">Installation</a>
+    <a href="#import-workspace">Import Your Workspace</a>
     <a href="#database-layout">Database Layout</a>
     <hr>
     <h4>Reference</h4>
@@ -277,6 +278,48 @@ node ladybugdb/scripts/query.js --stats</pre></div>
       <tr><td>Tool</td><td>26</td><td>All standard OpenClaw tools</td></tr>
       <tr><td>QueryMetrics</td><td>0</td><td>Schema only &mdash; populated automatically</td></tr>
     </table>
+
+    <!-- IMPORT WORKSPACE -->
+    <h2 id="import-workspace">Import Your Workspace</h2>
+    <p>Already running OpenClaw with flat markdown files? One command loads them into LadybugDB.</p>
+
+    <h3>Quick start</h3>
+    <div class="code-block"><pre><span class="comment"># From your openclaw-graph directory — reads ~/.openclaw/workspace/ by default</span>
+node ladybugdb/scripts/import-workspace.mjs
+
+<span class="comment"># Preview what will be imported without writing anything</span>
+node ladybugdb/scripts/import-workspace.mjs --dry-run
+
+<span class="comment"># Import + replace flat files with GRAPH stubs (originals backed up to *.bak)</span>
+node ladybugdb/scripts/import-workspace.mjs --write-stubs
+
+<span class="comment"># Custom path or workspace name</span>
+node ladybugdb/scripts/import-workspace.mjs --workspace-dir ~/my/path --workspace-name myagent
+
+<span class="comment"># Replace existing nodes</span>
+node ladybugdb/scripts/import-workspace.mjs --overwrite</pre></div>
+
+    <h3>File → Node mapping</h3>
+    <table>
+      <tr><th>File</th><th>Node type</th><th>Section → field</th><th>Notes</th></tr>
+      <tr><td><code>SOUL.md</code></td><td>Soul</td><td><code>## heading</code> → <code>section</code></td><td>Ordered by priority (file order)</td></tr>
+      <tr><td><code>MEMORY.md</code></td><td>Memory</td><td><code>## heading</code> → <code>domain</code></td><td>Timestamped on import date</td></tr>
+      <tr><td><code>USER.md</code></td><td>Memory</td><td><code>## heading</code> → <code>User: &lt;heading&gt;</code></td><td>Queryable separately via <code>STARTS WITH 'User:'</code></td></tr>
+      <tr><td><code>TOOLS.md</code></td><td>Tool</td><td><code>## heading</code> → <code>name</code></td><td>No workspace column — tools are global</td></tr>
+      <tr><td><code>AGENTS.md</code></td><td>AgentConfig</td><td><code>## heading</code> → <code>key</code></td><td>Drives AGENTS.md stub query</td></tr>
+    </table>
+
+    <p><strong>Format requirement:</strong> Each file is parsed by <code>##</code> headings — each heading becomes one graph node. Files with no <code>##</code> headings are imported as a single node titled <em>Main</em>. Files that already contain a GRAPH stub directive are automatically skipped.</p>
+
+    <h3>What <code>--write-stubs</code> does</h3>
+    <div class="code-block"><pre><span class="comment"># Before: flat file (~1,800 bytes)</span>
+~/.openclaw/workspace/SOUL.md
+
+<span class="comment"># After --write-stubs:</span>
+~/.openclaw/workspace/SOUL.md      <span class="comment"># ← single-line GRAPH stub (144 bytes)</span>
+~/.openclaw/workspace/SOUL.md.bak  <span class="comment"># ← original backed up automatically</span></pre></div>
+
+    <p>OpenClaw resolves the stub at runtime from LadybugDB — your content is preserved in the graph, not the file.</p>
 
     <!-- DATABASE LAYOUT -->
     <h2 id="database-layout">Database Layout</h2>
