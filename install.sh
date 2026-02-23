@@ -8,8 +8,8 @@
 #
 # Usage:
 #   ./install.sh              # interactive (prompts lite vs full)
-#   ./install.sh --lite       # skills only (~10 MB download)
-#   ./install.sh --full       # skills + all DevDocs (~500 MB download)
+#   ./install.sh --lite       # skills only (~300 MB compressed)
+#   ./install.sh --full       # skills + all DevDocs (~500 MB compressed)
 #   ./install.sh --verify     # verify existing DB without reinstalling
 #   ./install.sh --version v1.2  # install a specific release version
 # ============================================================
@@ -121,6 +121,17 @@ EXT="zst"
 
 # ── Choose tier ──────────────────────────────────────────────
 if [ -z "$MODE" ]; then
+  # When piped from curl, stdin is not a TTY — prompt will silently fail.
+  # Require an explicit flag in that case.
+  if [ ! -t 0 ]; then
+    echo ""
+    echo -e "${BOLD}Usage (piped install requires explicit flag):${RESET}"
+    echo ""
+    echo "  Lite (~300 MB):  curl -fsSL https://raw.githubusercontent.com/${REPO}/main/install.sh | bash -s -- --lite"
+    echo "  Full (~500 MB):  curl -fsSL https://raw.githubusercontent.com/${REPO}/main/install.sh | bash -s -- --full"
+    echo ""
+    exit 1
+  fi
   header "Choose database tier:"
   echo ""
   echo "  [1] Lite  — 316 skills + 9 AgentConfig + 1536d embeddings    (~300 MB)"

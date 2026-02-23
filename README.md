@@ -84,11 +84,11 @@ LadybugDB (embedded SQLite + Cypher, no daemon)
 ### Option A — One-line install (recommended)
 
 ```bash
-# Full install (skills + 545k DevDocs reference nodes)
-curl -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh | bash
-
-# Lite install (skills + embeddings only)
+# Lite install — skills + embeddings (~300 MB compressed)
 curl -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh | bash -s -- --lite
+
+# Full install — skills + 545k DevDocs reference nodes (~500 MB compressed)
+curl -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh | bash -s -- --full
 ```
 
 The DB ships with `workspace='openclaw'` pre-seeded. Skip to step 3.
