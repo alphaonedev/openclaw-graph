@@ -26,6 +26,8 @@ Replace flat workspace markdown files with an embedded Cypher graph database. 31
 | QueryMetrics schema | ❌ | ✅ |
 | Prompt optimization (Path Aliases, TOON) | ❌ | ✅ 70% token reduction |
 | `seed-default-workspace.mjs` | ❌ | ✅ |
+| `import-workspace.mjs` (load flat files into DB) | ❌ | ✅ |
+| `USER.md` stub | ❌ | ✅ |
 
 See [CUSTOMIZING.md](CUSTOMIZING.md) for how to personalize or fork the default workspace.
 
@@ -55,8 +57,9 @@ OpenClaw Session
 ├── loadWorkspaceBootstrapFiles()
 │   ├── SOUL.md    (1 line: <!-- GRAPH: MATCH (s:Soul)... -->)
 │   ├── MEMORY.md  (1 line: <!-- GRAPH: MATCH (m:Memory)... -->)
+│   ├── USER.md    (1 line: <!-- GRAPH: MATCH (m:Memory) WHERE m.domain STARTS WITH 'User:'... -->)
 │   ├── TOOLS.md   (1 line: <!-- GRAPH: MATCH (t:Tool)... -->)
-│   └── AGENTS.md  (1 line: <!-- GRAPH: MATCH (s:Soul WHERE section STARTS WITH...) -->)
+│   └── AGENTS.md  (1 line: <!-- GRAPH: MATCH (a:AgentConfig)... -->)
 │       │
 │       └── readFileWithCache()
 │           ├── detect GRAPH directive
@@ -69,8 +72,9 @@ OpenClaw Session
 
 Skills (316 nodes, 27 clusters)
 │
-├── loader.js        → parse SKILL.md files → insert into DB
-├── query.js         → text search / cluster / graph traversal / Cypher
+├── loader.js               → parse SKILL.md files → insert into DB
+├── query.js                → text search / cluster / graph traversal / Cypher
+├── import-workspace.mjs    → load flat SOUL/MEMORY/USER/TOOLS/AGENTS.md into DB
 └── seed-default-workspace.mjs → populate Soul / Memory / Tool / AgentConfig tables
 
 LadybugDB (embedded SQLite + Cypher, no daemon)
@@ -392,10 +396,10 @@ The ~104ms first-load cost is Node.js process spawn + lbug init — not the quer
 
 | Metric | Value |
 |--------|-------|
-| Workspace stub total size | ~513 bytes (4 files) |
-| Flat-file workspace size | ~9,000–25,000+ bytes |
-| **Size reduction** | **94–98%** |
-| Token savings per session | ~2,200–6,200 tokens |
+| Workspace stub total size | ~655 bytes (5 files) |
+| Flat-file workspace size | ~11,000–25,000+ bytes |
+| **Size reduction** | **94–97%** |
+| Token savings per session | ~2,700–6,200 tokens |
 | DB compressed (full) | 295 MB (zstd) |
 | DB raw (full) | 3.2 GB |
 

@@ -857,10 +857,10 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
   <p>The install script downloads a pre-built, SHA256-verified database from the GitHub Release. No build step required.</p>
 
   <div class="code-block" style="margin-top:1.5rem;">
-    <pre><span class="comment"># Full install (skills + 545k DevDocs reference nodes) — recommended</span>
-<span class="fn">curl</span> -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh <span class="keyword">|</span> bash
+    <pre><span class="comment"># Full install — skills + 545k DevDocs reference nodes (recommended)</span>
+<span class="fn">curl</span> -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh <span class="keyword">|</span> bash -s -- --full
 
-<span class="comment"># Lite install (skills + embeddings only, faster download)</span>
+<span class="comment"># Lite install — skills + embeddings only, faster download</span>
 <span class="fn">curl</span> -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh <span class="keyword">|</span> bash -s -- --lite
 
 <span class="comment"># Pin to a specific release</span>
@@ -918,11 +918,20 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
     <div class="step">
       <div class="step-num">4</div>
       <div class="step-body">
-        <h4>Seed workspace identity</h4>
+        <h4>Load your workspace files into the graph</h4>
         <div class="code-block">
-          <pre><span class="comment"># Edit seed-workspace.js — set WORKSPACE_ID, fill Soul/Memory/Tool nodes</span>
-<span class="fn">node</span> ladybugdb/scripts/seed-workspace.js</pre>
+          <pre><span class="comment"># Option A — import your existing SOUL.md, MEMORY.md, USER.md, TOOLS.md, AGENTS.md</span>
+<span class="fn">node</span> ladybugdb/scripts/import-workspace.mjs
+
+<span class="comment"># Option B — use the pre-seeded defaults (already in the DB from install)</span>
+<span class="comment"># Nothing to do — workspace='openclaw' ships pre-seeded in every DB release</span>
+
+<span class="comment"># Option C — seed from scratch with the template script</span>
+<span class="fn">node</span> ladybugdb/scripts/seed-default-workspace.mjs</pre>
         </div>
+        <p style="font-size:0.83rem; color:var(--text2); margin-top:0.5rem;">
+          <code>import-workspace.mjs</code> reads <code>~/.openclaw/workspace/</code>, parses each file by <code>##</code> headings, and creates the correct graph nodes. Run with <code>--dry-run</code> to preview.
+        </p>
       </div>
     </div>
     <div class="step">

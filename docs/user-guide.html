@@ -185,6 +185,9 @@
     <a href="#caching" class="sub">Caching</a>
     <a href="#loading-flow">Loading Flow</a>
     <hr>
+    <h4>Migration</h4>
+    <a href="#import-workspace">Import Your Files</a>
+    <hr>
     <h4>Personalization</h4>
     <a href="#customizing">Customizing</a>
     <a href="#node-ids">Default Node IDs</a>
@@ -197,12 +200,13 @@
     <h2 id="overview">Overview</h2>
     <p>openclaw-graph replaces OpenClaw's flat workspace files (<code>SOUL.md</code>, <code>MEMORY.md</code>, <code>TOOLS.md</code>, <code>AGENTS.md</code>) with single-line <strong>stubs</strong> that resolve against an embedded graph database at session start.</p>
     <table>
-      <tr><th></th><th>Before (flat files)</th><th>After (graph stubs)</th></tr>
-      <tr><td>SOUL.md</td><td>~1,800 bytes of markdown</td><td>144 bytes &mdash; one GRAPH directive</td></tr>
-      <tr><td>MEMORY.md</td><td>~5,000+ bytes</td><td>130 bytes</td></tr>
-      <tr><td>TOOLS.md</td><td>~2,000 bytes</td><td>112 bytes</td></tr>
-      <tr><td>AGENTS.md</td><td>~500 bytes</td><td>127 bytes</td></tr>
-      <tr><td><strong>Total</strong></td><td><strong>~9,000+ bytes</strong></td><td><strong>~513 bytes</strong></td></tr>
+      <tr><th></th><th>Before (flat files)</th><th>After (graph stubs)</th><th>Node type</th></tr>
+      <tr><td>SOUL.md</td><td>~1,800 bytes of markdown</td><td>144 bytes &mdash; one GRAPH directive</td><td>Soul</td></tr>
+      <tr><td>MEMORY.md</td><td>~5,000+ bytes</td><td>130 bytes</td><td>Memory</td></tr>
+      <tr><td>USER.md</td><td>~800+ bytes</td><td>142 bytes</td><td>Memory (prefix: <code>User:</code>)</td></tr>
+      <tr><td>TOOLS.md</td><td>~2,000 bytes</td><td>112 bytes</td><td>Tool</td></tr>
+      <tr><td>AGENTS.md</td><td>~500 bytes</td><td>127 bytes</td><td>AgentConfig</td></tr>
+      <tr><td><strong>Total</strong></td><td><strong>~11,000+ bytes</strong></td><td><strong>~655 bytes</strong></td><td></td></tr>
     </table>
     <p>Content is stored as <strong>nodes</strong> in LadybugDB (an embedded graph database). Stubs query the database at runtime and inject the resolved content into your agent's system prompt &mdash; exactly as if you'd written it by hand.</p>
 
@@ -225,6 +229,7 @@
     <div class="arch-block"><pre>~/.openclaw/workspace/
 &#9500;&#9472;&#9472; SOUL.md      &#8594; resolves <span class="hl2">Soul</span> nodes (identity, prime directive, safety)
 &#9500;&#9472;&#9472; MEMORY.md    &#8594; resolves <span class="hl">Memory</span> nodes (project facts, infrastructure)
+&#9500;&#9472;&#9472; USER.md      &#8594; resolves <span class="hl">Memory</span> nodes where domain starts with <span class="hl2">'User:'</span>
 &#9500;&#9472;&#9472; AGENTS.md    &#8594; resolves <span class="hl">AgentConfig</span> nodes (session behavior, delegation)
 &#9492;&#9472;&#9472; TOOLS.md     &#8594; resolves <span class="hl">Tool</span> nodes (available tools and usage notes)</pre></div>
     <p>Each file is a single line:</p>
@@ -234,6 +239,10 @@
 
     <h4>MEMORY.md</h4>
     <div class="code-block"><pre>&lt;!-- GRAPH: MATCH (m:Memory) WHERE m.workspace = 'openclaw' RETURN m.domain AS domain, m.content AS content ORDER BY m.domain --&gt;</pre></div>
+
+    <h4>USER.md</h4>
+    <p style="font-size:0.87rem; color:var(--text2); margin-bottom:0.5rem;">User context lives as Memory nodes with a <code>User:</code> domain prefix — importable from your existing <code>USER.md</code> via <code>import-workspace.mjs</code>.</p>
+    <div class="code-block"><pre>&lt;!-- GRAPH: MATCH (m:Memory) WHERE m.workspace = 'openclaw' AND m.domain STARTS WITH 'User:' RETURN m.domain AS domain, m.content AS content ORDER BY m.domain --&gt;</pre></div>
 
     <h4>AGENTS.md</h4>
     <div class="code-block"><pre>&lt;!-- GRAPH: MATCH (a:AgentConfig) WHERE a.workspace = 'openclaw' RETURN a.key AS section, a.value AS content ORDER BY a.id --&gt;</pre></div>
@@ -495,6 +504,40 @@ sed -i '' <span class="string">"s/workspace = 'openclaw'/workspace = 'myagent'/g
     </table>
     <p>Plus 21 Tool nodes (<code>tool-web-search</code>, <code>tool-sessions-spawn</code>, etc.).</p>
 
+    <!-- IMPORT WORKSPACE -->
+    <h2 id="import-workspace">Import Your Existing Workspace</h2>
+    <p>Already running OpenClaw with flat <code>SOUL.md</code>, <code>MEMORY.md</code>, <code>USER.md</code>, <code>TOOLS.md</code>, <code>AGENTS.md</code> files? One command loads them all into LadybugDB:</p>
+
+    <div class="code-block"><pre><span class="comment"># From your openclaw-graph directory</span>
+<span class="fn">node</span> ladybugdb/scripts/import-workspace.mjs</pre></div>
+
+    <p>The importer scans <code>~/.openclaw/workspace/</code> by default, parses each file by <code>##</code> headings, and creates the correct graph nodes. Files already containing a <code>&lt;!-- GRAPH: --&gt;</code> stub are automatically skipped.</p>
+
+    <h3>Options</h3>
+    <div class="code-block"><pre><span class="comment"># Preview what will be imported — no DB writes</span>
+<span class="fn">node</span> ladybugdb/scripts/import-workspace.mjs --dry-run
+
+<span class="comment"># Import + replace flat files with GRAPH stubs (backs up originals to *.bak)</span>
+<span class="fn">node</span> ladybugdb/scripts/import-workspace.mjs --write-stubs
+
+<span class="comment"># Replace existing nodes</span>
+<span class="fn">node</span> ladybugdb/scripts/import-workspace.mjs --overwrite
+
+<span class="comment"># Custom source directory or workspace name</span>
+<span class="fn">node</span> ladybugdb/scripts/import-workspace.mjs --workspace-dir ~/my/path --workspace-name myagent</pre></div>
+
+    <h3>File → Node mapping</h3>
+    <table>
+      <tr><th>File</th><th>Node type</th><th>How sections map</th></tr>
+      <tr><td><code>SOUL.md</code></td><td>Soul</td><td><code>## Heading</code> → <code>section</code> field, body → <code>content</code></td></tr>
+      <tr><td><code>MEMORY.md</code></td><td>Memory</td><td><code>## Heading</code> → <code>domain</code> field, body → <code>content</code></td></tr>
+      <tr><td><code>USER.md</code></td><td>Memory</td><td><code>## Heading</code> → <code>User: &lt;Heading&gt;</code> domain — queryable separately</td></tr>
+      <tr><td><code>TOOLS.md</code></td><td>Tool</td><td><code>## Heading</code> → <code>name</code> field, body → <code>notes</code></td></tr>
+      <tr><td><code>AGENTS.md</code></td><td>AgentConfig</td><td><code>## Heading</code> → <code>key</code> field, body → <code>value</code></td></tr>
+    </table>
+
+    <div class="callout"><p><strong>Format tip:</strong> Structure your markdown files with <code>##</code> headings — each heading becomes one graph node. Files with no <code>##</code> headings are imported as a single node titled <em>Main</em>.</p></div>
+
     <!-- FAQ -->
     <h2 id="faq">FAQ</h2>
 
@@ -503,6 +546,9 @@ sed -i '' <span class="string">"s/workspace = 'openclaw'/workspace = 'myagent'/g
 
     <h3>What happens if the database is missing?</h3>
     <p>The GRAPH directive returns empty content. Your agent will start with blank workspace sections. Run <code>install.sh</code> to download the database, then <code>seed-default-workspace.mjs</code> if workspace nodes are missing.</p>
+
+    <h3>How do I import my existing flat workspace files?</h3>
+    <p>Run <code>node ladybugdb/scripts/import-workspace.mjs</code> from your openclaw-graph directory. It reads <code>~/.openclaw/workspace/</code>, parses each file by <code>##</code> headings, and creates the correct graph nodes. Add <code>--write-stubs</code> to automatically replace your flat files with GRAPH stubs (originals backed up as <code>*.bak</code>). See the <a href="#import-workspace">Import Your Files</a> section above.</p>
 
     <h3>Can I mix flat files and graph stubs?</h3>
     <p>Yes. Any workspace file without a <code>&lt;!-- GRAPH: ... --&gt;</code> directive on line 1 is loaded as a normal flat file. You can migrate one file at a time.</p>
