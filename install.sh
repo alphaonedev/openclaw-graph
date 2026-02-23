@@ -106,18 +106,105 @@ EOF
   exit 0
 fi
 
+# ── Detect platform ──────────────────────────────────────────
+detect_platform() {
+  case "$(uname -s 2>/dev/null)" in
+    Darwin)       echo "macos" ;;
+    Linux)
+      if   command -v apt-get &>/dev/null; then echo "debian"
+      elif command -v dnf     &>/dev/null; then echo "fedora"
+      elif command -v pacman  &>/dev/null; then echo "arch"
+      else echo "linux"
+      fi ;;
+    MINGW*|MSYS*|CYGWIN*)  echo "windows" ;;
+    *)            echo "unknown" ;;
+  esac
+}
+PLATFORM="$(detect_platform)"
+
+install_hint() {
+  case "$1" in
+    curl)
+      case "$PLATFORM" in
+        macos)   echo "brew install curl" ;;
+        debian)  echo "sudo apt-get install -y curl" ;;
+        fedora)  echo "sudo dnf install -y curl" ;;
+        arch)    echo "sudo pacman -S curl" ;;
+        *)       echo "https://curl.se/download.html" ;;
+      esac ;;
+    node)
+      case "$PLATFORM" in
+        macos)   echo "brew install node@22  OR  https://nodejs.org  OR  nvm install --lts" ;;
+        debian)  echo "sudo apt-get install -y nodejs npm  OR  nvm install --lts" ;;
+        fedora)  echo "sudo dnf install -y nodejs  OR  nvm install --lts" ;;
+        arch)    echo "sudo pacman -S nodejs npm  OR  nvm install --lts" ;;
+        *)       echo "https://nodejs.org (v18+ required)" ;;
+      esac ;;
+    zstd)
+      case "$PLATFORM" in
+        macos)   echo "brew install zstd" ;;
+        debian)  echo "sudo apt-get install -y zstd" ;;
+        fedora)  echo "sudo dnf install -y zstd" ;;
+        arch)    echo "sudo pacman -S zstd" ;;
+        *)       echo "https://github.com/facebook/zstd/releases" ;;
+      esac ;;
+    npm)   echo "npm ships with Node.js — install node first (see above)" ;;
+    lbug)  echo "npm install -g lbug" ;;
+  esac
+}
+
 # ── Check dependencies ───────────────────────────────────────
 header "Checking dependencies..."
 
-check_cmd() { command -v "$1" &>/dev/null && success "$1 found" && return 0 || return 1; }
+MISSING=()
 
-check_cmd curl   || error "curl required: brew install curl"
-check_cmd "$NODE_BIN" || error "node required: https://nodejs.org"
+check_dep() {
+  local cmd="$1" label="${2:-$1}"
+  if command -v "$cmd" &>/dev/null; then
+    success "$label found ($(command -v "$cmd"))"
+    return 0
+  else
+    warn "$label not found  →  $(install_hint "$label")"
+    MISSING+=("$label")
+    return 1
+  fi
+}
 
-check_cmd zstd || error "zstd required: brew install zstd (macOS) / apt install zstd (Linux)"
+check_dep curl
+NODE_OK=false
+if check_dep "$NODE_BIN" node; then
+  # Verify minimum version (Node 18+)
+  NODE_MAJ=$("$NODE_BIN" --version 2>/dev/null | sed 's/v//' | cut -d. -f1)
+  if [ -n "$NODE_MAJ" ] && [ "$NODE_MAJ" -lt 18 ] 2>/dev/null; then
+    warn "Node.js v$NODE_MAJ detected — v18+ required  →  $(install_hint node)"
+    MISSING+=("node-v18+")
+  else
+    success "Node.js $("$NODE_BIN" --version) — version OK"
+    NODE_OK=true
+  fi
+fi
+check_dep npm
+check_dep zstd
 EXT="zst"
 
-"$NODE_BIN" --input-type=module -e "import 'lbug'" 2>/dev/null || error "lbug not found: npm install lbug"
+# Check lbug (only if node is usable)
+if $NODE_OK; then
+  if "$NODE_BIN" --input-type=module -e "import 'lbug'" 2>/dev/null; then
+    success "lbug found"
+  else
+    warn "lbug not found  →  npm install -g lbug"
+    MISSING+=("lbug")
+  fi
+fi
+
+if [ ${#MISSING[@]} -gt 0 ]; then
+  echo ""
+  echo -e "${RED}❌  Missing: ${MISSING[*]}${RESET}"
+  echo ""
+  echo "  Install the above, then re-run this script."
+  echo ""
+  exit 1
+fi
 
 # ── Choose tier ──────────────────────────────────────────────
 if [ -z "$MODE" ]; then
