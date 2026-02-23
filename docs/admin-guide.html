@@ -280,6 +280,7 @@ node ladybugdb/scripts/query.js --stats</pre></div>
       <tr><td>Tool</td><td>26</td><td>All standard OpenClaw tools</td></tr>
       <tr><td>QueryMetrics</td><td>grows</td><td>Auto-recorded by query.js on every GRAPH directive resolution &mdash; view with <code>sync-metrics.mjs</code></td></tr>
     </table>
+    <p><strong>Secondary indexes:</strong> <code>soul_workspace</code>, <code>memory_workspace</code>, <code>agentconfig_workspace</code> &mdash; created automatically by <code>seed-default-workspace.mjs</code>. Keeps workspace-filtered queries fast as node counts grow.</p>
 
     <!-- IMPORT WORKSPACE -->
     <h2 id="import-workspace">Import Your Workspace</h2>
@@ -765,7 +766,8 @@ node ladybugdb/scripts/seed-default-workspace.mjs</pre></div>
       <tr><td>Reference PK (545k table)</td><td>0.11ms</td><td>&mdash;</td></tr>
       <tr><td>Full skill scan (316)</td><td>2.02ms</td><td>&mdash;</td></tr>
     </table>
-    <p>All in-process queries are sub-millisecond. CLI subprocess cost is amortized by the 60s adaptive TTL cache.</p>
+    <p>All in-process queries are sub-millisecond. CLI subprocess cost (~104ms) is amortized by the 60&ndash;180s adaptive TTL cache. All 5 workspace GRAPH directives resolve in <strong>parallel</strong> via <code>Promise.allSettled()</code> &mdash; cold workspace load is ~104ms total, not 5&times;104ms.</p>
+    <p>Secondary indexes on <code>workspace</code> field (Soul, Memory, AgentConfig) keep workspace-filtered queries O(log&nbsp;n) as node counts grow across multi-workspace deployments.</p>
     <p>Full benchmark data: <a href="https://github.com/alphaonedev/openclaw-graph/blob/main/benchmarks/results.md">benchmarks/results.md</a></p>
 
   </main>

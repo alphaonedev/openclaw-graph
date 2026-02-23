@@ -29,6 +29,8 @@ Replace flat workspace markdown files with an embedded Cypher graph database. 31
 | `import-workspace.mjs` (load flat files into DB) | ❌ | ✅ |
 | `sync-metrics.mjs` (view query metrics dashboard) | ❌ | ✅ |
 | `USER.md` stub | ❌ | ✅ |
+| Parallel workspace loading (5× faster cold load) | ❌ | ✅ |
+| Secondary indexes on `workspace` field | ❌ | ✅ |
 
 See [CUSTOMIZING.md](CUSTOMIZING.md) for how to personalize or fork the default workspace.
 
@@ -394,8 +396,9 @@ Measured on production data — 316 skills · 545,072 Reference nodes · Mac min
 | Full skill scan (316 nodes) | **2.02ms** |
 | GRAPH directive — first load (CLI subprocess) | **~104ms** |
 | GRAPH directive — cached hit | **0ms** |
+| 5 workspace files, cold load (parallel) | **~104ms total** |
 
-The ~104ms first-load cost is Node.js process spawn + lbug init — not the query itself. The three-layer cache (workspaceFileCache → graphQueryCache → graphQueryInFlight) amortizes this over a 60–180s adaptive TTL window.
+The ~104ms first-load cost is Node.js process spawn + lbug init — not the query itself. All 5 workspace GRAPH directives (SOUL/MEMORY/USER/TOOLS/AGENTS) resolve in parallel via `Promise.allSettled()` — cold workspace load is bound by the slowest single query, not the sum. The three-layer cache (workspaceFileCache → graphQueryCache → graphQueryInFlight) amortizes this over a 60–180s adaptive TTL window. Secondary indexes on `workspace` field across Soul, Memory, and AgentConfig tables keep workspace-filtered queries O(log n) as node counts grow.
 
 | Metric | Value |
 |--------|-------|
