@@ -10,7 +10,7 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DB_PATH = resolve(__dirname, '../db/skills.db');
+const DB_PATH = resolve(__dirname, '../db/alphaone-skills.db');
 
 async function openDB() {
   const db = new Database(DB_PATH);

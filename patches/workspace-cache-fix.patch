@@ -61,7 +61,7 @@ index a119d02d7..de92161d7 100644
 +// the resolved content and its 60s TTL fires correctly on every session load.
  
  const GRAPH_DIRECTIVE_PREFIX = "<!-- GRAPH:";
- const GRAPH_NODE_BIN = "/opt/homebrew/Cellar/node@22/22.22.0/bin/node";
+ const GRAPH_NODE_BIN = process.env.OPENCLAW_GRAPH_NODE_BIN ?? "node";
 @@ -28,32 +41,53 @@ function extractGraphDirective(content: string): string | null {
    return trimmed.slice(GRAPH_DIRECTIVE_PREFIX.length, end).trim();
  }

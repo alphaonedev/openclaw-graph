@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '../../');
 const DB_DIR = resolve(__dirname, '../db');
-const DB_PATH = resolve(DB_DIR, 'skills.db');
+const DB_PATH = resolve(DB_DIR, 'alphaone-skills.db');
 
 // Ensure DB dir exists
 if (!existsSync(DB_DIR)) mkdirSync(DB_DIR, { recursive: true });

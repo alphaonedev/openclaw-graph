@@ -1,15 +1,14 @@
 {
   "name": "openclaw-graph",
-  "version": "1.0.0",
-  "description": "Graph-native workspace backend for OpenClaw using LadybugDB — 312 skills, embedded Cypher queries, zero flat files",
+  "version": "1.2.0",
+  "description": "Graph-native workspace backend for OpenClaw using LadybugDB — 316 skills, embedded Cypher queries, zero flat files",
   "type": "module",
   "scripts": {
-    "seed": "node ladybugdb/scripts/seed-workspace.js",
-    "seed:reset": "node ladybugdb/scripts/seed-workspace.js --reset",
+    "seed": "node ladybugdb/scripts/seed-default-workspace.mjs",
+    "seed:reset": "node ladybugdb/scripts/seed-default-workspace.mjs --reset",
     "load": "node ladybugdb/scripts/loader.js",
     "query": "node ladybugdb/scripts/query.js",
-    "stats": "node ladybugdb/scripts/query.js --stats",
-    "gap": "node ladybugdb/scripts/gap-analysis.js"
+    "stats": "node ladybugdb/scripts/query.js --stats"
   },
   "keywords": ["openclaw", "ladybugdb", "graph", "skills", "ai-assistant", "workspace"],
   "license": "MIT",

@@ -19,7 +19,13 @@ set -euo pipefail
 # ── Config ───────────────────────────────────────────────────
 REPO="alphaonedev/openclaw-graph"
 RELEASE_VERSION="${RELEASE_VERSION:-latest}"
-DB_DIR="$(cd "$(dirname "$0")/ladybugdb/db" && pwd)"
+# Detect repo-relative path or fallback for curl|bash piped installs
+_SELF_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd)" || _SELF_DIR=""
+if [ -n "$_SELF_DIR" ] && [ -d "$_SELF_DIR/ladybugdb/db" ]; then
+  DB_DIR="$_SELF_DIR/ladybugdb/db"
+else
+  DB_DIR="${OPENCLAW_GRAPH_DB_DIR:-$HOME/openclaw-graph/ladybugdb/db}"
+fi
 DB_FILE="$DB_DIR/alphaone-skills.db"
 TMP_DIR="$(mktemp -d)"
 NODE_BIN="${NODE_BIN:-node}"
@@ -46,29 +52,32 @@ trap cleanup EXIT
 # ── Parse args ───────────────────────────────────────────────
 MODE=""
 VERIFY_ONLY=false
-for arg in "$@"; do
-  case "$arg" in
+while [ $# -gt 0 ]; do
+  case "$1" in
     --lite)        MODE="lite" ;;
     --full)        MODE="full" ;;
     --verify)      VERIFY_ONLY=true ;;
-    --version)     shift; RELEASE_VERSION="$1" ;;
+    --version)     shift; RELEASE_VERSION="${1:-v1.2}" ;;
     --help|-h)
       echo "Usage: $0 [--lite|--full|--verify|--version <tag>]"
       echo ""
-      echo "  --lite          Skills only (~10 MB)"
-      echo "  --full          Skills + all DevDocs (~500 MB)"
+      echo "  --lite          Skills only (~300 MB compressed)"
+      echo "  --full          Skills + all DevDocs (~500 MB compressed)"
       echo "  --verify        Verify existing DB"
-      echo "  --version <tag> Pin to a specific release (e.g. v1.0)"
+      echo "  --version <tag> Pin to a specific release (e.g. v1.2)"
       exit 0 ;;
   esac
+  shift
 done
 
 # ── Resolve version ──────────────────────────────────────────
 if [ "$RELEASE_VERSION" = "latest" ]; then
   info "Resolving latest release tag..."
-  RELEASE_VERSION=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
-    | python3 -c "import json,sys; print(json.load(sys.stdin)['tag_name'])" 2>/dev/null \
-    || echo "v1.2")
+  API_RESP=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null || echo "")
+  if [ -n "$API_RESP" ]; then
+    RELEASE_VERSION=$(echo "$API_RESP" | grep -o '"tag_name"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"\([^"]*\)"/\1/' || echo "v1.2")
+  fi
+  [ -z "$RELEASE_VERSION" ] && RELEASE_VERSION="v1.2"
   info "Latest: $RELEASE_VERSION"
 fi
 
@@ -105,17 +114,10 @@ check_cmd() { command -v "$1" &>/dev/null && success "$1 found" && return 0 || r
 check_cmd curl   || error "curl required: brew install curl"
 check_cmd "$NODE_BIN" || error "node required: https://nodejs.org"
 
-DECOMP=""; EXT=""
-if check_cmd zstd; then
-  DECOMP="zstd"; EXT="zst"
-elif check_cmd gzip; then
-  warn "zstd not found — using gzip fallback"
-  DECOMP="gzip"; EXT="gz"
-else
-  error "zstd or gzip required: brew install zstd"
-fi
+check_cmd zstd || error "zstd required: brew install zstd (macOS) / apt install zstd (Linux)"
+EXT="zst"
 
-"$NODE_BIN" -e "require('lbug')" 2>/dev/null || error "lbug not found: npm install lbug"
+"$NODE_BIN" --input-type=module -e "import 'lbug'" 2>/dev/null || error "lbug not found: npm install lbug"
 
 # ── Choose tier ──────────────────────────────────────────────
 if [ -z "$MODE" ]; then
@@ -181,11 +183,7 @@ fi
 
 # ── Decompress ───────────────────────────────────────────────
 header "Decompressing..."
-if [ "$DECOMP" = "zstd" ]; then
-  zstd -d "$COMPRESSED_FILE" -o "$DB_FILE"
-else
-  gzip -dc "$COMPRESSED_FILE" > "$DB_FILE"
-fi
+zstd -d "$COMPRESSED_FILE" -o "$DB_FILE"
 success "Decompressed: $(du -sh "$DB_FILE" | cut -f1)"
 
 # ── Verify DB ────────────────────────────────────────────────
@@ -210,5 +208,5 @@ echo "  DB: $DB_FILE ($(du -sh "$DB_FILE" | cut -f1))"
 echo ""
 echo "  Query the graph:"
 echo "    node ladybugdb/scripts/query.js --cluster python"
-echo "    node ladybugdb/scripts/query.js --semantic \"async rate limiting\""
+echo "    node ladybugdb/scripts/query.js \"async rate limiting\""
 echo ""

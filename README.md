@@ -22,7 +22,7 @@ Replace flat workspace markdown files with an embedded Cypher graph database. 31
 | Skills | 316 | 316 |
 | Reference nodes | 545,072 | 545,072 |
 | Default workspace | ❌ | ✅ `workspace='openclaw'` |
-| Soul / Memory / AgentConfig / Tool | manual seed | ✅ pre-seeded (4 + 2 + 9 + 26) |
+| Soul / Memory / AgentConfig / Tool | manual seed | ✅ pre-seeded (4 + 2 + 9 + 21) |
 | QueryMetrics schema | ❌ | ✅ |
 | Prompt optimization (Path Aliases, TOON) | ❌ | ✅ 70% token reduction |
 | `seed-default-workspace.mjs` | ❌ | ✅ |
@@ -71,7 +71,7 @@ Skills (316 nodes, 27 clusters)
 │
 ├── loader.js        → parse SKILL.md files → insert into DB
 ├── query.js         → text search / cluster / graph traversal / Cypher
-└── seed-workspace.js → populate Soul / Memory / Tool / AgentConfig tables
+└── seed-default-workspace.mjs → populate Soul / Memory / Tool / AgentConfig tables
 
 LadybugDB (embedded SQLite + Cypher, no daemon)
 └── ladybugdb/db/alphaone-skills.db
@@ -269,7 +269,7 @@ Measured on production data — 316 skills · 545,072 Reference nodes · Mac min
 | Reference PK lookup (1 row, 545k table) | **0.11ms** |
 | Skill PK lookup (warm, in-process) | **0.18ms** |
 | AGENTS.md hot path (9 AgentConfig nodes) | **0.33ms** |
-| TOOLS.md hot path (26 Tool nodes) | **0.41ms** |
+| TOOLS.md hot path (21 Tool nodes) | **0.41ms** |
 | Full skill scan (316 nodes) | **2.02ms** |
 | GRAPH directive — first load (CLI subprocess) | **~104ms** |
 | GRAPH directive — cached hit | **0ms** |

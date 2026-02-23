@@ -20,7 +20,13 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DB_PATH   = resolve(__dirname, '../db/alphaone-skills.db');
-const WORKSPACE = process.argv.find(a => a.startsWith('--workspace='))?.split('=')[1] ?? 'openclaw';
+const WORKSPACE = (() => {
+  const eqArg = process.argv.find(a => a.startsWith('--workspace='));
+  if (eqArg) return eqArg.split('=')[1];
+  const idx = process.argv.indexOf('--workspace');
+  if (idx !== -1 && process.argv[idx + 1] && !process.argv[idx + 1].startsWith('--')) return process.argv[idx + 1];
+  return 'openclaw';
+})();
 const RESET     = process.argv.includes('--reset');
 
 function esc(s) {
@@ -165,7 +171,7 @@ const TOOLS = [
   { id: 'tool-session-status',   name: 'session_status',   available: true,  notes: 'Show status card (usage + time + cost). Use for model-use questions.' },
   { id: 'tool-image',            name: 'image',            available: true,  notes: 'Analyze image(s) with vision model. Use when images NOT provided in message.' },
   { id: 'tool-tts',              name: 'tts',              available: true,  notes: 'Convert text to speech. Reply NO_REPLY after successful call.' },
-  { id: 'tool-ladybugdb',        name: 'LadybugDB',        available: true,  notes: 'Query skill graph: node ladybugdb/scripts/query.js "<task>" | --cluster <name> | --skill <id> | --stats | --cypher "<q>". DB: ~/Downloads/alphaone-openclaw/ladybugdb/db/alphaone-skills.db. 316 skills, 27 clusters, 545,072 Reference nodes.' },
+  { id: 'tool-ladybugdb',        name: 'LadybugDB',        available: true,  notes: 'Query skill graph: node ladybugdb/scripts/query.js "<task>" | --cluster <name> | --skill <id> | --stats | --cypher "<q>". DB: ~/openclaw-graph/ladybugdb/db/alphaone-skills.db. 316 skills, 27 clusters, 545,072 Reference nodes.' },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
