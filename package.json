@@ -1,6 +1,6 @@
 {
   "name": "openclaw-graph",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Graph-native workspace backend for OpenClaw using LadybugDB — 316 skills, embedded Cypher queries, zero flat files",
   "type": "module",
   "scripts": {

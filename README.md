@@ -4,12 +4,28 @@
 
 Replace flat workspace markdown files with an embedded Cypher graph database. 316 skills across 27 clusters · 545,072 DevDocs reference nodes · 718 docsets · 1536d vector embeddings. Zero daemons, zero servers, zero flat files. **100% graph-native from install.**
 
-[![v1.2](https://img.shields.io/badge/release-v1.2-brightgreen)](https://github.com/alphaonedev/openclaw-graph/releases)
+[![v1.3](https://img.shields.io/badge/release-v1.3-brightgreen)](https://github.com/alphaonedev/openclaw-graph/releases)
 [![Skills](https://img.shields.io/badge/skills-316-blue)](skills/)
 [![Clusters](https://img.shields.io/badge/clusters-27-green)](skills/)
 [![LadybugDB](https://img.shields.io/badge/LadybugDB-0.14.3-purple)](https://www.npmjs.com/package/lbug)
 [![License](https://img.shields.io/badge/license-MIT-orange)](LICENSE)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://alphaonedev.github.io/openclaw-graph)
+
+---
+
+## What's new in v1.3
+
+**Security and correctness release.** Fixes Cypher injection, removes dead index DDL that was logging false success messages, and ships platform-aware install improvements.
+
+| | v1.2 | v1.3 |
+|--|------|------|
+| Cypher injection protection (`escCypher`) | ❌ | ✅ sanitizes all user-supplied parameters |
+| Honest DDL — no false secondary-index code | ❌ | ✅ lbug 0.14.3 doesn't support `CREATE INDEX` |
+| Platform-aware install (macOS / Ubuntu / Fedora) | ❌ | ✅ auto-detects package manager |
+| `curl \| bash` pipe fix (no interactive prompts) | ❌ | ✅ |
+| `OPENCLAW_GRAPH_QUERY_SCRIPT` env var | ❌ | ✅ configurable script path |
+
+DB artifacts are identical to v1.2 — no reinstall needed if you have v1.2 already. Pull the repo to get the script improvements.
 
 ---
 

@@ -11,7 +11,7 @@
 #   ./install.sh --lite       # skills only (~300 MB compressed)
 #   ./install.sh --full       # skills + all DevDocs (~500 MB compressed)
 #   ./install.sh --verify     # verify existing DB without reinstalling
-#   ./install.sh --version v1.2  # install a specific release version
+#   ./install.sh --version v1.3  # install a specific release version
 # ============================================================
 
 set -euo pipefail
@@ -57,14 +57,14 @@ while [ $# -gt 0 ]; do
     --lite)        MODE="lite" ;;
     --full)        MODE="full" ;;
     --verify)      VERIFY_ONLY=true ;;
-    --version)     shift; RELEASE_VERSION="${1:-v1.2}" ;;
+    --version)     shift; RELEASE_VERSION="${1:-v1.3}" ;;
     --help|-h)
       echo "Usage: $0 [--lite|--full|--verify|--version <tag>]"
       echo ""
       echo "  --lite          Skills only (~300 MB compressed)"
       echo "  --full          Skills + all DevDocs (~500 MB compressed)"
       echo "  --verify        Verify existing DB"
-      echo "  --version <tag> Pin to a specific release (e.g. v1.2)"
+      echo "  --version <tag> Pin to a specific release (e.g. v1.3)"
       exit 0 ;;
   esac
   shift
@@ -75,9 +75,9 @@ if [ "$RELEASE_VERSION" = "latest" ]; then
   info "Resolving latest release tag..."
   API_RESP=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null || echo "")
   if [ -n "$API_RESP" ]; then
-    RELEASE_VERSION=$(echo "$API_RESP" | grep -o '"tag_name"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"\([^"]*\)"/\1/' || echo "v1.2")
+    RELEASE_VERSION=$(echo "$API_RESP" | grep -o '"tag_name"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"\([^"]*\)"/\1/' || echo "v1.3")
   fi
-  [ -z "$RELEASE_VERSION" ] && RELEASE_VERSION="v1.2"
+  [ -z "$RELEASE_VERSION" ] && RELEASE_VERSION="v1.3"
   info "Latest: $RELEASE_VERSION"
 fi
 
