@@ -81,16 +81,78 @@ LadybugDB (embedded SQLite + Cypher, no daemon)
 
 ## Prerequisites
 
-Install these before running the installer:
+Install these **before** running the installer:
 
-| Dependency | Version | macOS | Ubuntu / Debian | Other |
-|------------|---------|-------|-----------------|-------|
-| **Node.js** | 18+ | `brew install node@22` or [nodejs.org](https://nodejs.org) | `sudo apt-get install -y nodejs npm` | [nvm install --lts](https://github.com/nvm-sh/nvm) |
+| Dependency | Version | macOS | Ubuntu / Debian | Fedora |
+|------------|---------|-------|-----------------|--------|
+| **Node.js** | 18+ | `brew install node@22` | NodeSource (see below) | `sudo dnf install -y nodejs npm` |
 | **lbug** | 0.14.3+ | `npm install -g lbug` | `npm install -g lbug` | `npm install -g lbug` |
-| **zstd** | 1.5+ | `brew install zstd` | `sudo apt-get install -y zstd` | [github.com/facebook/zstd](https://github.com/facebook/zstd/releases) |
-| **curl** | any | pre-installed | `sudo apt-get install -y curl` | [curl.se](https://curl.se/download.html) |
+| **zstd** | 1.5+ | `brew install zstd` | `sudo apt-get install -y zstd` | `sudo dnf install -y zstd` |
+| **curl** | any | pre-installed | `sudo apt-get install -y curl` | pre-installed |
 
 > **Quick check:** `node --version && npm --version && zstd --version && node --input-type=module -e "import 'lbug'" && echo "✅ all good"`
+
+<details>
+<summary><strong>macOS — step by step</strong></summary>
+
+```bash
+# 1. Install Homebrew (skip if already installed)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# 2. Install Node.js 22 LTS (includes npm)
+brew install node@22
+echo 'export PATH="/opt/homebrew/opt/node@22/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
+# 3. Install lbug globally
+npm install -g lbug
+
+# 4. Install zstd
+brew install zstd
+
+# curl is pre-installed on macOS — no action needed
+```
+
+</details>
+
+<details>
+<summary><strong>Ubuntu / Debian — step by step</strong></summary>
+
+```bash
+# 1. Install curl
+sudo apt-get update && sudo apt-get install -y curl
+
+# 2. Add NodeSource repo and install Node.js 22 LTS (includes npm)
+#    (apt's default nodejs is often too old — use NodeSource for v22)
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# 3. Install lbug globally
+npm install -g lbug
+
+# 4. Install zstd
+sudo apt-get install -y zstd
+```
+
+</details>
+
+<details>
+<summary><strong>Fedora — step by step</strong></summary>
+
+```bash
+# 1. Install Node.js 22 and npm
+sudo dnf install -y nodejs npm
+
+# 2. Install lbug globally
+npm install -g lbug
+
+# 3. Install zstd
+sudo dnf install -y zstd
+
+# curl is pre-installed on Fedora — no action needed
+```
+
+</details>
 
 ---
 

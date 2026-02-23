@@ -187,13 +187,57 @@
     <p>Install these <strong>before</strong> running the installer. Quick check:</p>
     <div class="code-block"><pre>node --version &amp;&amp; npm --version &amp;&amp; zstd --version &amp;&amp; node --input-type=module -e "import 'lbug'" &amp;&amp; echo "✅ all good"</pre></div>
     <table>
-      <tr><th>Dependency</th><th>Version</th><th>macOS</th><th>Ubuntu / Debian</th></tr>
-      <tr><td>Node.js</td><td>18+</td><td><code>brew install node@22</code> or <a href="https://nodejs.org">nodejs.org</a></td><td><code>sudo apt-get install -y nodejs npm</code></td></tr>
-      <tr><td>lbug</td><td>0.14.3+</td><td colspan="2"><code>npm install -g lbug</code></td></tr>
-      <tr><td>zstd</td><td>1.5+</td><td><code>brew install zstd</code></td><td><code>sudo apt-get install -y zstd</code></td></tr>
-      <tr><td>curl</td><td>any</td><td>pre-installed</td><td><code>sudo apt-get install -y curl</code></td></tr>
-      <tr><td>OpenClaw</td><td>latest</td><td colspan="2"><a href="https://github.com/openclaw/openclaw">github.com/openclaw/openclaw</a></td></tr>
+      <tr><th>Dependency</th><th>Version</th><th>macOS</th><th>Ubuntu / Debian</th><th>Fedora</th></tr>
+      <tr><td>Node.js</td><td>18+</td><td><code>brew install node@22</code></td><td>NodeSource (see below)</td><td><code>sudo dnf install -y nodejs npm</code></td></tr>
+      <tr><td>lbug</td><td>0.14.3+</td><td colspan="3"><code>npm install -g lbug</code></td></tr>
+      <tr><td>zstd</td><td>1.5+</td><td><code>brew install zstd</code></td><td><code>sudo apt-get install -y zstd</code></td><td><code>sudo dnf install -y zstd</code></td></tr>
+      <tr><td>curl</td><td>any</td><td>pre-installed</td><td><code>sudo apt-get install -y curl</code></td><td>pre-installed</td></tr>
+      <tr><td>OpenClaw</td><td>latest</td><td colspan="3"><a href="https://github.com/openclaw/openclaw">github.com/openclaw/openclaw</a></td></tr>
     </table>
+
+    <h3>macOS — step by step</h3>
+    <div class="code-block"><pre><span class="comment"># 1. Install Homebrew (skip if already installed)</span>
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+<span class="comment"># 2. Install Node.js 22 LTS (includes npm)</span>
+brew install node@22
+echo 'export PATH="/opt/homebrew/opt/node@22/bin:$PATH"' &gt;&gt; ~/.zshrc
+source ~/.zshrc
+
+<span class="comment"># 3. Install lbug globally</span>
+npm install -g lbug
+
+<span class="comment"># 4. Install zstd</span>
+brew install zstd
+
+<span class="comment"># curl is pre-installed on macOS — no action needed</span></pre></div>
+
+    <h3>Ubuntu / Debian — step by step</h3>
+    <div class="code-block"><pre><span class="comment"># 1. Install curl</span>
+sudo apt-get update &amp;&amp; sudo apt-get install -y curl
+
+<span class="comment"># 2. Add NodeSource repo and install Node.js 22 LTS (includes npm)</span>
+<span class="comment">#    (apt's default nodejs is often too old — NodeSource guarantees v22)</span>
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+<span class="comment"># 3. Install lbug globally</span>
+npm install -g lbug
+
+<span class="comment"># 4. Install zstd</span>
+sudo apt-get install -y zstd</pre></div>
+
+    <h3>Fedora — step by step</h3>
+    <div class="code-block"><pre><span class="comment"># 1. Install Node.js 22 and npm</span>
+sudo dnf install -y nodejs npm
+
+<span class="comment"># 2. Install lbug globally</span>
+npm install -g lbug
+
+<span class="comment"># 3. Install zstd</span>
+sudo dnf install -y zstd
+
+<span class="comment"># curl is pre-installed on Fedora — no action needed</span></pre></div>
 
     <!-- INSTALLATION -->
     <h2 id="installation">Installation</h2>
