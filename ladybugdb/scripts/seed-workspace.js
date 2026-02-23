@@ -90,7 +90,7 @@ const MEMORY_NODES = [
     workspace: WORKSPACE_ID,
     domain: 'Infrastructure',
     timestamp: new Date().toISOString().slice(0, 10),
-    content: `[Document your infrastructure: servers, services, ports, paths. E.g.: OpenClaw install: ~/Downloads/openclaw/. Skills: ~/Downloads/openclaw/skills/.]`
+    content: `[Document your infrastructure: servers, services, ports, paths. E.g.: OpenClaw install: ~/openclaw/. Skills: ~/openclaw/skills/.]`
   },
   {
     id: `mem-${WORKSPACE_ID}-graph`,

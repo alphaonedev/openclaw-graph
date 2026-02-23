@@ -12,6 +12,12 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DB_PATH = resolve(__dirname, '../db/alphaone-skills.db');
 
+// Escape a value for safe interpolation into Cypher single-quoted strings.
+// Prevents injection by escaping backslashes and single quotes.
+function escCypher(s) {
+  return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
 async function openDB() {
   const db = new Database(DB_PATH);
   await db.init();
@@ -34,9 +40,10 @@ async function queryByText(text) {
     process.exit(1);
   }
   
-  const whereParts = terms.map(t =>
-    `(LOWER(s.embedding_hint) CONTAINS '${t}' OR LOWER(s.description) CONTAINS '${t}' OR LOWER(s.name) CONTAINS '${t}')`
-  ).join(' OR ');
+  const whereParts = terms.map(t => {
+    const safe = escCypher(t);
+    return `(LOWER(s.embedding_hint) CONTAINS '${safe}' OR LOWER(s.description) CONTAINS '${safe}' OR LOWER(s.name) CONTAINS '${safe}')`;
+  }).join(' OR ');
   
   const rows = await runQuery(conn, `
     MATCH (s:Skill)
@@ -65,24 +72,25 @@ async function queryByText(text) {
 
 async function queryBySkill(skillId, hops = 2) {
   const { db, conn } = await openDB();
-  
+  const safeId = escCypher(skillId);
+
   const rootRows = await runQuery(conn, `
-    MATCH (s:Skill {id: '${skillId}'})
+    MATCH (s:Skill {id: '${safeId}'})
     RETURN s.name AS name, s.cluster AS cluster, s.description AS description
   `);
-  
+
   if (!rootRows.length) {
     console.log(`Skill '${skillId}' not found`);
     process.exit(1);
   }
-  
+
   console.log(`\n=== Skill Graph: ${skillId} (${hops} hops) ===`);
   console.log(`Root: [${rootRows[0].cluster}] ${rootRows[0].name}`);
   console.log(`  ${rootRows[0].description}\n`);
-  
+
   for (let h = 1; h <= hops; h++) {
     const hopRows = await runQuery(conn, `
-      MATCH (s:Skill {id: '${skillId}'})-[r]->(related:Skill)
+      MATCH (s:Skill {id: '${safeId}'})-[r]->(related:Skill)
       RETURN type(r) AS rel_type, related.name AS name, related.cluster AS cluster, related.description AS desc
     `);
     
@@ -102,9 +110,10 @@ async function queryBySkill(skillId, hops = 2) {
 
 async function queryByCluster(cluster) {
   const { db, conn } = await openDB();
-  
+  const safeCluster = escCypher(cluster);
+
   const rows = await runQuery(conn, `
-    MATCH (s:Skill {cluster: '${cluster}'})
+    MATCH (s:Skill {cluster: '${safeCluster}'})
     RETURN s.name AS name, s.description AS description, s.authorization_required AS auth
     ORDER BY s.name
   `);

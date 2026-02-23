@@ -166,8 +166,8 @@ async function main() {
   const output = {
     run_date: runDate,
     run_time: runTime,
-    host: 'Mac mini (Apple M-series, 32 GB RAM)',
-    db_path: '~/Downloads/alphaone-openclaw/ladybugdb/db/alphaone-skills.db',
+    host: 'Apple Silicon, 32 GB RAM',
+    db_path: process.env.OPENCLAW_DB_PATH || './ladybugdb/db/alphaone-skills.db',
     db_stats: {
       skill_nodes: skillCount,
       clusters: clusterCount,

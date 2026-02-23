@@ -145,7 +145,7 @@ Add three blocks to `src/agents/workspace.ts`:
 ```typescript
 import path from "node:path";
 import os from "node:os";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 
 const GRAPH_DIRECTIVE_PREFIX = "<!-- GRAPH:";
 const GRAPH_NODE_BIN = process.env.OPENCLAW_GRAPH_NODE_BIN ?? "node";
@@ -163,8 +163,9 @@ function extractGraphDirective(content: string): string | null {
 
 function executeGraphQuery(cypher: string): string {
   try {
-    const result = execSync(
-      `${GRAPH_NODE_BIN} ${GRAPH_QUERY_SCRIPT} --workspace --cypher ${JSON.stringify(cypher)}`,
+    const result = execFileSync(
+      GRAPH_NODE_BIN,
+      [GRAPH_QUERY_SCRIPT, "--workspace", "--cypher", cypher],
       { encoding: "utf-8", timeout: 8000 },
     );
     return result.trim();

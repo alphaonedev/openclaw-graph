@@ -27,7 +27,7 @@ curl -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/ins
 cp workspace-stubs/*.md ~/.openclaw/workspace/
 
 # 3. Apply workspace.ts patch
-cd ~/Downloads/openclaw && git apply path/to/patches/workspace-cache-fix.patch && pnpm build
+cd /path/to/openclaw && git apply path/to/patches/workspace-cache-fix.patch && pnpm build
 
 # 4. Done. OpenClaw resolves all stubs from LadybugDB on next session start.
 ```

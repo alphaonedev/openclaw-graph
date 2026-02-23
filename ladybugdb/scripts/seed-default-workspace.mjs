@@ -89,7 +89,7 @@ const MEMORY = [
   {
     id:      `mem-${WORKSPACE}-infrastructure`,
     domain:  'Infrastructure',
-    content: `Configure your infrastructure facts here. Example: DB: ~/myapp/ladybugdb/db/alphaone-skills.db | Node: /usr/local/bin/node | Workspace: ~/.openclaw/workspace/ | OpenClaw: ~/Downloads/openclaw/`,
+    content: `Configure your infrastructure facts here. Example: DB: ~/openclaw-graph/ladybugdb/db/alphaone-skills.db | Node: /usr/local/bin/node | Workspace: ~/.openclaw/workspace/ | OpenClaw: ~/openclaw/`,
   },
 ];
 

@@ -8,5 +8,4 @@ ladybugdb/db/*.db-shm
 .DS_Store
 dist/
 
-# PRIVATE — redteam cluster must NEVER be in public repo
 skills/redteam/

@@ -1,8 +1,8 @@
 {
   "run_date": "2026-02-22",
   "run_time": "11:46 EST",
-  "host": "Mac mini (Apple M-series, 32 GB RAM)",
-  "db_path": "~/Downloads/alphaone-openclaw/ladybugdb/db/alphaone-skills.db",
+  "host": "Apple Silicon, 32 GB RAM",
+  "db_path": "./ladybugdb/db/alphaone-skills.db",
   "db_stats": {
     "skill_nodes": 316,
     "clusters": 27,
