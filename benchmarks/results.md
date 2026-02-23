@@ -1,7 +1,7 @@
 # LadybugDB Performance Benchmarks
 
 **Run date:** 2026-02-22 11:46 EST  
-**Host:** Mac mini (Apple M-series, 32 GB RAM)  
+**Host:** Apple Silicon, 32 GB RAM
 **DB:** 316 skills · 27 clusters · 545,072 Reference nodes · 716 docsets  
 **Workspace:** 4 Soul · 2 Memory · 9 AgentConfig · 26 Tool
 

@@ -193,7 +193,7 @@ async function main() {
 
   let md = `# LadybugDB Performance Benchmarks\n\n`;
   md += `**Run date:** ${runDate} ${runTime}  \n`;
-  md += `**Host:** Mac mini (Apple M-series, 32 GB RAM)  \n`;
+  md += `**Host:** Apple Silicon, 32 GB RAM  \n`;
   md += `**DB:** ${skillCount} skills · ${clusterCount} clusters · ${refCount.toLocaleString()} Reference nodes · ${docsetCount} docsets  \n`;
   md += `**Workspace:** ${soulCount} Soul · ${memCount} Memory · ${acCount} AgentConfig · ${toolCount} Tool\n\n`;
   md += `---\n\n`;

@@ -97,7 +97,7 @@ const MEMORY_NODES = [
     workspace: WORKSPACE_ID,
     domain: 'LadybugDB Graph Backend',
     timestamp: new Date().toISOString().slice(0, 10),
-    content: `DB: ~/openclaw-graph/ladybugdb/db/skills.db. 312 skills, 27 clusters, 247 edges. lbug 0.14.3. Query: node ladybugdb/scripts/query.js "<task>" | --cluster <name> | --stats.`
+    content: `DB: ~/openclaw-graph/ladybugdb/db/alphaone-skills.db. 316 skills, 27 clusters. lbug 0.14.3. Query: node ladybugdb/scripts/query.js "<task>" | --cluster <name> | --stats.`
   },
   // Add more Memory nodes as needed...
 ];
