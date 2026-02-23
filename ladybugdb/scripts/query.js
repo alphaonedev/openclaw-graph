@@ -18,6 +18,75 @@ function escCypher(s) {
   return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 }
 
+/**
+ * Record a workspace query event into the QueryMetrics table.
+ * Called automatically by queryCypher() when in --workspace mode.
+ * Failure is always silent — metrics recording never breaks workspace queries.
+ *
+ * Schema: QueryMetrics(cypher, hit_count, miss_count, last_hit, avg_ms, p95_ms)
+ *   hit_count  — queries that returned ≥1 row
+ *   miss_count — queries that returned 0 rows
+ *   avg_ms     — rolling mean of execution time (hits only)
+ *   p95_ms     — high-water mark: rises instantly on slow queries, decays slowly toward avg
+ */
+async function recordMetric(conn, cypher, durationMs, resultCount) {
+  try {
+    const isHit = resultCount > 0;
+    const now   = new Date().toISOString();
+    // Normalize whitespace so the same logical query always maps to one key
+    const key     = cypher.trim().replace(/\s+/g, ' ');
+    const safeKey = escCypher(key);
+
+    const existing = await (await conn.query(
+      `MATCH (m:QueryMetrics {cypher: '${safeKey}'}) ` +
+      `RETURN m.hit_count AS h, m.miss_count AS mi, m.avg_ms AS avg, m.p95_ms AS p95`
+    )).getAll();
+
+    if (existing.length > 0) {
+      const e      = existing[0];
+      const oldH   = Number(e.h   ?? 0);
+      const oldMi  = Number(e.mi  ?? 0);
+      const oldAvg = Number(e.avg ?? 0);
+      const oldP95 = Number(e.p95 ?? 0);
+
+      if (isHit) {
+        const newH   = oldH + 1;
+        // Welford rolling mean (exact)
+        const newAvg = (oldAvg * (newH - 1) + durationMs) / newH;
+        // p95: rises instantly on slow queries; otherwise exponential decay toward avg
+        const newP95 = durationMs > oldP95
+          ? durationMs
+          : oldP95 * 0.99 + durationMs * 0.01;
+        await (await conn.query(
+          `MATCH (m:QueryMetrics {cypher: '${safeKey}'}) ` +
+          `SET m.hit_count = ${newH}, m.avg_ms = ${newAvg.toFixed(2)}, ` +
+          `m.p95_ms = ${newP95.toFixed(2)}, m.last_hit = '${now}'`
+        )).getAll();
+      } else {
+        await (await conn.query(
+          `MATCH (m:QueryMetrics {cypher: '${safeKey}'}) ` +
+          `SET m.miss_count = ${oldMi + 1}`
+        )).getAll();
+      }
+    } else {
+      const hc = isHit ? 1 : 0;
+      const mc = isHit ? 0 : 1;
+      await (await conn.query(
+        `CREATE (m:QueryMetrics {` +
+        `cypher: '${safeKey}', ` +
+        `hit_count: ${hc}, ` +
+        `miss_count: ${mc}, ` +
+        `last_hit: '${isHit ? now : ''}', ` +
+        `avg_ms: ${isHit ? durationMs.toFixed(2) : 0.0}, ` +
+        `p95_ms: ${isHit ? durationMs.toFixed(2) : 0.0}` +
+        `})`
+      )).getAll();
+    }
+  } catch (_) {
+    // Non-fatal — workspace queries must never fail due to metrics errors
+  }
+}
+
 async function openDB() {
   const db = new Database(DB_PATH);
   await db.init();
@@ -210,18 +279,22 @@ function formatWorkspaceOutput(rows, cypher) {
 
 async function queryCypher(cypher, { workspace = false } = {}) {
   const { db, conn } = await openDB();
+  const t0   = Date.now();
   const rows = await runQuery(conn, cypher);
-  
+  const ms   = Date.now() - t0;
+
   if (workspace) {
     // Workspace mode: output clean markdown for injection into system prompt
     console.log(formatWorkspaceOutput(rows, cypher));
+    // Record metrics inline — failure is silent and never blocks output
+    await recordMetric(conn, cypher, ms, rows.length);
   } else {
     // CLI debug mode: labeled output
     console.log('\n=== Cypher Query Result ===');
     const formatted = formatWorkspaceOutput(rows, cypher);
     console.log(formatted || '(no results)');
   }
-  
+
   await conn.close();
   await db.close();
   process.exit(0);
