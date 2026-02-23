@@ -207,20 +207,11 @@ async function main() {
       console.log(`  ${ok ? '✓' : '⚠ already exists'} ${label}`);
     }
 
-    // Secondary indexes on workspace field — workspace-filtered queries are
-    // the hot path; indexes prevent full table scans as node counts grow.
-    // CREATE INDEX IF NOT EXISTS is idempotent — safe to re-run.
-    const indexes = [
-      `CREATE INDEX IF NOT EXISTS soul_workspace ON Soul(workspace)`,
-      `CREATE INDEX IF NOT EXISTS memory_workspace ON Memory(workspace)`,
-      `CREATE INDEX IF NOT EXISTS agentconfig_workspace ON AgentConfig(workspace)`,
-      // Tool has no workspace column — omitted intentionally
-    ];
-    for (const idx of indexes) {
-      await run(conn, idx);
-      const label = idx.match(/INDEX IF NOT EXISTS (\w+)/)?.[1] ?? '?';
-      console.log(`  ✓ index ${label}`);
-    }
+    // Note: lbug does not expose a secondary-index DDL via Cypher for regular
+    // node properties. Workspace tables (Soul, Memory, AgentConfig) are small
+    // in practice (4–30 nodes each), so full table scans are sub-millisecond
+    // and not a bottleneck. If lbug adds a secondary-index API in a future
+    // release, add workspace indexes here for the hot-path workspace= filter.
 
     // ── Seed Soul ─────────────────────────────────────────────
     console.log('\n  Soul nodes:');
