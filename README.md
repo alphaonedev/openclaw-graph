@@ -435,6 +435,64 @@ Each instance gets its own identity, memory, and tool configuration from the sha
 
 ---
 
+## Service Management
+
+> **openclaw-graph has no daemon.** It is embedded in the OpenClaw gateway process. Managing openclaw-graph = managing the OpenClaw gateway. The DB file is always directly queryable via `query.js --stats` regardless of gateway state.
+
+### macOS (launchd — `ai.openclaw.gateway`)
+
+```bash
+# Start
+launchctl bootstrap gui/$UID ~/Library/LaunchAgents/ai.openclaw.gateway.plist
+
+# Stop
+launchctl bootout gui/$UID/ai.openclaw.gateway
+
+# Restart
+launchctl kickstart -k gui/$UID/ai.openclaw.gateway
+
+# Status  (look for "state = running" and "pid =")
+launchctl print gui/$UID/ai.openclaw.gateway | grep -E "state|pid"
+
+# Logs
+tail -f ~/.openclaw/logs/gateway.log          # stdout
+tail -f ~/.openclaw/logs/gateway.err.log       # stderr
+log stream --predicate 'subsystem == "ai.openclaw"' --level info   # unified log
+```
+
+### Ubuntu & Fedora (systemd — `openclaw-gateway.service`)
+
+```bash
+# Start
+systemctl --user start openclaw-gateway.service
+
+# Stop
+systemctl --user stop openclaw-gateway.service
+
+# Restart
+systemctl --user restart openclaw-gateway.service
+
+# Status
+systemctl --user status openclaw-gateway.service
+
+# Logs
+journalctl --user -u openclaw-gateway.service -f
+tail -f ~/.openclaw/logs/gateway.log          # or read flat file directly
+```
+
+### DB health check (all platforms — no gateway needed)
+
+```bash
+# Full stats
+node ~/openclaw-graph/ladybugdb/scripts/query.js --stats
+
+# Workspace sanity check
+node ~/openclaw-graph/ladybugdb/scripts/query.js \
+  --cypher "MATCH (n) WHERE n.workspace = 'openclaw' RETURN labels(n)[0] AS type, count(n) AS n ORDER BY type"
+```
+
+---
+
 ## Contributing
 
 Pull requests welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.

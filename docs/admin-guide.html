@@ -174,6 +174,7 @@
     <a href="#fleet">Fleet Management</a>
     <hr>
     <h4>Operations</h4>
+    <a href="#service-management">Service Management</a>
     <a href="#upgrading">Upgrading</a>
     <a href="#backup">Backup &amp; Restore</a>
     <a href="#env-vars">Environment Variables</a>
@@ -521,6 +522,109 @@ node ladybugdb/scripts/query.js --cypher \
   <span class="string">"MATCH (t:Tool {id:'tool-sessions-spawn'}) \
    WHERE EXISTS { MATCH (a:AgentConfig {workspace:'browser-agent'}) } \
    SET t.available = false"</span></pre></div>
+
+    <!-- SERVICE MANAGEMENT -->
+    <h2 id="service-management">Service Management</h2>
+
+    <div class="callout"><p><strong>Architecture note:</strong> openclaw-graph has <strong>no daemon of its own</strong>. It is embedded directly inside the OpenClaw gateway process. "Restarting the graph" means restarting the OpenClaw gateway. The LadybugDB file is always accessible directly via <code>query.js --stats</code> regardless of gateway state.</p></div>
+
+    <h3>macOS (launchd)</h3>
+    <p>OpenClaw installs a launchd service with label <code>ai.openclaw.gateway</code>.</p>
+
+    <div class="code-block"><pre><span class="comment"># Start</span>
+launchctl bootstrap gui/$UID \
+  ~/Library/LaunchAgents/ai.openclaw.gateway.plist
+
+<span class="comment"># Stop</span>
+launchctl bootout gui/$UID/ai.openclaw.gateway
+
+<span class="comment"># Restart (stop + start in one command)</span>
+launchctl kickstart -k gui/$UID/ai.openclaw.gateway
+
+<span class="comment"># Status — look for "state = running" and "pid ="</span>
+launchctl print gui/$UID/ai.openclaw.gateway | grep -E "state|pid"</pre></div>
+
+    <h4>macOS log files</h4>
+    <div class="code-block"><pre><span class="comment"># Structured log (stdout) — primary log</span>
+tail -f ~/.openclaw/logs/gateway.log
+
+<span class="comment"># Error log (stderr)</span>
+tail -f ~/.openclaw/logs/gateway.err.log
+
+<span class="comment"># macOS unified log stream (real-time, subsystem ai.openclaw)</span>
+log stream --predicate 'subsystem == "ai.openclaw"' --level info
+
+<span class="comment"># Or use the bundled clawlog utility from the openclaw directory</span>
+bash scripts/clawlog.sh</pre></div>
+
+    <h3>Ubuntu (systemd)</h3>
+    <p>OpenClaw installs a user-scope systemd unit: <code>openclaw-gateway.service</code>.</p>
+
+    <div class="code-block"><pre><span class="comment"># Start</span>
+systemctl --user start openclaw-gateway.service
+
+<span class="comment"># Stop</span>
+systemctl --user stop openclaw-gateway.service
+
+<span class="comment"># Restart</span>
+systemctl --user restart openclaw-gateway.service
+
+<span class="comment"># Status</span>
+systemctl --user status openclaw-gateway.service</pre></div>
+
+    <h4>Ubuntu log files</h4>
+    <div class="code-block"><pre><span class="comment"># Live log stream via journald</span>
+journalctl --user -u openclaw-gateway.service -f
+
+<span class="comment"># Or read the flat log files directly</span>
+tail -f ~/.openclaw/logs/gateway.log
+tail -f ~/.openclaw/logs/gateway.err.log</pre></div>
+
+    <h3>Fedora (systemd)</h3>
+    <p>Same commands as Ubuntu — both use user-scope systemd.</p>
+
+    <div class="code-block"><pre><span class="comment"># Start</span>
+systemctl --user start openclaw-gateway.service
+
+<span class="comment"># Stop</span>
+systemctl --user stop openclaw-gateway.service
+
+<span class="comment"># Restart</span>
+systemctl --user restart openclaw-gateway.service
+
+<span class="comment"># Status</span>
+systemctl --user status openclaw-gateway.service</pre></div>
+
+    <h4>Fedora log files</h4>
+    <div class="code-block"><pre><span class="comment"># Live log stream via journald</span>
+journalctl --user -u openclaw-gateway.service -f
+
+<span class="comment"># Or read the flat log files directly</span>
+tail -f ~/.openclaw/logs/gateway.log
+tail -f ~/.openclaw/logs/gateway.err.log</pre></div>
+
+    <h3>DB health check (all platforms)</h3>
+    <p>These run directly against the LadybugDB file — no gateway required.</p>
+
+    <div class="code-block"><pre><span class="comment"># Full stats: node count, edge count, DB file size</span>
+node ~/openclaw-graph/ladybugdb/scripts/query.js --stats
+
+<span class="comment"># Quick workspace sanity check</span>
+node ~/openclaw-graph/ladybugdb/scripts/query.js --cypher \
+  "MATCH (s:Soul {workspace:'openclaw'}) RETURN count(s) AS souls"
+
+<span class="comment"># Check all workspace node counts</span>
+node ~/openclaw-graph/ladybugdb/scripts/query.js --cypher \
+  "MATCH (n) WHERE n.workspace = 'openclaw' RETURN labels(n)[0] AS type, count(n) AS n ORDER BY type"</pre></div>
+
+    <h3>Log file locations (all platforms)</h3>
+    <table>
+      <thead><tr><th>File</th><th>Contains</th></tr></thead>
+      <tbody>
+        <tr><td><code>~/.openclaw/logs/gateway.log</code></td><td>Gateway stdout — normal operational output</td></tr>
+        <tr><td><code>~/.openclaw/logs/gateway.err.log</code></td><td>Gateway stderr — errors and warnings</td></tr>
+      </tbody>
+    </table>
 
     <!-- UPGRADING -->
     <h2 id="upgrading">Upgrading</h2>
