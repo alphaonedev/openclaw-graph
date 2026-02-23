@@ -175,6 +175,7 @@
     <hr>
     <h4>Operations</h4>
     <a href="#service-management">Service Management</a>
+    <a href="#metrics">Query Metrics</a>
     <a href="#upgrading">Upgrading</a>
     <a href="#backup">Backup &amp; Restore</a>
     <a href="#env-vars">Environment Variables</a>
@@ -277,7 +278,7 @@ node ladybugdb/scripts/query.js --stats</pre></div>
       <tr><td>Memory</td><td>2</td><td>Principal (placeholder), Infrastructure (placeholder)</td></tr>
       <tr><td>AgentConfig</td><td>9</td><td>Every Session, Delegation, Safety, Heartbeats, Memory, TOON, Search Resilience, Schema Rules, Path Aliases</td></tr>
       <tr><td>Tool</td><td>26</td><td>All standard OpenClaw tools</td></tr>
-      <tr><td>QueryMetrics</td><td>0</td><td>Schema only &mdash; populated automatically</td></tr>
+      <tr><td>QueryMetrics</td><td>grows</td><td>Auto-recorded by query.js on every GRAPH directive resolution &mdash; view with <code>sync-metrics.mjs</code></td></tr>
     </table>
 
     <!-- IMPORT WORKSPACE -->
@@ -332,9 +333,11 @@ node ladybugdb/scripts/import-workspace.mjs --overwrite</pre></div>
 &#9474;   &#9500;&#9472;&#9472; edges.cypher             <span class="hl"># Relationship DDL</span>
 &#9474;   &#9492;&#9472;&#9472; workspace-nodes.cypher   <span class="hl"># Soul, Memory, AgentConfig, Tool DDL</span>
 &#9492;&#9472;&#9472; scripts/
-    &#9500;&#9472;&#9472; query.js                 <span class="hl"># CLI query tool</span>
+    &#9500;&#9472;&#9472; query.js                 <span class="hl"># CLI query tool (auto-records QueryMetrics)</span>
     &#9500;&#9472;&#9472; loader.js                <span class="hl"># Load SKILL.md files into DB</span>
     &#9500;&#9472;&#9472; seed-default-workspace.mjs  <span class="hl"># Seed default workspace nodes</span>
+    &#9500;&#9472;&#9472; import-workspace.mjs     <span class="hl"># Load flat SOUL/MEMORY/USER/TOOLS/AGENTS.md into DB</span>
+    &#9500;&#9472;&#9472; sync-metrics.mjs         <span class="hl"># View / reset QueryMetrics dashboard</span>
     &#9492;&#9472;&#9472; seed-workspace.js        <span class="hl"># Custom workspace seeder</span></pre></div>
     <p>LadybugDB is an embedded graph database (KuzuDB). The entire DB is a single file &mdash; no daemon, no port, no configuration. Queries execute in-process via the <code>lbug</code> Node.js bindings.</p>
 
@@ -623,6 +626,42 @@ node ~/openclaw-graph/ladybugdb/scripts/query.js --cypher \
       <tbody>
         <tr><td><code>~/.openclaw/logs/gateway.log</code></td><td>Gateway stdout — normal operational output</td></tr>
         <tr><td><code>~/.openclaw/logs/gateway.err.log</code></td><td>Gateway stderr — errors and warnings</td></tr>
+      </tbody>
+    </table>
+
+    <!-- QUERY METRICS -->
+    <h2 id="metrics">Query Metrics</h2>
+
+    <p><code>query.js</code> automatically records a row into <code>QueryMetrics</code> every time a GRAPH directive resolves from a workspace stub (<code>--workspace</code> mode). <strong>No configuration needed</strong> — it just works after install.</p>
+
+    <div class="callout"><p><strong>New install?</strong> <code>QueryMetrics</code> starts empty and fills itself automatically. The first entry appears after OpenClaw loads any workspace stub for the first time.</p></div>
+
+    <h3>View the dashboard</h3>
+    <div class="code-block"><pre><span class="comment"># Dashboard — top 20 queries by hit count</span>
+node ladybugdb/scripts/sync-metrics.mjs
+
+<span class="comment"># Show top 40</span>
+node ladybugdb/scripts/sync-metrics.mjs --top 40
+
+<span class="comment"># Include queries that returned 0 results</span>
+node ladybugdb/scripts/sync-metrics.mjs --zero
+
+<span class="comment"># Raw JSON (for scripting or export)</span>
+node ladybugdb/scripts/sync-metrics.mjs --json
+
+<span class="comment"># Clear all metrics (e.g. after a workspace reset)</span>
+node ladybugdb/scripts/sync-metrics.mjs --reset</pre></div>
+
+    <h3>What the dashboard shows</h3>
+    <table>
+      <thead><tr><th>Column</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>hits</code></td><td>Times this Cypher query returned ≥1 row</td></tr>
+        <tr><td><code>miss</code></td><td>Times this Cypher query returned 0 rows</td></tr>
+        <tr><td><code>rate</code></td><td>Hit rate percentage (hits / total)</td></tr>
+        <tr><td><code>avg</code></td><td>Rolling mean execution time (hits only, Welford algorithm)</td></tr>
+        <tr><td><code>p95</code></td><td>High-water mark — rises instantly on slow queries, decays slowly</td></tr>
+        <tr><td><code>last_hit</code></td><td>UTC timestamp of most recent successful hit</td></tr>
       </tbody>
     </table>
 

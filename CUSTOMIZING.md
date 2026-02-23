@@ -12,7 +12,7 @@ Every v1.2+ release includes these `workspace='openclaw'` nodes out of the box:
 | Memory | 2 | Principal (placeholder) · Infrastructure (placeholder) |
 | AgentConfig | 9 | Every Session · Delegation · Safety · Heartbeats · Memory · TOON · Search Resilience · Schema Rules · Path Aliases |
 | Tool | 21 | All standard OpenClaw tools · `sessions_spawn=true` |
-| QueryMetrics | 0 | Schema only — populated automatically by workspace.ts |
+| QueryMetrics | grows | Auto-recorded by query.js on every GRAPH directive resolution — view with `node ladybugdb/scripts/sync-metrics.mjs` |
 
 These work out of the box. The placeholders tell you exactly what to fill in.
 

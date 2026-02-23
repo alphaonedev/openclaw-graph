@@ -23,10 +23,11 @@ Replace flat workspace markdown files with an embedded Cypher graph database. 31
 | Reference nodes | 545,072 | 545,072 |
 | Default workspace | ❌ | ✅ `workspace='openclaw'` |
 | Soul / Memory / AgentConfig / Tool | manual seed | ✅ pre-seeded (4 + 2 + 9 + 21) |
-| QueryMetrics schema | ❌ | ✅ |
+| QueryMetrics (auto-recorded per GRAPH query) | ❌ | ✅ auto-fills on every workspace load |
 | Prompt optimization (Path Aliases, TOON) | ❌ | ✅ 70% token reduction |
 | `seed-default-workspace.mjs` | ❌ | ✅ |
 | `import-workspace.mjs` (load flat files into DB) | ❌ | ✅ |
+| `sync-metrics.mjs` (view query metrics dashboard) | ❌ | ✅ |
 | `USER.md` stub | ❌ | ✅ |
 
 See [CUSTOMIZING.md](CUSTOMIZING.md) for how to personalize or fork the default workspace.
@@ -74,8 +75,10 @@ Skills (316 nodes, 27 clusters)
 │
 ├── loader.js               → parse SKILL.md files → insert into DB
 ├── query.js                → text search / cluster / graph traversal / Cypher
+│                              (auto-records QueryMetrics on every --workspace call)
 ├── import-workspace.mjs    → load flat SOUL/MEMORY/USER/TOOLS/AGENTS.md into DB
-└── seed-default-workspace.mjs → populate Soul / Memory / Tool / AgentConfig tables
+├── seed-default-workspace.mjs → populate Soul / Memory / Tool / AgentConfig tables
+└── sync-metrics.mjs        → view / reset QueryMetrics dashboard
 
 LadybugDB (embedded SQLite + Cypher, no daemon)
 └── ladybugdb/db/alphaone-skills.db
@@ -423,6 +426,33 @@ MATCH (s:Soul) WHERE s.workspace = 'infra' RETURN ...
 ```
 
 Each instance gets its own identity, memory, and tool configuration from the shared graph.
+
+---
+
+## Query Metrics
+
+Every time OpenClaw resolves a GRAPH directive from a workspace stub, `query.js` automatically records the event into the `QueryMetrics` table — no configuration needed.
+
+```bash
+# Show the metrics dashboard (top 20 queries by hit count)
+node ladybugdb/scripts/sync-metrics.mjs
+
+# Show top 40
+node ladybugdb/scripts/sync-metrics.mjs --top 40
+
+# Include queries that returned 0 results
+node ladybugdb/scripts/sync-metrics.mjs --zero
+
+# Raw JSON (for scripting)
+node ladybugdb/scripts/sync-metrics.mjs --json
+
+# Clear all metrics
+node ladybugdb/scripts/sync-metrics.mjs --reset
+```
+
+The dashboard shows: **hits · misses · hit-rate % · avg_ms · p95_ms · last_hit** per query.
+
+> **New install?** `QueryMetrics` starts empty and fills automatically — no setup required. The first entry appears after OpenClaw loads any workspace stub.
 
 ---
 
