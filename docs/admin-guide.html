@@ -184,23 +184,29 @@
 
     <!-- PREREQUISITES -->
     <h2 id="prerequisites">Prerequisites</h2>
+    <p>Install these <strong>before</strong> running the installer. Quick check:</p>
+    <div class="code-block"><pre>node --version &amp;&amp; npm --version &amp;&amp; zstd --version &amp;&amp; node --input-type=module -e "import 'lbug'" &amp;&amp; echo "✅ all good"</pre></div>
     <table>
-      <tr><th>Dependency</th><th>Version</th><th>Install</th></tr>
-      <tr><td>Node.js</td><td>22+</td><td><code>brew install node@22</code></td></tr>
-      <tr><td>lbug</td><td>0.14.3+</td><td><code>npm install lbug</code></td></tr>
-      <tr><td>zstd</td><td>1.5+</td><td><code>brew install zstd</code> (for install.sh)</td></tr>
-      <tr><td>OpenClaw</td><td>latest</td><td><a href="https://github.com/openclaw/openclaw">github.com/openclaw/openclaw</a></td></tr>
+      <tr><th>Dependency</th><th>Version</th><th>macOS</th><th>Ubuntu / Debian</th></tr>
+      <tr><td>Node.js</td><td>18+</td><td><code>brew install node@22</code> or <a href="https://nodejs.org">nodejs.org</a></td><td><code>sudo apt-get install -y nodejs npm</code></td></tr>
+      <tr><td>lbug</td><td>0.14.3+</td><td colspan="2"><code>npm install -g lbug</code></td></tr>
+      <tr><td>zstd</td><td>1.5+</td><td><code>brew install zstd</code></td><td><code>sudo apt-get install -y zstd</code></td></tr>
+      <tr><td>curl</td><td>any</td><td>pre-installed</td><td><code>sudo apt-get install -y curl</code></td></tr>
+      <tr><td>OpenClaw</td><td>latest</td><td colspan="2"><a href="https://github.com/openclaw/openclaw">github.com/openclaw/openclaw</a></td></tr>
     </table>
 
     <!-- INSTALLATION -->
     <h2 id="installation">Installation</h2>
     <h3>One-command install</h3>
-    <div class="code-block"><pre><span class="comment"># Interactive &mdash; choose Lite or Full</span>
-curl -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh | bash
+    <div class="code-block"><pre><span class="comment"># Lite — skills + embeddings (~300 MB compressed)</span>
+curl -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh | bash -s -- --lite
 
-<span class="comment"># Non-interactive</span>
-bash install.sh --full          <span class="comment"># skills + 545k DevDocs references</span>
+<span class="comment"># Full — skills + 545k DevDocs reference nodes (~500 MB compressed)</span>
+curl -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh | bash -s -- --full
+
+<span class="comment"># From a cloned repo</span>
 bash install.sh --lite          <span class="comment"># skills only</span>
+bash install.sh --full          <span class="comment"># skills + DevDocs</span>
 bash install.sh --version v1.2  <span class="comment"># pin a specific release</span>
 bash install.sh --verify        <span class="comment"># check an existing DB</span></pre></div>
 

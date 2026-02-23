@@ -79,6 +79,21 @@ LadybugDB (embedded SQLite + Cypher, no daemon)
 
 ---
 
+## Prerequisites
+
+Install these before running the installer:
+
+| Dependency | Version | macOS | Ubuntu / Debian | Other |
+|------------|---------|-------|-----------------|-------|
+| **Node.js** | 18+ | `brew install node@22` or [nodejs.org](https://nodejs.org) | `sudo apt-get install -y nodejs npm` | [nvm install --lts](https://github.com/nvm-sh/nvm) |
+| **lbug** | 0.14.3+ | `npm install -g lbug` | `npm install -g lbug` | `npm install -g lbug` |
+| **zstd** | 1.5+ | `brew install zstd` | `sudo apt-get install -y zstd` | [github.com/facebook/zstd](https://github.com/facebook/zstd/releases) |
+| **curl** | any | pre-installed | `sudo apt-get install -y curl` | [curl.se](https://curl.se/download.html) |
+
+> **Quick check:** `node --version && npm --version && zstd --version && node --input-type=module -e "import 'lbug'" && echo "✅ all good"`
+
+---
+
 ## Quick Start
 
 ### Option A — One-line install (recommended)
