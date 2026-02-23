@@ -254,7 +254,7 @@ curl -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/ins
 <span class="comment"># From a cloned repo</span>
 bash install.sh --lite          <span class="comment"># skills only</span>
 bash install.sh --full          <span class="comment"># skills + DevDocs</span>
-bash install.sh --version v1.2  <span class="comment"># pin a specific release</span>
+bash install.sh --version v1.3  <span class="comment"># pin a specific release</span>
 bash install.sh --verify        <span class="comment"># check an existing DB</span></pre></div>
 
     <h3>Manual install</h3>
@@ -263,13 +263,13 @@ cd openclaw-graph
 npm install
 
 <span class="comment"># Download and decompress the DB</span>
-curl -L https://github.com/alphaonedev/openclaw-graph/releases/download/v1.2/alphaone-skills-full.db.zst \
+curl -L https://github.com/alphaonedev/openclaw-graph/releases/download/v1.3/alphaone-skills-full.db.zst \
   | zstd -d &gt; ladybugdb/db/alphaone-skills.db
 
 <span class="comment"># Verify</span>
 node ladybugdb/scripts/query.js --stats</pre></div>
 
-    <h3>What the DB contains (v1.2)</h3>
+    <h3>What the DB contains (v1.3)</h3>
     <table>
       <tr><th>Table</th><th>Nodes</th><th>Description</th></tr>
       <tr><td>Skill</td><td>316</td><td>Skills across 27 clusters</td></tr>
@@ -735,7 +735,7 @@ node ladybugdb/scripts/query.js --cypher \
 <span class="comment"># Cypher must be a single line</span></pre></div>
 
     <h3>"Table X does not exist"</h3>
-    <p><strong>Cause:</strong> The workspace tables haven't been created. This happens if you installed a pre-v1.2 DB.</p>
+    <p><strong>Cause:</strong> The workspace tables haven't been created. This happens if you installed a pre-v1.3 DB.</p>
     <p><strong>Fix:</strong></p>
     <div class="code-block"><pre>node ladybugdb/scripts/seed-default-workspace.mjs</pre></div>
 
@@ -774,7 +774,7 @@ node ladybugdb/scripts/seed-default-workspace.mjs</pre></div>
 </div>
 
 <footer>
-  openclaw-graph v1.2 &middot; MIT License &middot;
+  openclaw-graph v1.3 &middot; MIT License &middot;
   <a href="index.html">Home</a> &middot;
   <a href="user-guide.html">User Guide</a> &middot;
   <a href="https://github.com/alphaonedev/openclaw-graph">GitHub</a>

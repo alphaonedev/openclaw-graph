@@ -4,7 +4,7 @@ openclaw-graph ships with a minimal, agnostic default workspace (`workspace='ope
 
 ## What ships in the DB
 
-Every v1.2+ release includes these `workspace='openclaw'` nodes out of the box:
+Every v1.3+ release includes these `workspace='openclaw'` nodes out of the box:
 
 | Table | Nodes | What's there |
 |-------|-------|-------------|

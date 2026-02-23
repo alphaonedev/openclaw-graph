@@ -129,7 +129,7 @@ async function main() {
   results.push(await bench(conn, `Cluster scan — devops-sre (10 skills)`, "MATCH (s:Skill {cluster:'devops-sre'}) RETURN s.name, s.description", 20));
   results.push(await bench(conn, `Full skill scan — ${skillCount} nodes`, `MATCH (s:Skill) RETURN s.name, s.cluster`, 10));
 
-  // Workspace queries (the ones that matter for v1.2 — now 9 AgentConfig nodes)
+  // Workspace queries (the ones that matter for v1.3 — now 9 AgentConfig nodes)
   results.push(await bench(conn, `Soul workspace query — default (${soulCount} nodes)`, "MATCH (s:Soul {workspace:'openclaw'}) RETURN s.section, s.content ORDER BY s.priority", 20));
   results.push(await bench(conn, `Memory query — default (${memCount} nodes)`, "MATCH (m:Memory {workspace:'openclaw'}) RETURN m.domain, m.content", 20));
   results.push(await bench(conn, `AgentConfig — default AGENTS.md hot path (${acCount} nodes)`, "MATCH (a:AgentConfig {workspace:'openclaw'}) RETURN a.key, a.value ORDER BY a.id", 20));
