@@ -186,14 +186,14 @@
 
     <!-- WHAT SHIPS -->
     <h2 id="whats-included">What ships in the DB</h2>
-    <p>Every v1.3+ release includes these <code>workspace='openclaw'</code> nodes out of the box:</p>
+    <p>Every v1.4+ release includes these <code>workspace='openclaw'</code> nodes out of the box:</p>
     <table>
       <tr><th>Table</th><th>Nodes</th><th>What's there</th></tr>
       <tr><td><span class="node-badge soul">Soul</span></td><td>4</td><td>Prime Directive &middot; Identity (placeholder) &middot; Safety &middot; Heartbeat Protocol</td></tr>
       <tr><td><span class="node-badge memory">Memory</span></td><td>2</td><td>Principal (placeholder) &middot; Infrastructure (placeholder)</td></tr>
       <tr><td><span class="node-badge config">AgentConfig</span></td><td>9</td><td>Every Session &middot; Delegation &middot; Safety &middot; Heartbeats &middot; Memory &middot; TOON &middot; Search Resilience &middot; Schema Rules &middot; Path Aliases</td></tr>
       <tr><td><span class="node-badge tool">Tool</span></td><td>21</td><td>All standard OpenClaw tools &middot; <code>sessions_spawn=true</code></td></tr>
-      <tr><td>QueryMetrics</td><td>grows</td><td>Auto-recorded by query.js on every GRAPH directive resolution &mdash; view with <code>node sync-metrics.mjs</code></td></tr>
+      <tr><td><span class="node-badge">SkillCluster</span></td><td>27</td><td>Semantic skill groupings &middot; first-class nodes with IN_CLUSTER edges</td></tr>
     </table>
     <div class="callout"><p>These work out of the box. The placeholders tell you exactly what to fill in.</p></div>
 
@@ -202,12 +202,12 @@
       <div class="step-num">1</div>
       <h2>Verify the defaults loaded</h2>
     </div>
-    <div class="code-block"><pre>node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (s:Soul {workspace:'openclaw'}) RETURN s.section, s.priority ORDER BY s.priority"</span>
+    <div class="code-block"><pre>cypher-shell <span class="string">"MATCH (s:Soul) WHERE s.workspace = 'openclaw'
+RETURN s.section, s.priority ORDER BY s.priority"</span>
 
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (a:AgentConfig {workspace:'openclaw'}) RETURN a.key ORDER BY a.id"</span></pre></div>
-    <p>You should see 4 Soul sections and 9 AgentConfig keys. If not, run <code>node ladybugdb/scripts/seed-default-workspace.mjs</code> to seed them.</p>
+cypher-shell <span class="string">"MATCH (a:AgentConfig) WHERE a.workspace = 'openclaw'
+RETURN a.key ORDER BY a.id"</span></pre></div>
+    <p>You should see 4 Soul sections and 9 AgentConfig keys. If not, run <code>python3 migrate_ladybugdb_to_neo4j.py</code> to seed them.</p>
 
     <!-- STEP 2 -->
     <div class="step-header" id="step-2">
@@ -215,9 +215,8 @@ node ladybugdb/scripts/query.js --cypher \
       <h2>Update your Identity</h2>
     </div>
     <p>The Identity soul node ships as a placeholder. Replace it with your agent's name and role:</p>
-    <div class="code-block"><pre>node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (s:Soul {id:'soul-openclaw-identity'}) \
-   SET s.content = 'Name: Aria | Role: DevOps automation agent | Emoji: &#x1f6e1;&#xfe0f; | Workspace: openclaw'"</span></pre></div>
+    <div class="code-block"><pre>cypher-shell <span class="string">"MATCH (s:Soul {id:'soul-openclaw-identity'})
+SET s.content = 'Name: Aria | Role: DevOps automation agent | Emoji: &#x1f6e1;&#xfe0f; | Workspace: openclaw'"</span></pre></div>
 
     <!-- STEP 3 -->
     <div class="step-header" id="step-3">
@@ -226,14 +225,12 @@ node ladybugdb/scripts/query.js --cypher \
     </div>
     <p>These Memory nodes tell the agent who it works for and what environment it operates in.</p>
     <div class="code-block"><pre><span class="comment"># Principal &mdash; who you're helping</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (m:Memory {id:'mem-openclaw-principal'}) \
-   SET m.content = 'Name: Alice | Timezone: America/Chicago | Channel: signal | UUID: uuid:...'"</span>
+cypher-shell <span class="string">"MATCH (m:OCMemory {id:'mem-openclaw-principal'})
+SET m.content = 'Name: Alice | Timezone: America/Chicago | Channel: signal | UUID: uuid:...'"</span>
 
 <span class="comment"># Infrastructure &mdash; your environment facts</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (m:Memory {id:'mem-openclaw-infrastructure'}) \
-   SET m.content = 'DB: ~/myapp/ladybugdb/db/alphaone-skills.db | Node: /usr/local/bin/node | Workspace: ~/.openclaw/workspace/'"</span></pre></div>
+cypher-shell <span class="string">"MATCH (m:OCMemory {id:'mem-openclaw-infrastructure'})
+SET m.content = 'Neo4j: bolt://localhost:7687 | Python: python3 | Workspace: ~/.openclaw/workspace/'"</span></pre></div>
 
     <!-- STEP 4 -->
     <div class="step-header" id="step-4">
@@ -241,14 +238,13 @@ node ladybugdb/scripts/query.js --cypher \
       <h2>Add more Memory domains</h2>
     </div>
     <p>Create additional memory nodes for any factual context your agent needs:</p>
-    <div class="code-block"><pre>node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"CREATE (m:Memory {
-     id: 'mem-openclaw-api-keys',
-     workspace: 'openclaw',
-     domain: 'API Keys',
-     content: 'Brave Search: \$BRAVE_API_KEY | xAI: \$XAI_API_KEY (env vars in shell profile)',
-     timestamp: '2026-01-01'
-   })"</span></pre></div>
+    <div class="code-block"><pre>cypher-shell <span class="string">"CREATE (m:OCMemory {
+  id: 'mem-openclaw-api-keys',
+  workspace: 'openclaw',
+  domain: 'API Keys',
+  content: 'Brave Search: \$BRAVE_API_KEY | xAI: \$XAI_API_KEY (env vars in shell profile)',
+  timestamp: '2026-01-01'
+})"</span></pre></div>
     <div class="callout"><p>Store API keys as <strong>environment variable references</strong>, not raw values. The agent reads them from the shell at runtime.</p></div>
 
     <!-- STEP 5 -->
@@ -258,20 +254,20 @@ node ladybugdb/scripts/query.js --cypher \
     </div>
     <p>Disable tools to create a restricted agent, or re-enable them for a capable one:</p>
     <div class="code-block"><pre><span class="comment"># Disable sub-agent delegation for a restricted agent</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (t:Tool {id:'tool-sessions-spawn'}) SET t.available = false, t.notes = 'BLOCKED &mdash; standalone agent'"</span>
+cypher-shell <span class="string">"MATCH (t:OCTool {id:'tool-sessions-spawn'})
+SET t.available = false, t.notes = 'BLOCKED &mdash; standalone agent'"</span>
 
 <span class="comment"># Re-enable it</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (t:Tool {id:'tool-sessions-spawn'}) SET t.available = true"</span></pre></div>
+cypher-shell <span class="string">"MATCH (t:OCTool {id:'tool-sessions-spawn'})
+SET t.available = true"</span></pre></div>
 
     <!-- FLEET -->
     <h2 id="fleet">Running multiple workspaces (fleet setup)</h2>
     <p>For an 8-agent fleet, give each agent its own workspace ID:</p>
-    <div class="code-block"><pre><span class="comment"># Seed separate workspaces from the default template</span>
-node ladybugdb/scripts/seed-default-workspace.mjs --workspace intel-agent
-node ladybugdb/scripts/seed-default-workspace.mjs --workspace code-agent
-node ladybugdb/scripts/seed-default-workspace.mjs --workspace ops-agent
+    <div class="code-block"><pre><span class="comment"># Seed separate workspaces via the migration script</span>
+python3 migrate_ladybugdb_to_neo4j.py --workspace intel-agent
+python3 migrate_ladybugdb_to_neo4j.py --workspace code-agent
+python3 migrate_ladybugdb_to_neo4j.py --workspace ops-agent
 
 <span class="comment"># Each agent's workspace stubs point to its own workspace</span>
 <span class="comment"># ~/.openclaw/workspace-intel/SOUL.md:</span>
@@ -279,24 +275,18 @@ node ladybugdb/scripts/seed-default-workspace.mjs --workspace ops-agent
     <p>See <a href="admin-guide.html#fleet">Fleet Management</a> in the Admin Guide for the full topology and per-workspace tool overrides.</p>
 
     <!-- FORKING -->
-    <h2 id="forking">Forking the seed script</h2>
-    <p>For full control, fork <code>seed-default-workspace.mjs</code>:</p>
-    <div class="code-block"><pre>cp ladybugdb/scripts/seed-default-workspace.mjs ladybugdb/scripts/seed-myagent.mjs</pre></div>
-    <p>Edit the <code>SOUL</code>, <code>MEMORY</code>, <code>AGENT_CONFIG</code>, and <code>TOOLS</code> arrays at the top of the file, then:</p>
-    <div class="code-block"><pre>node ladybugdb/scripts/seed-myagent.mjs --workspace myagent --reset</pre></div>
-    <div class="callout warn"><p><code>--reset</code> drops and recreates the tables before seeding &mdash; use for a clean slate. Existing workspace nodes will be deleted.</p></div>
+    <h2 id="forking">Customizing the migration script</h2>
+    <p>For full control, modify the workspace configuration in <code>migrate_ladybugdb_to_neo4j.py</code>:</p>
+    <p>Edit the Soul, Memory, AgentConfig, and Tool data structures, then run:</p>
+    <div class="code-block"><pre>python3 migrate_ladybugdb_to_neo4j.py --workspace myagent</pre></div>
+    <div class="callout warn"><p>The migration uses MERGE &mdash; safe to re-run. Existing nodes are updated, not duplicated.</p></div>
 
     <!-- UPGRADES -->
-    <h2 id="upgrades">Keeping your customizations across DB upgrades</h2>
-    <p>When you upgrade to a new LadybugDB release (<code>install.sh</code>), the DB is <strong>replaced</strong>. Your workspace nodes live in the DB, so they'll be gone.</p>
-    <p>Two strategies:</p>
-    <ol>
-      <li><strong>Re-run your seed script after upgrade</strong> &mdash; keeps everything reproducible (recommended)</li>
-      <li><strong>Dump your workspace nodes before upgrading:</strong></li>
-    </ol>
-    <div class="code-block"><pre>node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (s:Soul {workspace:'openclaw'}) RETURN s.id, s.section, s.content, s.priority"</span> \
-  &gt; my-workspace-backup.json</pre></div>
+    <h2 id="upgrades">Keeping your customizations across upgrades</h2>
+    <p>The migration script uses MERGE (not CREATE), so it's safe to re-run after pulling new versions. Your customizations to existing nodes are preserved.</p>
+    <div class="code-block"><pre><span class="comment"># Pull latest and re-run</span>
+cd openclaw-graph &amp;&amp; git pull
+python3 migrate_ladybugdb_to_neo4j.py</pre></div>
     <p>See <a href="admin-guide.html#upgrading">Upgrading</a> in the Admin Guide for the full workflow.</p>
 
     <!-- NODE IDS -->
@@ -326,7 +316,7 @@ node ladybugdb/scripts/seed-default-workspace.mjs --workspace ops-agent
 </div>
 
 <footer>
-  openclaw-graph v1.3 &middot; MIT License &middot;
+  openclaw-graph v1.4 &middot; MIT License &middot;
   <a href="index.html">Home</a> &middot;
   <a href="admin-guide.html">Admin Guide</a> &middot;
   <a href="user-guide.html">User Guide</a> &middot;

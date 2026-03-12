@@ -134,7 +134,6 @@
     .tier-badge.lite { background: rgba(108,99,255,0.15); color: var(--accent); border: 1px solid rgba(108,99,255,0.3); }
     .tier-badge.full { background: rgba(0,212,170,0.15); color: var(--accent2); border: 1px solid rgba(0,212,170,0.3); }
 
-    .devdocs-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem; }
     .tag-chip { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.78rem; color: var(--text2); font-family: 'JetBrains Mono', monospace; }
 
     .install-steps { margin-top: 2rem; }
@@ -161,7 +160,6 @@
   <div class="nav-brand">openclaw<span>-graph</span></div>
   <div class="nav-links">
     <a href="#how">Architecture</a>
-    <a href="#devdocs">DevDocs</a>
     <a href="skills.html">Skills ↗</a>
     <a href="#metrics">Metrics</a>
     <a href="#optimization">Optimization</a>
@@ -173,12 +171,12 @@
 
 <!-- HERO -->
 <div class="hero">
-  <div class="badge">⚡ v1.3 Released — 100% Graph-Native</div>
+  <div class="badge">⚡ v1.4 Released — Neo4j Integration</div>
   <h1>Graph-Native Workspace<br>for <span>OpenClaw</span></h1>
   <p class="hero-sub">
     Replace flat workspace markdown with embedded Cypher queries.
-    Default <code style="background:rgba(108,99,255,0.15); padding:0.1rem 0.4rem; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:0.9em;">workspace='openclaw'</code> pre-seeded in every release — Soul, Memory, AgentConfig, Tools ready out of the box.
-    316 enriched skills · 545k DevDocs reference nodes · 718 docsets · 9 AgentConfig nodes · zero daemons.
+    Powered by <strong>Neo4j</strong> with proper graph modeling — SkillCluster nodes, typed relationships, namespaced labels.
+    316 skills · 27 clusters · 217 relationships · ~10 MB footprint · sub-millisecond queries.
   </p>
   <div class="hero-actions">
     <a href="#install" class="btn-primary">Quick Install ↓</a>
@@ -198,38 +196,37 @@
     <div class="stat-label">Clusters</div>
   </div>
   <div class="stat">
-    <div class="stat-num green">545k</div>
-    <div class="stat-label">Reference Nodes</div>
+    <div class="stat-num green">2</div>
+    <div class="stat-label">Graph Backends</div>
   </div>
   <div class="stat">
-    <div class="stat-num">718</div>
-    <div class="stat-label">DevDocs Docsets</div>
+    <div class="stat-num">217</div>
+    <div class="stat-label">Skill Relationships</div>
   </div>
   <div class="stat">
-    <div class="stat-num green">&lt;0.5ms</div>
-    <div class="stat-label">Workspace Query (in-process)</div>
+    <div class="stat-num green">&lt;1ms</div>
+    <div class="stat-label">Neo4j Query Time</div>
   </div>
   <div class="stat">
-    <div class="stat-num">1536d</div>
-    <div class="stat-label">Embeddings</div>
+    <div class="stat-num">~10MB</div>
+    <div class="stat-label">Neo4j Footprint</div>
   </div>
   <div class="stat">
-    <div class="stat-num">0</div>
-    <div class="stat-label">Daemons</div>
+    <div class="stat-num green">0.9s</div>
+    <div class="stat-label">Migration Time</div>
   </div>
 </div>
 
-<!-- v1.3 CALLOUT -->
+<!-- v1.4 CALLOUT -->
 <div style="background:rgba(0,212,170,0.04); border-top:1px solid rgba(0,212,170,0.15); border-bottom:1px solid rgba(0,212,170,0.15); padding:1.25rem 2rem;">
   <div style="max-width:1100px; margin:0 auto; display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
-    <div style="background:rgba(0,212,170,0.15); border:1px solid rgba(0,212,170,0.3); color:var(--accent2); padding:0.25rem 0.7rem; border-radius:6px; font-size:0.78rem; font-weight:700; white-space:nowrap;">NEW IN v1.3</div>
+    <div style="background:rgba(0,212,170,0.15); border:1px solid rgba(0,212,170,0.3); color:var(--accent2); padding:0.25rem 0.7rem; border-radius:6px; font-size:0.78rem; font-weight:700; white-space:nowrap;">NEW IN v1.4</div>
     <div style="font-size:0.88rem; color:var(--text2); flex:1; min-width:200px;">
-      <strong style="color:var(--text);">100% graph-native out of the box.</strong>
-      Every DB release now ships with a default <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">workspace='openclaw'</code> pre-seeded —
-      Soul · Memory · AgentConfig (9 nodes incl. TOON, Search Resilience, Schema Rules, Path Aliases) · Tool nodes ready to use immediately. No manual seed required.
+      <strong style="color:var(--text);">Neo4j integration.</strong>
+      Migrate the entire skill graph into an existing Neo4j instance in under 1 second (~10 MB). Proper graph modeling with <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">SkillCluster</code> nodes, <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">IN_CLUSTER</code> + <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">RELATED_TO</code> edges, and namespaced labels for multi-graph coexistence.
     </div>
     <div style="display:flex; gap:0.75rem; flex-shrink:0;">
-      <a href="#install" style="background:var(--accent2); color:#000; padding:0.35rem 0.9rem; border-radius:6px; font-size:0.82rem; font-weight:700; text-decoration:none;">Install v1.3 ↓</a>
+      <a href="#install" style="background:var(--accent2); color:#000; padding:0.35rem 0.9rem; border-radius:6px; font-size:0.82rem; font-weight:700; text-decoration:none;">Install v1.4 ↓</a>
       <a href="customizing.html" style="background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:0.35rem 0.9rem; border-radius:6px; font-size:0.82rem; font-weight:600; text-decoration:none;">Customize →</a>
     </div>
   </div>
@@ -241,7 +238,7 @@
 <section id="how">
   <div class="section-label">Architecture</div>
   <h2>How it works</h2>
-  <p>Instead of loading multi-kilobyte markdown files on every session, OpenClaw reads a single-line Cypher directive — then queries an embedded graph database to build structured, prioritized context on demand.</p>
+  <p>Instead of loading multi-kilobyte markdown files on every session, OpenClaw reads a single-line Cypher directive — then queries <strong>Neo4j</strong> to build structured, prioritized context on demand.</p>
 
   <div class="arch-block">
     <pre>
@@ -265,13 +262,15 @@
 └── buildAgentSystemPrompt()
     └── injects graph-resolved markdown into agent context
 
-<span class="hl2">LadybugDB</span> (embedded graph DB — no daemon, no network)
-├── <span class="hl">Skill</span>        316 nodes · 27 clusters · 247 edges · 1536d embeddings
-├── <span class="hl">Reference</span>    545,072 nodes · 718 DevDocs docsets · full API docs
-├── <span class="hl">Soul</span>         identity, persona, capabilities per workspace
-├── <span class="hl">Memory</span>       project context, infrastructure facts, state
-├── <span class="hl">Tool</span>         available tools + usage notes per workspace
-└── <span class="hl">AgentConfig</span>  per-workspace agent behavior overrides
+<span class="hl2">Neo4j</span> (bolt://localhost:7687)
+├── <span class="hl">Skill</span>         316 nodes · 27 SkillCluster nodes · 217 RELATED_TO edges
+├── <span class="hl">SkillCluster</span>  proper graph nodes with IN_CLUSTER relationships
+├── <span class="hl">Soul</span>          identity, persona, capabilities per workspace
+├── <span class="hl">OCMemory</span>      project context, infrastructure facts (namespaced)
+├── <span class="hl">OCTool</span>        available tools + usage notes (namespaced)
+├── <span class="hl">OCAgent</span>       agent definitions (namespaced)
+├── <span class="hl">AgentConfig</span>   per-workspace agent behavior overrides
+└── <span class="hl">Bootstrap</span>     boot identity
     </pre>
   </div>
 
@@ -288,13 +287,13 @@
     </div>
     <div class="how-card">
       <div class="how-num">3</div>
-      <h3>545k reference nodes on-demand</h3>
-      <p>Every DevDocs docset — Python, TypeScript, Rust, Go, C++, React, PostgreSQL and 710 more — is queryable by source, path, section, or full-text content search.</p>
+      <h3>Proper graph modeling</h3>
+      <p>SkillCluster nodes, IN_CLUSTER and RELATED_TO typed edges, namespaced labels (OCAgent, OCMemory, OCTool) for multi-graph coexistence. Graph-native, not SQL with graph syntax bolted on.</p>
     </div>
     <div class="how-card">
       <div class="how-num">4</div>
-      <h3>Multi-instance, per-copy DB</h3>
-      <p>Each OpenClaw agent gets its own local DB via <code style="font-family:monospace;">install.sh --full</code>. Sub-millisecond queries, no network dependency, no lock contention across an 8-agent fleet.</p>
+      <h3>~10 MB, sub-millisecond</h3>
+      <p>316 skills + 27 clusters + workspace nodes add only ~10 MB to a Neo4j instance. Sub-millisecond lookups, ~2ms full scans. Installs on macOS, Ubuntu, and Fedora.</p>
     </div>
   </div>
 
@@ -354,7 +353,7 @@ matters. Not a corporate drone...
   LIMIT 8
 --&gt;</pre>
 <br>
-<span style="color:#525570">→ Resolved from LadybugDB at session start
+<span style="color:#525570">→ Resolved from Neo4j at session start
 → Returns prioritized, structured markdown
 → Adaptive TTL cache (60s–180s based on query frequency · 0ms after first load)
 → Update identity without touching files</span>
@@ -365,119 +364,11 @@ matters. Not a corporate drone...
 
 <hr>
 
-<!-- DEVDOCS REFERENCE -->
-<section id="devdocs">
-  <div class="section-label">Reference Database <span class="badge-new">NEW in v1.0</span></div>
-  <h2>545,072 API reference nodes from 718 docsets</h2>
-  <p>Every major technology's official documentation is imported as <span class="pill">Reference</span> nodes in LadybugDB — queryable by source, path, section, title, or full-text content. Agents can pull precise API docs without leaving their context window.</p>
-
-  <div class="info-row" style="margin-bottom: 1.5rem;">
-    <div class="info-item"><strong>545,072</strong> Reference nodes</div>
-    <div class="info-item"><strong>718</strong> docsets imported</div>
-    <div class="info-item"><strong>295 MB</strong> compressed (zstd)</div>
-    <div class="info-item"><strong>3.2 GB</strong> raw on disk</div>
-  </div>
-
-  <div class="code-block">
-    <pre><span class="comment"># Find API docs by source + content</span>
-<span class="fn">node</span> ladybugdb/scripts/query.js --cypher <span class="string">"MATCH (r:Reference) WHERE r.source = 'python' AND r.content CONTAINS 'asyncio' RETURN r.path, r.title LIMIT 10"</span>
-
-<span class="comment"># All entries for a specific version</span>
-<span class="fn">node</span> ladybugdb/scripts/query.js --cypher <span class="string">"MATCH (r:Reference) WHERE r.source = 'postgresql~18' RETURN r.section, count(r) AS n ORDER BY n DESC"</span>
-
-<span class="comment"># Lookup a specific API path</span>
-<span class="fn">node</span> ladybugdb/scripts/query.js --cypher <span class="string">"MATCH (r:Reference {source:'react', path:'hooks/use-state'}) RETURN r.title, r.content"</span></pre>
-  </div>
-
-  <div style="background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.75rem; margin-top:1.5rem;">
-    <h3 style="font-size:1rem; font-weight:700; margin-bottom:1rem;">Coverage — technologies included</h3>
-    <div class="devdocs-tags">
-      <span class="tag-chip">Python 3.13</span>
-      <span class="tag-chip">TypeScript 5</span>
-      <span class="tag-chip">JavaScript</span>
-      <span class="tag-chip">React 18</span>
-      <span class="tag-chip">Vue 3</span>
-      <span class="tag-chip">Node.js 22 LTS</span>
-      <span class="tag-chip">Rust</span>
-      <span class="tag-chip">Go</span>
-      <span class="tag-chip">C++</span>
-      <span class="tag-chip">C</span>
-      <span class="tag-chip">Java</span>
-      <span class="tag-chip">OpenJDK 17</span>
-      <span class="tag-chip">Kotlin 1.8</span>
-      <span class="tag-chip">Swift</span>
-      <span class="tag-chip">Ruby on Rails 7.1</span>
-      <span class="tag-chip">Django 4.1</span>
-      <span class="tag-chip">Flask 2.0</span>
-      <span class="tag-chip">FastAPI</span>
-      <span class="tag-chip">Laravel 11</span>
-      <span class="tag-chip">PostgreSQL 18</span>
-      <span class="tag-chip">MySQL 8</span>
-      <span class="tag-chip">Redis</span>
-      <span class="tag-chip">MongoDB</span>
-      <span class="tag-chip">Elasticsearch</span>
-      <span class="tag-chip">Docker</span>
-      <span class="tag-chip">Kubernetes</span>
-      <span class="tag-chip">Terraform</span>
-      <span class="tag-chip">Ansible</span>
-      <span class="tag-chip">GNU/Linux man</span>
-      <span class="tag-chip">Nginx</span>
-      <span class="tag-chip">Apache HTTP</span>
-      <span class="tag-chip">PyTorch 2.3</span>
-      <span class="tag-chip">NumPy 1.21</span>
-      <span class="tag-chip">Tailwind CSS</span>
-      <span class="tag-chip">Sass</span>
-      <span class="tag-chip">GraphQL</span>
-      <span class="tag-chip">Socket.IO 4</span>
-      <span class="tag-chip">Webpack</span>
-      <span class="tag-chip">Vite</span>
-      <span class="tag-chip">SaltStack</span>
-      <span class="tag-chip">GNU Make</span>
-      <span class="tag-chip">Kubectl</span>
-      <span class="tag-chip">Scala</span>
-      <span class="tag-chip">Haskell</span>
-      <span class="tag-chip">Elixir</span>
-      <span class="tag-chip">Phoenix</span>
-      <span class="tag-chip">Qt 6</span>
-      <span class="tag-chip">+ 670 more</span>
-    </div>
-  </div>
-
-  <div class="tier-grid" style="margin-top:2rem;">
-    <div class="tier-card">
-      <div class="tier-badge lite">LITE</div>
-      <h3>Skills + Embeddings</h3>
-      <p style="font-size:0.87rem; margin-bottom:0.75rem;">For skill lookup, workspace stubs, and semantic search. Fast, lightweight, suitable for most deployments.</p>
-      <ul>
-        <li>316 Skill nodes across 27 clusters</li>
-        <li>1536d vector embeddings (all skills)</li>
-        <li>Workspace graph schema</li>
-        <li>247 skill relationship edges</li>
-      </ul>
-      <div style="margin-top:1rem; font-size:0.82rem; color:var(--text2);">295 MB compressed · ~65 MB uncompressed</div>
-    </div>
-    <div class="tier-card" style="border-color: rgba(0,212,170,0.25);">
-      <div class="tier-badge full">FULL</div>
-      <h3>Skills + DevDocs Reference</h3>
-      <p style="font-size:0.87rem; margin-bottom:0.75rem;">Includes all 545k DevDocs Reference nodes. Agents can query precise API documentation on demand.</p>
-      <ul>
-        <li>Everything in Lite</li>
-        <li>545,072 Reference nodes</li>
-        <li>718 DevDocs docsets</li>
-        <li>Full-text content search</li>
-      </ul>
-      <div style="margin-top:1rem; font-size:0.82rem; color:var(--text2);">295 MB compressed · 3.2 GB uncompressed</div>
-    </div>
-  </div>
-</section>
-
-<hr>
-
 <!-- SKILLS -->
 <section id="skills">
   <div class="section-label">Skill Database</div>
   <h2>316 skills across 27 clusters</h2>
-  <p>Expert-level reference skills covering the full development and operations surface. Query by text, cluster, or graph traversal. All skills ship with 1536d vector embeddings for semantic search.</p>
+  <p>Expert-level reference skills covering the full development and operations surface. Query by Cypher — cluster traversal, multi-hop reasoning, workspace-scoped filtering.</p>
 
   <div style="text-align:right; margin-bottom:0.75rem;">
     <a href="skills.html" style="font-size:0.85rem; color:var(--accent2); font-weight:600;">Browse full skills directory →</a>
@@ -514,20 +405,17 @@ matters. Not a corporate drone...
   </div>
 
   <div class="code-block" style="margin-top:2rem;">
-    <pre><span class="comment"># Natural language text search</span>
-<span class="fn">node</span> ladybugdb/scripts/query.js <span class="string">"deploy a React app to Cloudflare Pages"</span>
+    <pre><span class="comment"># Browse a cluster via IN_CLUSTER traversal</span>
+<span class="string">MATCH (s:Skill)-[:IN_CLUSTER]->(c:SkillCluster {name: 'devops-sre'}) RETURN s.name, s.description</span>
 
-<span class="comment"># Browse a cluster</span>
-<span class="fn">node</span> ladybugdb/scripts/query.js --cluster devops-sre
+<span class="comment"># Multi-hop skill discovery (2 hops via RELATED_TO)</span>
+<span class="string">MATCH (s:Skill {name: 'terraform'})-[:RELATED_TO*1..2]->(t:Skill) RETURN DISTINCT t.name, t.cluster</span>
 
-<span class="comment"># Graph traversal — skill + related (2 hops)</span>
-<span class="fn">node</span> ladybugdb/scripts/query.js --skill terraform --hops 2
+<span class="comment"># Skills by tag</span>
+<span class="string">MATCH (s:Skill) WHERE 'kubernetes' IN s.tags RETURN s.name, s.cluster, s.description</span>
 
-<span class="comment"># Semantic search (requires embeddings)</span>
-<span class="fn">node</span> ladybugdb/scripts/query.js --semantic <span class="string">"deploy containerized app with auto-scaling"</span>
-
-<span class="comment"># Raw Cypher</span>
-<span class="fn">node</span> ladybugdb/scripts/query.js --cypher <span class="string">"MATCH (s:Skill {cluster:'ai-apis'}) RETURN s.name, s.description"</span></pre>
+<span class="comment"># Full skill scan</span>
+<span class="string">MATCH (s:Skill) RETURN s.name, s.cluster ORDER BY s.cluster, s.name</span></pre>
   </div>
 </section>
 
@@ -536,106 +424,47 @@ matters. Not a corporate drone...
 <!-- METRICS -->
 <section id="metrics">
   <div class="section-label">Performance</div>
-  <h2>Measured on production data — 545k nodes, Mac mini M-series</h2>
-  <p style="margin-bottom:2rem; color:var(--text2); font-size:0.9rem;">All numbers are real benchmark averages. In-process queries run against the live embedded engine. CLI subprocess numbers include full Node.js + lbug init overhead — the cost paid once per TTL window.</p>
+  <h2>Measured on production data — Mac mini M-series</h2>
+  <p style="margin-bottom:2rem; color:var(--text2); font-size:0.9rem;">All numbers are real benchmark averages on Neo4j 2026.01 — 316 skills, 27 clusters, 393 total nodes.</p>
 
-  <!-- Tier 1: In-process hero numbers -->
+  <!-- Neo4j hero numbers -->
   <div style="margin-bottom:0.5rem;">
-    <div style="font-size:0.75rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--accent2); margin-bottom:0.75rem;">In-process · embedded engine (lbug)</div>
+    <div style="font-size:0.75rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--accent); margin-bottom:0.75rem;">Neo4j Performance</div>
   </div>
-  <div class="metrics-grid" style="margin-top:0;">
-    <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
-      <div class="metric-big green">0.11ms</div>
-      <div class="metric-label">Reference PK lookup<br><span style="font-size:0.72rem; opacity:0.7;">single row from 545,072-node table</span></div>
+  <div class="metrics-grid" style="margin-top:0; margin-bottom:2rem;">
+    <div class="metric-card" style="border-color:rgba(108,99,255,0.25);">
+      <div class="metric-big purple">&lt;1ms</div>
+      <div class="metric-label">Skill lookup by ID<br><span style="font-size:0.72rem; opacity:0.7;">index-free adjacency, constant time</span></div>
     </div>
-    <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
-      <div class="metric-big green">0.18ms</div>
-      <div class="metric-label">Skill PK lookup<br><span style="font-size:0.72rem; opacity:0.7;">warm in-process, 316-skill corpus</span></div>
-    </div>
-    <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
-      <div class="metric-big green">0.33ms</div>
-      <div class="metric-label">AGENTS.md hot path<br><span style="font-size:0.72rem; opacity:0.7;">9-node AgentConfig result set</span></div>
-    </div>
-    <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
-      <div class="metric-big green">0.41ms</div>
-      <div class="metric-label">TOOLS.md hot path<br><span style="font-size:0.72rem; opacity:0.7;">26-node Tool result set</span></div>
-    </div>
-    <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
-      <div class="metric-big green">0.25ms</div>
-      <div class="metric-label">Reference count aggregate<br><span style="font-size:0.72rem; opacity:0.7;">COUNT(*) over 545k nodes</span></div>
-    </div>
-    <div class="metric-card" style="border-color:rgba(0,212,170,0.25);">
-      <div class="metric-big green">2.02ms</div>
+    <div class="metric-card" style="border-color:rgba(108,99,255,0.25);">
+      <div class="metric-big purple">~2ms</div>
       <div class="metric-label">Full skill scan<br><span style="font-size:0.72rem; opacity:0.7;">all 316 nodes, no filter</span></div>
     </div>
-  </div>
-
-  <!-- Two-tier story -->
-  <div style="margin-top:2rem; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.75rem;">
-    <h3 style="font-size:0.95rem; font-weight:700; margin-bottom:0.75rem;">Two tiers: DB query vs. CLI subprocess startup</h3>
-    <p style="font-size:0.88rem; margin-bottom:1.25rem; color:var(--text2);">The ~104ms CLI number is <strong>Node.js process launch + lbug init</strong> — not the query itself. In-process, the same query costs 0.33ms. The cache pays the subprocess tax once per TTL window, then serves 0ms hits.</p>
-
-    <div class="compare" style="margin-top:0;">
-      <div class="compare-card">
-        <div class="compare-header before" style="background:rgba(108,99,255,0.1); color:var(--accent);">First load — CLI subprocess (once per TTL)</div>
-        <div class="compare-body">
-<pre style="color:var(--text2);">node query.js --cypher "..."
-├── Node.js init ......... ~70ms
-├── lbug open ............ ~25ms
-└── query execute ........ ~0.3ms
-                          ────────
-total                     ~104ms
-
-→ result cached in graphQueryCache</pre>
-        </div>
-      </div>
-      <div class="compare-card">
-        <div class="compare-header after">Every subsequent hit (within TTL window)</div>
-        <div class="compare-body">
-<pre style="color:var(--text2);">graphQueryCache.get(cypher)
-├── Map lookup ........... &lt;0.01ms
-└── return cached string . &lt;0.01ms
-                          ────────
-total                        ~0ms
-
-→ no subprocess, no DB, no I/O</pre>
-        </div>
-      </div>
+    <div class="metric-card" style="border-color:rgba(108,99,255,0.25);">
+      <div class="metric-big purple">&lt;1ms</div>
+      <div class="metric-label">Cluster traversal<br><span style="font-size:0.72rem; opacity:0.7;">IN_CLUSTER edge traversal</span></div>
     </div>
-
-    <div class="code-block" style="margin:1.25rem 0 1rem 0;">
-      <pre><span class="comment"># Adaptive TTL: hot queries stay warm longer</span>
-TTL = 60s × log₁₀(hit_count + 10)
-<span class="comment"># hit_count=0  →  60s  |  hit_count=90  →  120s  |  hit_count=900  →  180s</span>
-
-<span class="comment"># Pre-warm on startup — top-20 by hit_count seeded before first request</span>
-preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">first request: 0ms</span></pre>
+    <div class="metric-card" style="border-color:rgba(108,99,255,0.25);">
+      <div class="metric-big purple">~3ms</div>
+      <div class="metric-label">Multi-hop reasoning<br><span style="font-size:0.72rem; opacity:0.7;">2-hop RELATED_TO traversal</span></div>
     </div>
-
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; font-size:0.82rem;">
-      <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.85rem;">
-        <div style="font-weight:700; margin-bottom:0.35rem; color:var(--accent);">workspaceFileCache</div>
-        <div style="color:var(--text2);">Raw stub content · mtime-invalidated · avoids repeated disk reads</div>
-      </div>
-      <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.85rem;">
-        <div style="font-weight:700; margin-bottom:0.35rem; color:var(--accent);">graphQueryCache</div>
-        <div style="color:var(--text2);">Resolved graph content · adaptive TTL · shared across all stubs in process</div>
-      </div>
-      <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.85rem;">
-        <div style="font-weight:700; margin-bottom:0.35rem; color:var(--accent);">graphQueryInFlight</div>
-        <div style="color:var(--text2);">Promise deduplication · concurrent misses share one subprocess · no thundering herd</div>
-      </div>
+    <div class="metric-card" style="border-color:rgba(108,99,255,0.25);">
+      <div class="metric-big purple">0.9s</div>
+      <div class="metric-label">Full migration<br><span style="font-size:0.72rem; opacity:0.7;">one-shot import script</span></div>
+    </div>
+    <div class="metric-card" style="border-color:rgba(108,99,255,0.25);">
+      <div class="metric-big purple">~10MB</div>
+      <div class="metric-label">Storage overhead<br><span style="font-size:0.72rem; opacity:0.7;">total Neo4j footprint</span></div>
     </div>
   </div>
 
-  <!-- Full benchmark table -->
+  <!-- Neo4j benchmark table -->
   <div style="margin-top:2rem; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.75rem;">
     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.75rem;">
       <h3 style="font-size:0.95rem; font-weight:700;">Full benchmark results</h3>
-      <div style="font-size:0.75rem; color:var(--text2); font-family:'JetBrains Mono',monospace;">Mac mini · Apple M-series · 32 GB RAM · 316 skills · 545,072 Reference nodes</div>
+      <div style="font-size:0.75rem; color:var(--text2); font-family:'JetBrains Mono',monospace;">Mac mini · Apple M-series · 32 GB RAM · Neo4j 2026.01 · 316 skills</div>
     </div>
 
-    <div style="font-size:0.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--accent2); margin-bottom:0.6rem;">In-process (lbug embedded engine)</div>
     <div style="overflow-x:auto;">
       <table style="width:100%; border-collapse:collapse; font-size:0.82rem; font-family:'JetBrains Mono',monospace;">
         <thead>
@@ -647,12 +476,6 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
           </tr>
         </thead>
         <tbody>
-          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
-            <td style="padding:0.45rem 0.75rem; color:var(--text);">Reference PK lookup (single, 545k table)</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.11ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.13ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.10ms</td>
-          </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
             <td style="padding:0.45rem 0.75rem; color:var(--text);">Skill PK lookup (warm)</td>
             <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.18ms</td>
@@ -666,22 +489,10 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
             <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.14ms</td>
           </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
-            <td style="padding:0.45rem 0.75rem; color:var(--text);">Reference count aggregate (545k nodes)</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.25ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.26ms</td>
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">Cluster scan — 10 skills (IN_CLUSTER traversal)</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.23ms</td>
             <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.25ms</td>
-          </tr>
-          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
-            <td style="padding:0.45rem 0.75rem; color:var(--text);">AgentConfig — AGENTS.md hot path (9 nodes)</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.33ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.41ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.26ms</td>
-          </tr>
-          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
-            <td style="padding:0.45rem 0.75rem; color:var(--text);">Tool query — TOOLS.md hot path (21 nodes)</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.41ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.55ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.30ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.20ms</td>
           </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
             <td style="padding:0.45rem 0.75rem; color:var(--text);">Soul workspace query — 4 nodes</td>
@@ -690,16 +501,16 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
             <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.20ms</td>
           </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
-            <td style="padding:0.45rem 0.75rem; color:var(--text);">Cluster scan — 10 skills</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.23ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.25ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.20ms</td>
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">AgentConfig — AGENTS.md hot path (9 nodes)</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.33ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.41ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.26ms</td>
           </tr>
           <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
-            <td style="padding:0.45rem 0.75rem; color:var(--text);">Reference source scan — ~12k nodes</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">13.41ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">14.16ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">13.08ms</td>
+            <td style="padding:0.45rem 0.75rem; color:var(--text);">Tool query — TOOLS.md hot path (26 nodes)</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent2); font-weight:700;">0.41ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.55ms</td>
+            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">0.30ms</td>
           </tr>
           <tr>
             <td style="padding:0.45rem 0.75rem; color:var(--text);">Full skill scan — all 316 nodes</td>
@@ -710,75 +521,9 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
         </tbody>
       </table>
     </div>
-
-    <div style="font-size:0.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--accent); margin-top:1.5rem; margin-bottom:0.6rem;">CLI subprocess (workspace.ts GRAPH directive — first load)</div>
-    <div style="overflow-x:auto;">
-      <table style="width:100%; border-collapse:collapse; font-size:0.82rem; font-family:'JetBrains Mono',monospace;">
-        <thead>
-          <tr style="border-bottom:1px solid var(--border);">
-            <th style="text-align:left; padding:0.4rem 0.75rem; color:var(--text2); font-weight:600;">Query</th>
-            <th style="text-align:right; padding:0.4rem 0.75rem; color:var(--text2); font-weight:600;">avg</th>
-            <th style="text-align:right; padding:0.4rem 0.75rem; color:var(--text2); font-weight:600;">p95</th>
-            <th style="text-align:right; padding:0.4rem 0.75rem; color:var(--text2); font-weight:600;">min</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
-            <td style="padding:0.45rem 0.75rem; color:var(--text);">GRAPH directive — AGENTS.md</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">127ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">209ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">103ms</td>
-          </tr>
-          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
-            <td style="padding:0.45rem 0.75rem; color:var(--text);">GRAPH directive — TOOLS.md</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">106ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">111ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">101ms</td>
-          </tr>
-          <tr style="border-bottom:1px solid rgba(37,40,54,0.5);">
-            <td style="padding:0.45rem 0.75rem; color:var(--text);">GRAPH directive — Soul/Memory</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">104ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">107ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">100ms</td>
-          </tr>
-          <tr>
-            <td style="padding:0.45rem 0.75rem; color:var(--text);">Text search (cold process)</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--accent); font-weight:700;">111ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">112ms</td>
-            <td style="padding:0.45rem 0.75rem; text-align:right; color:var(--text2);">108ms</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
     <div style="margin-top:0.85rem; font-size:0.78rem; color:var(--text2); line-height:1.6;">
-      ⚠ CLI numbers include full <code style="background:var(--code-bg); padding:0.1rem 0.3rem; border-radius:3px;">node</code> process spawn + lbug init (~80ms). The actual query inside the subprocess costs &lt;1ms — identical to in-process. This cost is amortized by the <strong>adaptive TTL cache</strong>: paid once per 60–180s window, then 0ms on every hit.
+      All queries via Python <code style="background:var(--code-bg); padding:0.1rem 0.3rem; border-radius:3px;">neo4j</code> driver against <code style="background:var(--code-bg); padding:0.1rem 0.3rem; border-radius:3px;">bolt://localhost:7687</code>. Neo4j's index-free adjacency means traversal times stay constant regardless of graph size.
     </div>
-  </div>
-
-  <!-- System76 projection -->
-  <div style="margin-top:1.5rem; padding:1.1rem 1.4rem; background:rgba(0,212,170,0.04); border:1px solid rgba(0,212,170,0.2); border-radius:10px; font-size:0.85rem;">
-    <span style="color:var(--accent2); font-weight:700;">System76 projection</span> — 96 GB RAM, PCIe 5 NVMe, 8-instance fleet:
-    DB permanently resident in OS page cache after first load. In-process queries expected &lt;0.05ms avg. CLI subprocess spawn cost unchanged (~80ms first load, then cached).
-  </div>
-
-  <!-- Embeddings callout -->
-  <div style="margin-top:2rem; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.75rem;">
-    <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
-      <div class="badge-new" style="margin-left:0;">EMBEDDINGS</div>
-      <h3 style="font-size:1rem; font-weight:700;">Vector Search — Semantic Skill Discovery</h3>
-    </div>
-    <p style="font-size:0.88rem; margin-bottom:1rem;">All 316 skills ship with precomputed <strong>text-embedding-3-small</strong> vectors (1536 dimensions). Cosine similarity search finds semantically relevant skills — not just keyword matches.</p>
-    <div class="code-block" style="margin:0;">
-      <pre><span class="comment"># Finds skills by meaning, not exact keywords</span>
-<span class="fn">node</span> ladybugdb/scripts/query.js --semantic <span class="string">"deploy containerized app to cloud"</span>
-<span class="comment"># → devops-sre/docker · cloud-aws/aws-ecs · cloud-gcp/gcp-cloud-run</span>
-
-<span class="comment"># Generate embeddings for new skills (OpenAI or local Ollama)</span>
-<span class="fn">node</span> ladybugdb/scripts/gen-embeddings.js --missing</pre>
-    </div>
-    <p style="font-size:0.82rem; color:var(--text2); margin-top:0.75rem;">
-      316 skills embedded in <strong>8.4s</strong> via OpenAI text-embedding-3-small · 0 errors · cost &lt;$0.01
-    </p>
   </div>
 </section>
 
@@ -788,7 +533,7 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
 <section id="optimization">
   <div class="section-label">Cost &amp; Performance <span class="badge-new">NEW</span></div>
   <h2>Prompt optimization — 70% token reduction</h2>
-  <p>v1.3 ships with four new AgentConfig nodes that reduce API costs and improve agent reliability. These optimizations are pre-seeded in every release and active out of the box.</p>
+  <p>v1.4 ships with four AgentConfig nodes that reduce API costs and improve agent reliability. These optimizations are pre-seeded in every release and active out of the box.</p>
 
   <div class="how-grid" style="margin-top:2rem;">
     <div class="how-card" style="border-color:rgba(0,212,170,0.25);">
@@ -853,111 +598,96 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
 <!-- INSTALL -->
 <section id="install">
   <div class="section-label">Quick Start</div>
-  <h2>One-line install</h2>
-  <p>The install script downloads a pre-built, SHA256-verified database from the GitHub Release. No build step required.</p>
-
-  <div class="code-block" style="margin-top:1.5rem;">
-    <pre><span class="comment"># Full install — skills + 545k DevDocs reference nodes (recommended)</span>
-<span class="fn">curl</span> -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh <span class="keyword">|</span> bash -s -- --full
-
-<span class="comment"># Lite install — skills + embeddings only, faster download</span>
-<span class="fn">curl</span> -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh <span class="keyword">|</span> bash -s -- --lite
-
-<span class="comment"># Pin to a specific release</span>
-<span class="fn">curl</span> -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh <span class="keyword">|</span> bash -s -- --full --version v1.3</pre>
-  </div>
+  <h2>Install &amp; Setup</h2>
+  <p>OpenClaw Graph runs on Neo4j. Install Neo4j, run the migration script, deploy workspace stubs — done in under 2 minutes.</p>
 
   <div class="tier-grid" style="margin-top:1.5rem;">
-    <div class="tier-card">
-      <div class="tier-badge lite">--lite</div>
-      <h3>Skills + Embeddings</h3>
-      <p style="font-size:0.87rem; color:var(--text2);">316 skills · 1536d vectors · workspace schema</p>
-      <div style="margin-top:0.75rem; font-size:0.82rem; color:var(--text2);">Download: <strong>295 MB</strong></div>
-    </div>
-    <div class="tier-card" style="border-color:rgba(0,212,170,0.25);">
-      <div class="tier-badge full">--full (default)</div>
-      <h3>Skills + DevDocs Reference</h3>
-      <p style="font-size:0.87rem; color:var(--text2);">316 skills · 545k Reference nodes · 718 docsets</p>
-      <div style="margin-top:0.75rem; font-size:0.82rem; color:var(--text2);">Download: <strong>295 MB</strong></div>
+    <div class="tier-card" style="border-color:rgba(108,99,255,0.25);">
+      <div class="tier-badge" style="background:rgba(108,99,255,0.15); border-color:rgba(108,99,255,0.3); color:var(--accent);">Neo4j Backend</div>
+      <h3>Graph-Native Storage</h3>
+      <p style="font-size:0.87rem; color:var(--text2);">Proper graph modeling with SkillCluster nodes, namespaced labels, and workspace isolation. Coexists safely with other graph domains in a shared Neo4j instance.</p>
+      <ul style="font-size:0.82rem; color:var(--text2); margin-top:0.75rem; padding-left:1.2rem;">
+        <li>316 Skills + 27 SkillCluster nodes</li>
+        <li>217 RELATED_TO + 316 IN_CLUSTER edges</li>
+        <li>Namespaced labels (OCAgent, OCMemory, OCTool)</li>
+        <li>Coexists with other graph domains</li>
+      </ul>
+      <div style="margin-top:0.75rem; font-size:0.82rem; color:var(--text2);">Footprint: <strong>~10 MB</strong> · Migration: <strong>0.9s</strong></div>
     </div>
   </div>
 
-  <h3 style="font-size:1.1rem; font-weight:700; margin-top:3rem; margin-bottom:0.5rem;">Manual setup (from source)</h3>
+  <!-- Neo4j Install -->
+  <h3 style="font-size:1.1rem; font-weight:700; margin-top:3rem; margin-bottom:0.5rem;">Neo4j Setup</h3>
+  <p style="font-size:0.88rem; color:var(--text2); margin-bottom:1rem;">Requires Neo4j running on <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">bolt://localhost:7687</code> and Python 3.10+ with the <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">neo4j</code> driver.</p>
+
+  <div style="background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:1.75rem; margin-bottom:1.5rem;">
+    <div style="font-size:0.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--accent); margin-bottom:0.75rem;">Install Neo4j</div>
+    <div class="code-block" style="margin:0;">
+      <pre><span class="comment"># macOS</span>
+<span class="fn">brew</span> install neo4j
+<span class="fn">brew</span> services start neo4j
+
+<span class="comment"># Ubuntu / Debian</span>
+<span class="fn">wget</span> -O - https://debian.neo4j.com/neotechnology.gpg.key <span class="keyword">|</span> sudo gpg --dearmor -o /usr/share/keyrings/neo4j.gpg
+<span class="fn">echo</span> <span class="string">"deb [signed-by=/usr/share/keyrings/neo4j.gpg] https://debian.neo4j.com stable latest"</span> <span class="keyword">|</span> sudo tee /etc/apt/sources.list.d/neo4j.list
+<span class="fn">sudo</span> apt-get update && sudo apt-get install -y neo4j
+<span class="fn">sudo</span> systemctl start neo4j
+
+<span class="comment"># Fedora</span>
+<span class="fn">sudo</span> rpm --import https://debian.neo4j.com/neotechnology.gpg.key
+<span class="fn">cat</span> <span class="keyword">&lt;&lt;</span> EOF <span class="keyword">|</span> sudo tee /etc/yum.repos.d/neo4j.repo
+[neo4j]
+name=Neo4j RPM Repository
+baseurl=https://yum.neo4j.com/stable/5
+gpgcheck=1
+gpgkey=https://debian.neo4j.com/neotechnology.gpg.key
+EOF
+<span class="fn">sudo</span> dnf install -y neo4j
+<span class="fn">sudo</span> systemctl start neo4j
+
+<span class="comment"># Install Python driver (all platforms)</span>
+<span class="fn">pip</span> install neo4j</pre>
+    </div>
+  </div>
+
   <div class="install-steps" style="margin-top:1rem;">
     <div class="step">
       <div class="step-num">1</div>
       <div class="step-body">
-        <h4>Clone and install</h4>
+        <h4>Clone the repository</h4>
         <div class="code-block">
           <pre><span class="fn">git</span> clone https://github.com/alphaonedev/openclaw-graph.git
-<span class="fn">cd</span> openclaw-graph && npm install</pre>
+<span class="fn">cd</span> openclaw-graph
+<span class="fn">pip</span> install neo4j</pre>
         </div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">2</div>
       <div class="step-body">
-        <h4>Load the skill database</h4>
+        <h4>Run the migration</h4>
         <div class="code-block">
-          <pre><span class="fn">node</span> ladybugdb/scripts/loader.js
-<span class="comment"># → 316 skills | 27 clusters | 247 edges | 0 errors</span></pre>
+          <pre><span class="comment"># Preview (no writes)</span>
+<span class="fn">python3</span> migrate_ladybugdb_to_neo4j.py --dry-run
+
+<span class="comment"># Migrate — creates all nodes, relationships, constraints</span>
+<span class="fn">python3</span> migrate_ladybugdb_to_neo4j.py
+<span class="comment"># → 316 Skills, 27 SkillClusters, 217 RELATED_TO, 316 IN_CLUSTER — 0.9s</span></pre>
         </div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">3</div>
       <div class="step-body">
-        <h4>Import DevDocs reference (optional)</h4>
+        <h4>Deploy workspace stubs</h4>
         <div class="code-block">
-          <pre><span class="fn">node</span> ladybugdb/scripts/import-devdocs.mjs
-<span class="comment"># Checkpoint-based — safe to kill and resume</span>
-<span class="comment"># → 718 docsets | 545,072 Reference nodes</span></pre>
-        </div>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-body">
-        <h4>Load your workspace files into the graph</h4>
-        <div class="code-block">
-          <pre><span class="comment"># Option A — import your existing SOUL.md, MEMORY.md, USER.md, TOOLS.md, AGENTS.md</span>
-<span class="fn">node</span> ladybugdb/scripts/import-workspace.mjs
-
-<span class="comment"># Option B — use the pre-seeded defaults (already in the DB from install)</span>
-<span class="comment"># Nothing to do — workspace='openclaw' ships pre-seeded in every DB release</span>
-
-<span class="comment"># Option C — seed from scratch with the template script</span>
-<span class="fn">node</span> ladybugdb/scripts/seed-default-workspace.mjs</pre>
-        </div>
-        <p style="font-size:0.83rem; color:var(--text2); margin-top:0.5rem;">
-          <code>import-workspace.mjs</code> reads <code>~/.openclaw/workspace/</code>, parses each file by <code>##</code> headings, and creates the correct graph nodes. Run with <code>--dry-run</code> to preview.
-        </p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">5</div>
-      <div class="step-body">
-        <h4>Patch OpenClaw + deploy stubs</h4>
-        <div class="code-block">
-          <pre><span class="comment"># Apply the workspace.ts patch</span>
-<span class="fn">git</span> apply patches/workspace-cache-fix.patch
-<span class="fn">pnpm</span> build
-
-<span class="comment"># Deploy graph stubs</span>
-<span class="fn">cp</span> workspace-stubs/*.md ~/.openclaw/workspace/
-<span class="comment"># Update 'myapp' → your WORKSPACE_ID in each stub</span></pre>
+          <pre><span class="fn">cp</span> workspace-stubs/*.md ~/.openclaw/workspace/
+<span class="comment"># Edit each stub: change workspace name to match your deployment</span></pre>
         </div>
       </div>
     </div>
   </div>
 
-  <div style="margin-top:2rem; padding:1.25rem 1.5rem; background:var(--bg2); border:1px solid var(--border); border-radius:10px; font-size:0.87rem;">
-    <strong>SHA256 checksums (v1.3)</strong><br>
-    <code style="font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--text2); display:block; margin-top:0.5rem; word-break:break-all;">
-      6da38b83a4cb7f865a55677386101d4745db146a7912042abc0e896357291e1b &nbsp; alphaone-skills-lite.db.zst<br>
-      d8f9e8f16583e58b974c30f8c1b8eba0580fe3595e89a24bd03ee1ac7733ce56 &nbsp; alphaone-skills-full.db.zst
-    </code>
-  </div>
 </section>
 
 <!-- DOCUMENTATION -->
@@ -985,7 +715,7 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
     <a href="https://github.com/alphaonedev/openclaw-graph" class="how-card" style="text-decoration:none; transition:border-color 0.2s;">
       <div class="how-num" style="background:rgba(108,99,255,0.15); border-color:rgba(108,99,255,0.3); color:var(--accent);">R</div>
       <h3 style="color:var(--text);">README</h3>
-      <p>Project overview, quick start, database tiers, workspace architecture, and what's new in v1.3.</p>
+      <p>Project overview, quick start, Neo4j setup, workspace architecture, and what's new in v1.4.</p>
     </a>
   </div>
 </section>
@@ -996,7 +726,7 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
 <div class="cta-section">
   <h2>Open source. Community-first.</h2>
   <p style="color:var(--text2); max-width:500px; margin:0 auto 2rem;">
-    Built as a contribution back to the OpenClaw project. PRs welcome — add skills, extend the DevDocs coverage, or improve the schema.
+    Built as a contribution back to the OpenClaw project. PRs welcome — add skills, improve the schema, or extend the graph model.
   </p>
   <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
     <a href="https://github.com/alphaonedev/openclaw-graph" class="btn-primary">View Source on GitHub</a>
@@ -1007,11 +737,11 @@ preWarmFromMetrics() → graphQueryCache pre-populated → <span class="string">
 </div>
 
 <footer>
-  openclaw-graph v1.3 · MIT License · Built for the <a href="https://github.com/openclaw/openclaw">OpenClaw</a> community ·
+  openclaw-graph v1.4 · MIT License · Built for the <a href="https://github.com/openclaw/openclaw">OpenClaw</a> community ·
   <a href="admin-guide.html">Admin Guide</a> ·
   <a href="user-guide.html">User Guide</a> ·
-  <a href="https://www.npmjs.com/package/lbug">LadybugDB 0.14.3</a> ·
-  <a href="https://github.com/alphaonedev/openclaw-graph/releases/tag/v1.3">Release Notes</a>
+  <a href="https://neo4j.com/">Neo4j</a> ·
+  <a href="https://github.com/alphaonedev/openclaw-graph/releases/tag/v1.4">Release Notes</a>
   <br><br>
   Created by and open source contributed by <a href="https://alpha-one.mobi" style="color: var(--accent);">AlphaOne LLC</a> to the open source <a href="https://github.com/openclaw/openclaw" style="color: var(--accent2);">OpenClaw</a> community
 </footer>

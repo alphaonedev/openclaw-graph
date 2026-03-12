@@ -187,120 +187,95 @@
 
     <!-- PREREQUISITES -->
     <h2 id="prerequisites">Prerequisites</h2>
-    <p>Install these <strong>before</strong> running the installer. Quick check:</p>
-    <div class="code-block"><pre>node --version &amp;&amp; npm --version &amp;&amp; zstd --version &amp;&amp; node --input-type=module -e "import 'lbug'" &amp;&amp; echo "✅ all good"</pre></div>
+    <p>Install these <strong>before</strong> running the migration. Quick check:</p>
+    <div class="code-block"><pre>cypher-shell "RETURN 1" &amp;&amp; python3 -c "import neo4j; print('✅ all good')"</pre></div>
     <table>
       <tr><th>Dependency</th><th>Version</th><th>macOS</th><th>Ubuntu / Debian</th><th>Fedora</th></tr>
-      <tr><td>Node.js</td><td>18+</td><td><code>brew install node@22</code></td><td>NodeSource (see below)</td><td><code>sudo dnf install -y nodejs npm</code></td></tr>
-      <tr><td>lbug</td><td>0.14.3+</td><td colspan="3"><code>npm install -g lbug</code></td></tr>
-      <tr><td>zstd</td><td>1.5+</td><td><code>brew install zstd</code></td><td><code>sudo apt-get install -y zstd</code></td><td><code>sudo dnf install -y zstd</code></td></tr>
-      <tr><td>curl</td><td>any</td><td>pre-installed</td><td><code>sudo apt-get install -y curl</code></td><td>pre-installed</td></tr>
+      <tr><td>Neo4j</td><td>2026.01+</td><td><code>brew install neo4j</code></td><td>See below</td><td>See below</td></tr>
+      <tr><td>Python</td><td>3.10+</td><td>pre-installed or <code>brew install python</code></td><td><code>sudo apt install python3</code></td><td><code>sudo dnf install python3</code></td></tr>
+      <tr><td>neo4j driver</td><td>5.x</td><td colspan="3"><code>pip install neo4j</code></td></tr>
       <tr><td>OpenClaw</td><td>latest</td><td colspan="3"><a href="https://github.com/openclaw/openclaw">github.com/openclaw/openclaw</a></td></tr>
     </table>
 
     <h3>macOS — step by step</h3>
-    <div class="code-block"><pre><span class="comment"># 1. Install Homebrew (skip if already installed)</span>
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    <div class="code-block"><pre><span class="comment"># 1. Install Neo4j</span>
+brew install neo4j
+brew services start neo4j
 
-<span class="comment"># 2. Install Node.js 22 LTS (includes npm)</span>
-brew install node@22
-echo 'export PATH="/opt/homebrew/opt/node@22/bin:$PATH"' &gt;&gt; ~/.zshrc
-source ~/.zshrc
-
-<span class="comment"># 3. Install lbug globally</span>
-npm install -g lbug
-
-<span class="comment"># 4. Install zstd</span>
-brew install zstd
-
-<span class="comment"># curl is pre-installed on macOS — no action needed</span></pre></div>
+<span class="comment"># 2. Install Python neo4j driver</span>
+pip install neo4j</pre></div>
 
     <h3>Ubuntu / Debian — step by step</h3>
-    <div class="code-block"><pre><span class="comment"># 1. Install curl</span>
-sudo apt-get update &amp;&amp; sudo apt-get install -y curl
+    <div class="code-block"><pre><span class="comment"># 1. Add Neo4j repository and install</span>
+wget -O - https://debian.neo4j.com/neotechnology.gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/neo4j.gpg
+echo "deb [signed-by=/usr/share/keyrings/neo4j.gpg] https://debian.neo4j.com stable latest" | sudo tee /etc/apt/sources.list.d/neo4j.list
+sudo apt-get update &amp;&amp; sudo apt-get install -y neo4j
+sudo systemctl start neo4j
 
-<span class="comment"># 2. Add NodeSource repo and install Node.js 22 LTS (includes npm)</span>
-<span class="comment">#    (apt's default nodejs is often too old — NodeSource guarantees v22)</span>
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
-<span class="comment"># 3. Install lbug globally</span>
-npm install -g lbug
-
-<span class="comment"># 4. Install zstd</span>
-sudo apt-get install -y zstd</pre></div>
+<span class="comment"># 2. Install Python neo4j driver</span>
+pip install neo4j</pre></div>
 
     <h3>Fedora — step by step</h3>
-    <div class="code-block"><pre><span class="comment"># 1. Install Node.js 22 and npm</span>
-sudo dnf install -y nodejs npm
+    <div class="code-block"><pre><span class="comment"># 1. Add Neo4j repository and install</span>
+sudo rpm --import https://debian.neo4j.com/neotechnology.gpg.key
+cat &lt;&lt; EOF | sudo tee /etc/yum.repos.d/neo4j.repo
+[neo4j]
+name=Neo4j RPM Repository
+baseurl=https://yum.neo4j.com/stable/5
+gpgcheck=1
+gpgkey=https://debian.neo4j.com/neotechnology.gpg.key
+EOF
+sudo dnf install -y neo4j
+sudo systemctl start neo4j
 
-<span class="comment"># 2. Install lbug globally</span>
-npm install -g lbug
-
-<span class="comment"># 3. Install zstd</span>
-sudo dnf install -y zstd
-
-<span class="comment"># curl is pre-installed on Fedora — no action needed</span></pre></div>
+<span class="comment"># 2. Install Python neo4j driver</span>
+pip install neo4j</pre></div>
 
     <!-- INSTALLATION -->
     <h2 id="installation">Installation</h2>
-    <h3>One-command install</h3>
-    <div class="code-block"><pre><span class="comment"># Lite — skills + embeddings (~300 MB compressed)</span>
-curl -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh | bash -s -- --lite
-
-<span class="comment"># Full — skills + 545k DevDocs reference nodes (~500 MB compressed)</span>
-curl -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh | bash -s -- --full
-
-<span class="comment"># From a cloned repo</span>
-bash install.sh --lite          <span class="comment"># skills only</span>
-bash install.sh --full          <span class="comment"># skills + DevDocs</span>
-bash install.sh --version v1.3  <span class="comment"># pin a specific release</span>
-bash install.sh --verify        <span class="comment"># check an existing DB</span></pre></div>
-
-    <h3>Manual install</h3>
-    <div class="code-block"><pre>git clone https://github.com/alphaonedev/openclaw-graph.git
+    <h3>Quick install</h3>
+    <div class="code-block"><pre><span class="comment"># 1. Clone the repository</span>
+git clone https://github.com/alphaonedev/openclaw-graph.git
 cd openclaw-graph
-npm install
 
-<span class="comment"># Download and decompress the DB</span>
-curl -L https://github.com/alphaonedev/openclaw-graph/releases/download/v1.3/alphaone-skills-full.db.zst \
-  | zstd -d &gt; ladybugdb/db/alphaone-skills.db
+<span class="comment"># 2. Run the migration (creates all nodes, relationships, constraints)</span>
+python3 migrate_ladybugdb_to_neo4j.py --dry-run   <span class="comment"># preview first</span>
+python3 migrate_ladybugdb_to_neo4j.py              <span class="comment"># run it</span>
+<span class="comment"># → 316 Skills, 27 SkillClusters, 217 RELATED_TO, 316 IN_CLUSTER — 0.9s</span>
 
-<span class="comment"># Verify</span>
-node ladybugdb/scripts/query.js --stats</pre></div>
+<span class="comment"># 3. Deploy workspace stubs</span>
+cp workspace-stubs/*.md ~/.openclaw/workspace/
 
-    <h3>What the DB contains (v1.3)</h3>
+<span class="comment"># 4. Verify</span>
+cypher-shell <span class="string">"MATCH (s:Skill) RETURN count(s)"</span></pre></div>
+
+    <h3>What Neo4j contains (v1.4)</h3>
     <table>
-      <tr><th>Table</th><th>Nodes</th><th>Description</th></tr>
+      <tr><th>Label</th><th>Nodes</th><th>Description</th></tr>
       <tr><td>Skill</td><td>316</td><td>Skills across 27 clusters</td></tr>
-      <tr><td>Reference</td><td>545,072</td><td>DevDocs entries (718 docsets) &mdash; full tier only</td></tr>
+      <tr><td>SkillCluster</td><td>27</td><td>Semantic skill groupings (first-class nodes)</td></tr>
       <tr><td>Soul</td><td>4</td><td>Prime Directive, Identity, Safety, Heartbeat Protocol</td></tr>
-      <tr><td>Memory</td><td>2</td><td>Principal (placeholder), Infrastructure (placeholder)</td></tr>
+      <tr><td>OCMemory</td><td>2</td><td>Principal (placeholder), Infrastructure (placeholder)</td></tr>
       <tr><td>AgentConfig</td><td>9</td><td>Every Session, Delegation, Safety, Heartbeats, Memory, TOON, Search Resilience, Schema Rules, Path Aliases</td></tr>
-      <tr><td>Tool</td><td>26</td><td>All standard OpenClaw tools</td></tr>
-      <tr><td>QueryMetrics</td><td>grows</td><td>Auto-recorded by query.js on every GRAPH directive resolution &mdash; view with <code>sync-metrics.mjs</code></td></tr>
+      <tr><td>OCTool</td><td>26</td><td>All standard OpenClaw tools</td></tr>
+      <tr><td>OCAgent</td><td>8</td><td>Agent definitions</td></tr>
+      <tr><td>Bootstrap</td><td>1</td><td>Boot identity</td></tr>
     </table>
-    <p><strong>Table sizes:</strong> Workspace tables (Soul, Memory, AgentConfig) hold 4&ndash;30 nodes each. Full table scans are sub-millisecond at this scale. lbug 0.14.x does not expose a secondary-index DDL for regular node properties; indexes will be added here when lbug support lands.</p>
+    <p><strong>Relationships:</strong> 316 IN_CLUSTER (Skill&rarr;SkillCluster) + 217 RELATED_TO (Skill&rarr;Skill). Total footprint: ~10 MB. All queries are sub-millisecond via Neo4j's native graph indexing.</p>
 
     <!-- IMPORT WORKSPACE -->
     <h2 id="import-workspace">Import Your Workspace</h2>
-    <p>Already running OpenClaw with flat markdown files? One command loads them into LadybugDB.</p>
+    <p>Already running OpenClaw with flat markdown files? The migration script loads them into Neo4j.</p>
 
     <h3>Quick start</h3>
-    <div class="code-block"><pre><span class="comment"># From your openclaw-graph directory — reads ~/.openclaw/workspace/ by default</span>
-node ladybugdb/scripts/import-workspace.mjs
+    <div class="code-block"><pre><span class="comment"># Run the migration — imports all workspace data into Neo4j</span>
+python3 migrate_ladybugdb_to_neo4j.py
 
 <span class="comment"># Preview what will be imported without writing anything</span>
-node ladybugdb/scripts/import-workspace.mjs --dry-run
+python3 migrate_ladybugdb_to_neo4j.py --dry-run
 
-<span class="comment"># Import + replace flat files with GRAPH stubs (originals backed up to *.bak)</span>
-node ladybugdb/scripts/import-workspace.mjs --write-stubs
-
-<span class="comment"># Custom path or workspace name</span>
-node ladybugdb/scripts/import-workspace.mjs --workspace-dir ~/my/path --workspace-name myagent
-
-<span class="comment"># Replace existing nodes</span>
-node ladybugdb/scripts/import-workspace.mjs --overwrite</pre></div>
+<span class="comment"># Deploy GRAPH stubs to workspace</span>
+cp workspace-stubs/*.md ~/.openclaw/workspace/</pre></div>
 
     <h3>File → Node mapping</h3>
     <table>
@@ -322,68 +297,69 @@ node ladybugdb/scripts/import-workspace.mjs --overwrite</pre></div>
 ~/.openclaw/workspace/SOUL.md      <span class="comment"># ← single-line GRAPH stub (144 bytes)</span>
 ~/.openclaw/workspace/SOUL.md.bak  <span class="comment"># ← original backed up automatically</span></pre></div>
 
-    <p>OpenClaw resolves the stub at runtime from LadybugDB — your content is preserved in the graph, not the file.</p>
+    <p>OpenClaw resolves the stub at runtime from Neo4j — your content is preserved in the graph, not the file.</p>
 
     <!-- DATABASE LAYOUT -->
     <h2 id="database-layout">Database Layout</h2>
-    <div class="arch-block"><pre>ladybugdb/
-&#9500;&#9472;&#9472; db/
-&#9474;   &#9492;&#9472;&#9472; alphaone-skills.db       <span class="hl"># Single-file embedded DB (no daemon)</span>
-&#9500;&#9472;&#9472; schema/
-&#9474;   &#9500;&#9472;&#9472; nodes.cypher             <span class="hl"># Skill + Reference DDL</span>
-&#9474;   &#9500;&#9472;&#9472; edges.cypher             <span class="hl"># Relationship DDL</span>
-&#9474;   &#9492;&#9472;&#9472; workspace-nodes.cypher   <span class="hl"># Soul, Memory, AgentConfig, Tool DDL</span>
-&#9492;&#9472;&#9472; scripts/
-    &#9500;&#9472;&#9472; query.js                 <span class="hl"># CLI query tool (auto-records QueryMetrics)</span>
-    &#9500;&#9472;&#9472; loader.js                <span class="hl"># Load SKILL.md files into DB</span>
-    &#9500;&#9472;&#9472; seed-default-workspace.mjs  <span class="hl"># Seed default workspace nodes</span>
-    &#9500;&#9472;&#9472; import-workspace.mjs     <span class="hl"># Load flat SOUL/MEMORY/USER/TOOLS/AGENTS.md into DB</span>
-    &#9500;&#9472;&#9472; sync-metrics.mjs         <span class="hl"># View / reset QueryMetrics dashboard</span>
-    &#9492;&#9472;&#9472; seed-workspace.js        <span class="hl"># Custom workspace seeder</span></pre></div>
-    <p>LadybugDB is an embedded graph database (KuzuDB). The entire DB is a single file &mdash; no daemon, no port, no configuration. Queries execute in-process via the <code>lbug</code> Node.js bindings.</p>
+    <div class="arch-block"><pre>Neo4j (bolt://localhost:7687)
+&#9500;&#9472;&#9472; Labels:
+&#9474;   &#9500;&#9472;&#9472; Skill (316)              <span class="hl"># Skills with full SKILL.md content</span>
+&#9474;   &#9500;&#9472;&#9472; SkillCluster (27)        <span class="hl"># Semantic skill groupings</span>
+&#9474;   &#9500;&#9472;&#9472; Soul (4)                 <span class="hl"># Agent personality/behavior</span>
+&#9474;   &#9500;&#9472;&#9472; OCMemory (2)             <span class="hl"># Namespaced memory nodes</span>
+&#9474;   &#9500;&#9472;&#9472; AgentConfig (9)          <span class="hl"># Runtime config directives</span>
+&#9474;   &#9500;&#9472;&#9472; OCAgent (8)              <span class="hl"># Namespaced agent nodes</span>
+&#9474;   &#9500;&#9472;&#9472; OCTool (26)              <span class="hl"># Namespaced tool nodes</span>
+&#9474;   &#9492;&#9472;&#9472; Bootstrap (1)            <span class="hl"># Boot identity</span>
+&#9500;&#9472;&#9472; Relationships:
+&#9474;   &#9500;&#9472;&#9472; IN_CLUSTER (316)         <span class="hl"># Skill → SkillCluster membership</span>
+&#9474;   &#9492;&#9472;&#9472; RELATED_TO (217)         <span class="hl"># Skill → Skill dependency graph</span>
+&#9492;&#9472;&#9472; Scripts:
+    &#9492;&#9472;&#9472; migrate_ladybugdb_to_neo4j.py  <span class="hl"># One-shot migration script</span></pre></div>
+    <p>Neo4j stores all graph data with proper graph modeling. Namespaced labels (OCAgent, OCMemory, OCTool) allow coexistence with other graph domains in a shared Neo4j instance. All nodes include a <code>workspace</code> property for multi-tenant isolation.</p>
 
     <!-- CLI REFERENCE -->
-    <h2 id="cli-reference">CLI Reference</h2>
-    <p>All commands use <code>node ladybugdb/scripts/query.js</code>:</p>
+    <h2 id="cli-reference">Query Reference</h2>
+    <p>All queries use Cypher via <code>cypher-shell</code> or the Python <code>neo4j</code> driver:</p>
 
     <h3 id="skill-queries">Skill queries</h3>
-    <div class="code-block"><pre><span class="comment"># Text search &mdash; matches against name, description, embedding hints</span>
-node ladybugdb/scripts/query.js <span class="string">"build a SwiftUI watchOS app"</span>
-
-<span class="comment"># Cluster filter &mdash; list all skills in a cluster</span>
-node ladybugdb/scripts/query.js --cluster devops-sre
-node ladybugdb/scripts/query.js --cluster financial
+    <div class="code-block"><pre><span class="comment"># List all skills in a cluster</span>
+cypher-shell <span class="string">"MATCH (s:Skill)-[:IN_CLUSTER]->(c:SkillCluster {name:'devops-sre'})
+RETURN s.name, s.description"</span>
 
 <span class="comment"># Skill graph traversal &mdash; show a skill and its relationships</span>
-node ladybugdb/scripts/query.js --skill cloudflare --hops 2
+cypher-shell <span class="string">"MATCH (s:Skill {name:'cloudflare'})-[:RELATED_TO*1..2]-(t:Skill)
+RETURN DISTINCT t.name, t.cluster"</span>
 
-<span class="comment"># Stats &mdash; total skills, clusters, auth-required flags</span>
-node ladybugdb/scripts/query.js --stats</pre></div>
+<span class="comment"># Stats &mdash; total skills, clusters</span>
+cypher-shell <span class="string">"MATCH (s:Skill) RETURN count(s) AS skills"</span>
+cypher-shell <span class="string">"MATCH (c:SkillCluster) RETURN count(c) AS clusters"</span></pre></div>
 
     <h3 id="raw-cypher">Raw Cypher queries</h3>
-    <div class="code-block"><pre><span class="comment"># Standard mode &mdash; labeled output for debugging</span>
-node ladybugdb/scripts/query.js --cypher <span class="string">"MATCH (s:Skill) RETURN count(s) AS total"</span>
+    <div class="code-block"><pre><span class="comment"># Via cypher-shell</span>
+cypher-shell <span class="string">"MATCH (s:Skill) RETURN count(s) AS total"</span>
 
-<span class="comment"># Workspace mode &mdash; clean markdown output (used by workspace.ts)</span>
-node ladybugdb/scripts/query.js --workspace --cypher \
-  <span class="string">"MATCH (a:AgentConfig {workspace:'openclaw'}) RETURN a.key, a.value ORDER BY a.id"</span></pre></div>
+<span class="comment"># Via Python</span>
+python3 -c <span class="string">"
+from neo4j import GraphDatabase
+driver = GraphDatabase.driver('bolt://localhost:7687')
+with driver.session() as session:
+    result = session.run('MATCH (s:Skill) RETURN count(s) AS total')
+    print(result.single()['total'])
+"</span></pre></div>
 
     <h3 id="workspace-queries">Workspace node queries</h3>
     <div class="code-block"><pre><span class="comment"># List all Soul nodes</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (s:Soul {workspace:'openclaw'}) RETURN s.section, s.priority ORDER BY s.priority"</span>
+cypher-shell <span class="string">"MATCH (s:Soul) WHERE s.workspace = 'openclaw'
+RETURN s.section, s.priority ORDER BY s.priority"</span>
 
 <span class="comment"># List all AgentConfig nodes</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (a:AgentConfig {workspace:'openclaw'}) RETURN a.key ORDER BY a.id"</span>
+cypher-shell <span class="string">"MATCH (a:AgentConfig) WHERE a.workspace = 'openclaw'
+RETURN a.key ORDER BY a.id"</span>
 
 <span class="comment"># List available tools</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (t:Tool) WHERE t.available = true RETURN t.name, t.notes ORDER BY t.name"</span>
-
-<span class="comment"># Query DevDocs references</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (r:Reference) WHERE r.source = 'python~3.12' AND r.path STARTS WITH 'library/' RETURN r.title, r.path LIMIT 20"</span></pre></div>
+cypher-shell <span class="string">"MATCH (t:OCTool) WHERE t.available = true AND t.workspace = 'openclaw'
+RETURN t.name, t.notes ORDER BY t.name"</span></pre></div>
 
     <h3 id="output-formats">Output formats</h3>
     <p>The <code>--workspace</code> flag activates clean markdown output (no labels), which is what <code>workspace.ts</code> uses when resolving GRAPH directives. Without it, output is labeled for human reading.</p>
@@ -419,10 +395,10 @@ pnpm build</pre></div>
 
     <h3>3. Verify resolution</h3>
     <div class="code-block"><pre><span class="comment"># Test that the directive resolves correctly</span>
-node ladybugdb/scripts/query.js --workspace --cypher \
-  <span class="string">"MATCH (s:Soul {workspace:'openclaw'}) RETURN s.section, s.content ORDER BY s.priority"</span>
+cypher-shell <span class="string">"MATCH (s:Soul) WHERE s.workspace = 'openclaw'
+RETURN s.section, s.content ORDER BY s.priority"</span>
 
-<span class="comment"># Expected: formatted markdown with Prime Directive, Identity, Safety, Heartbeat Protocol</span></pre></div>
+<span class="comment"># Expected: 4 rows — Prime Directive, Identity, Safety, Heartbeat Protocol</span></pre></div>
 
     <h3>4. Customize your workspace</h3>
     <p>See the <a href="user-guide.html#customizing">User Guide &rarr; Customizing</a> for step-by-step personalization.</p>
@@ -448,10 +424,10 @@ node ladybugdb/scripts/query.js --workspace --cypher \
   &#9492;&#9472;&#9472; Write output / send alerts
         &#9474;  --workspace --cypher
         &#9660;
-<span class="hl">LadybugDB</span> (alphaone-skills.db)
+<span class="hl">Neo4j</span> (bolt://localhost:7687)
   &#9500;&#9472;&#9472; AgentConfig &#8594; session behavior
   &#9500;&#9472;&#9472; Skill &#8594; task-relevant skills
-  &#9492;&#9472;&#9472; Reference &#8594; documentation context</pre></div>
+  &#9492;&#9472;&#9472; SkillCluster &#8594; semantic grouping</pre></div>
 
     <h3>Cron session bootstrap</h3>
     <p>Cron/sub-agent sessions use a minimal bootstrap. OpenClaw's <code>MINIMAL_BOOTSTRAP_ALLOWLIST</code> loads only:</p>
@@ -477,29 +453,28 @@ node ladybugdb/scripts/query.js --workspace --cypher \
   <span class="string">"name"</span>: <span class="string">"daily-report"</span>,
   <span class="string">"schedule"</span>: <span class="string">"0 8 * * *"</span>,
   <span class="string">"workspace"</span>: <span class="string">"openclaw"</span>,
-  <span class="string">"prompt"</span>: <span class="string">"Generate today's daily report. Query relevant skills with: node ladybugdb/scripts/query.js --cluster financial"</span>,
+  <span class="string">"prompt"</span>: <span class="string">"Generate today's daily report. Query relevant skills from the 'financial' cluster."</span>,
   <span class="string">"output"</span>: <span class="string">"~/.openclaw/workspace/reports/daily-$(date +%Y-%m-%d).md"</span>
 }</pre></div>
 
     <h3>Querying skills from cron prompts</h3>
-    <div class="code-block"><pre><span class="comment"># Find relevant skills for a domain</span>
-node ladybugdb/scripts/query.js <span class="string">"kubernetes monitoring alerts"</span>
+    <div class="code-block"><pre><span class="comment"># Find relevant skills by cluster</span>
+cypher-shell <span class="string">"MATCH (s:Skill)-[:IN_CLUSTER]->(c:SkillCluster {name:'devops-sre'})
+RETURN s.name, s.description"</span>
 
-<span class="comment"># Get specific skill content</span>
-node ladybugdb/scripts/query.js --skill kubernetes-ops --hops 1
-
-<span class="comment"># Query reference docs</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (r:Reference {source:'kubernetes'}) WHERE r.path STARTS WITH 'api/' RETURN r.title, r.content LIMIT 5"</span></pre></div>
+<span class="comment"># Get specific skill and its relationships</span>
+cypher-shell <span class="string">"MATCH (s:Skill {name:'kubernetes-ops'})-[:RELATED_TO*1..2]-(t:Skill)
+RETURN DISTINCT t.name, t.cluster"</span></pre></div>
 
     <!-- FLEET MANAGEMENT -->
     <h2 id="fleet">Fleet Management</h2>
-    <p>For multi-instance deployments, each OpenClaw instance gets its own workspace ID. All instances share the same DB file (no lock contention &mdash; LadybugDB is read-heavy).</p>
+    <p>For multi-instance deployments, each OpenClaw instance gets its own workspace ID. All instances share the same Neo4j instance &mdash; workspace-scoped queries ensure isolation.</p>
 
     <h3>Seed separate workspaces</h3>
-    <div class="code-block"><pre>node ladybugdb/scripts/seed-default-workspace.mjs --workspace intel-agent
-node ladybugdb/scripts/seed-default-workspace.mjs --workspace code-agent
-node ladybugdb/scripts/seed-default-workspace.mjs --workspace ops-agent</pre></div>
+    <div class="code-block"><pre><span class="comment"># Run migration with different workspace names</span>
+python3 migrate_ladybugdb_to_neo4j.py --workspace intel-agent
+python3 migrate_ladybugdb_to_neo4j.py --workspace code-agent
+python3 migrate_ladybugdb_to_neo4j.py --workspace ops-agent</pre></div>
 
     <h3>Point stubs to the correct workspace</h3>
     <div class="code-block"><pre><span class="comment"># Instance A stubs (~/.openclaw/workspace-intel/)</span>
@@ -518,19 +493,17 @@ node ladybugdb/scripts/seed-default-workspace.mjs --workspace ops-agent</pre></d
       <tr><td>18796</td><td>G &mdash; General</td><td><code>general-agent</code></td></tr>
       <tr><td>18797</td><td>H &mdash; Standby</td><td><code>standby-agent</code></td></tr>
     </table>
-    <p>Each instance runs its own DB copy (<code>install.sh --full</code>). No shared DB, no lock contention.</p>
+    <p>All instances connect to the same Neo4j instance. Workspace-scoped Cypher queries ensure complete isolation between agents.</p>
 
     <h3>Per-workspace tool overrides</h3>
     <div class="code-block"><pre><span class="comment"># Disable delegation for the browser-only instance</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (t:Tool {id:'tool-sessions-spawn'}) \
-   WHERE EXISTS { MATCH (a:AgentConfig {workspace:'browser-agent'}) } \
+cypher-shell <span class="string">"MATCH (t:OCTool {id:'tool-sessions-spawn', workspace:'browser-agent'})
    SET t.available = false"</span></pre></div>
 
     <!-- SERVICE MANAGEMENT -->
     <h2 id="service-management">Service Management</h2>
 
-    <div class="callout"><p><strong>Architecture note:</strong> openclaw-graph has <strong>no daemon of its own</strong>. It is embedded directly inside the OpenClaw gateway process. "Restarting the graph" means restarting the OpenClaw gateway. The LadybugDB file is always accessible directly via <code>query.js --stats</code> regardless of gateway state.</p></div>
+    <div class="callout"><p><strong>Architecture note:</strong> openclaw-graph runs on Neo4j, which is a separate service. "Restarting the graph" means restarting Neo4j. The OpenClaw gateway connects to Neo4j via <code>bolt://localhost:7687</code>.</p></div>
 
     <h3>macOS (launchd)</h3>
     <p>OpenClaw installs a launchd service with label <code>ai.openclaw.gateway</code>.</p>
@@ -608,18 +581,18 @@ tail -f ~/.openclaw/logs/gateway.log
 tail -f ~/.openclaw/logs/gateway.err.log</pre></div>
 
     <h3>DB health check (all platforms)</h3>
-    <p>These run directly against the LadybugDB file — no gateway required.</p>
+    <p>These run directly against Neo4j — no gateway required.</p>
 
-    <div class="code-block"><pre><span class="comment"># Full stats: node count, edge count, DB file size</span>
-node ~/openclaw-graph/ladybugdb/scripts/query.js --stats
+    <div class="code-block"><pre><span class="comment"># Quick connectivity check</span>
+cypher-shell <span class="string">"RETURN 1"</span>
 
-<span class="comment"># Quick workspace sanity check</span>
-node ~/openclaw-graph/ladybugdb/scripts/query.js --cypher \
-  "MATCH (s:Soul {workspace:'openclaw'}) RETURN count(s) AS souls"
+<span class="comment"># Node count by label</span>
+cypher-shell <span class="string">"MATCH (n) WHERE n.workspace = 'openclaw' RETURN labels(n)[0] AS type, count(n) AS n ORDER BY type"</span>
 
-<span class="comment"># Check all workspace node counts</span>
-node ~/openclaw-graph/ladybugdb/scripts/query.js --cypher \
-  "MATCH (n) WHERE n.workspace = 'openclaw' RETURN labels(n)[0] AS type, count(n) AS n ORDER BY type"</pre></div>
+<span class="comment"># Full stats: skills, clusters, relationships</span>
+cypher-shell <span class="string">"MATCH (s:Skill) RETURN count(s) AS skills"</span>
+cypher-shell <span class="string">"MATCH (c:SkillCluster) RETURN count(c) AS clusters"</span>
+cypher-shell <span class="string">"MATCH ()-[r:RELATED_TO]->() RETURN count(r) AS relationships"</span></pre></div>
 
     <h3>Log file locations (all platforms)</h3>
     <table>
@@ -637,21 +610,12 @@ node ~/openclaw-graph/ladybugdb/scripts/query.js --cypher \
 
     <div class="callout"><p><strong>New install?</strong> <code>QueryMetrics</code> starts empty and fills itself automatically. The first entry appears after OpenClaw loads any workspace stub for the first time.</p></div>
 
-    <h3>View the dashboard</h3>
-    <div class="code-block"><pre><span class="comment"># Dashboard — top 20 queries by hit count</span>
-node ladybugdb/scripts/sync-metrics.mjs
+    <h3>View query performance</h3>
+    <div class="code-block"><pre><span class="comment"># Neo4j query profile — shows execution plan and timing</span>
+cypher-shell <span class="string">"PROFILE MATCH (s:Skill) WHERE s.workspace = 'openclaw' RETURN count(s)"</span>
 
-<span class="comment"># Show top 40</span>
-node ladybugdb/scripts/sync-metrics.mjs --top 40
-
-<span class="comment"># Include queries that returned 0 results</span>
-node ladybugdb/scripts/sync-metrics.mjs --zero
-
-<span class="comment"># Raw JSON (for scripting or export)</span>
-node ladybugdb/scripts/sync-metrics.mjs --json
-
-<span class="comment"># Clear all metrics (e.g. after a workspace reset)</span>
-node ladybugdb/scripts/sync-metrics.mjs --reset</pre></div>
+<span class="comment"># Check Neo4j metrics via browser</span>
+<span class="comment"># Open http://localhost:7474 → :sysinfo</span></pre></div>
 
     <h3>What the dashboard shows</h3>
     <table>
@@ -671,46 +635,37 @@ node ladybugdb/scripts/sync-metrics.mjs --reset</pre></div>
     <p>When you upgrade to a new release, the DB is <strong>replaced</strong>. Workspace nodes live in the DB.</p>
 
     <h3>Upgrade workflow</h3>
-    <div class="code-block"><pre><span class="comment"># 1. Backup current workspace nodes</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (s:Soul {workspace:'myworkspace'}) RETURN s.id, s.section, s.content, s.priority"</span> \
-  &gt; workspace-backup.json
+    <div class="code-block"><pre><span class="comment"># 1. Pull latest migration script</span>
+cd openclaw-graph &amp;&amp; git pull
 
-<span class="comment"># 2. Run install.sh (downloads new DB, overwrites old)</span>
-bash install.sh --full
+<span class="comment"># 2. Re-run migration (idempotent — uses MERGE)</span>
+python3 migrate_ladybugdb_to_neo4j.py
 
-<span class="comment"># 3. Re-seed your workspace</span>
-node ladybugdb/scripts/seed-default-workspace.mjs --workspace myworkspace
-<span class="comment"># or: node ladybugdb/scripts/seed-myagent.mjs</span>
+<span class="comment"># 3. Verify</span>
+cypher-shell <span class="string">"MATCH (s:Skill) WHERE s.workspace = 'openclaw' RETURN count(s)"</span></pre></div>
 
-<span class="comment"># 4. Verify</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (a:AgentConfig {workspace:'myworkspace'}) RETURN count(a) AS n"</span></pre></div>
-
-    <div class="callout"><p><strong>Recommended:</strong> Keep your workspace customizations in a seed script (forked from <code>seed-default-workspace.mjs</code>). After any DB upgrade, re-run the script. This is more reliable than manual backup/restore.</p></div>
+    <div class="callout"><p><strong>Recommended:</strong> The migration script uses MERGE (not CREATE) — it is safe to re-run. Existing nodes are updated, new nodes are created.</p></div>
 
     <!-- BACKUP & RESTORE -->
     <h2 id="backup">Backup &amp; Restore</h2>
 
     <h3>Full DB backup</h3>
-    <div class="code-block"><pre><span class="comment"># The DB is a single file &mdash; just copy it</span>
-cp ladybugdb/db/alphaone-skills.db ladybugdb/db/alphaone-skills.db.bak</pre></div>
+    <div class="code-block"><pre><span class="comment"># Neo4j dump (requires neo4j-admin)</span>
+neo4j-admin database dump neo4j --to-path=/tmp/neo4j-backup/</pre></div>
 
     <h3>Export workspace nodes to JSON</h3>
-    <div class="code-block"><pre><span class="comment"># Export each table</span>
-<span class="keyword">for</span> table <span class="keyword">in</span> Soul Memory AgentConfig Tool; <span class="keyword">do</span>
-  node ladybugdb/scripts/query.js --cypher \
-    <span class="string">"MATCH (n:${table}) RETURN n.*"</span> &gt; backup-${table}.json
-<span class="keyword">done</span></pre></div>
+    <div class="code-block"><pre><span class="comment"># Export via cypher-shell</span>
+cypher-shell <span class="string">"MATCH (s:Skill) WHERE s.workspace = 'openclaw' RETURN s"</span> &gt; skills-backup.json
+cypher-shell <span class="string">"MATCH (s:Soul) WHERE s.workspace = 'openclaw' RETURN s"</span> &gt; soul-backup.json</pre></div>
 
     <!-- ENVIRONMENT VARIABLES -->
     <h2 id="env-vars">Environment Variables</h2>
     <table>
       <tr><th>Variable</th><th>Default</th><th>Description</th></tr>
-      <tr><td><code>OPENCLAW_GRAPH_NODE_BIN</code></td><td><code>node</code></td><td>Path to Node.js binary for query.js</td></tr>
-      <tr><td><code>OPENCLAW_GRAPH_QUERY_SCRIPT</code></td><td><code>~/openclaw-graph/ladybugdb/scripts/query.js</code></td><td>Path to CLI query script</td></tr>
-      <tr><td><code>NODE_BIN</code></td><td><code>node</code></td><td>Used by install.sh</td></tr>
-      <tr><td><code>RELEASE_VERSION</code></td><td><code>latest</code></td><td>Pin install.sh to a specific release</td></tr>
+      <tr><td><code>NEO4J_URI</code></td><td><code>bolt://localhost:7687</code></td><td>Neo4j connection URI</td></tr>
+      <tr><td><code>NEO4J_USER</code></td><td><code>neo4j</code></td><td>Neo4j username (if auth enabled)</td></tr>
+      <tr><td><code>NEO4J_PASSWORD</code></td><td><code></code></td><td>Neo4j password (if auth enabled)</td></tr>
+      <tr><td><code>PYTHON</code></td><td><code>python3</code></td><td>Path to Python binary</td></tr>
     </table>
 
     <!-- TROUBLESHOOTING -->
@@ -719,62 +674,57 @@ cp ladybugdb/db/alphaone-skills.db ladybugdb/db/alphaone-skills.db.bak</pre></di
     <h3>GRAPH directive returns empty</h3>
     <p><strong>Symptom:</strong> Workspace file loads but content is empty.</p>
     <p><strong>Check:</strong></p>
-    <div class="code-block"><pre><span class="comment"># 1. Is the DB present?</span>
-ls -lh ladybugdb/db/alphaone-skills.db
+    <div class="code-block"><pre><span class="comment"># 1. Is Neo4j running?</span>
+cypher-shell <span class="string">"RETURN 1"</span>
 
-<span class="comment"># 2. Can query.js connect?</span>
-node ladybugdb/scripts/query.js --stats
+<span class="comment"># 2. Does the workspace have nodes?</span>
+cypher-shell <span class="string">"MATCH (a:AgentConfig) WHERE a.workspace = 'openclaw' RETURN count(a) AS n"</span>
 
-<span class="comment"># 3. Does the workspace have nodes?</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (a:AgentConfig {workspace:'openclaw'}) RETURN count(a) AS n"</span>
-
-<span class="comment"># 4. Is the directive syntax correct?</span>
+<span class="comment"># 3. Is the directive syntax correct?</span>
 <span class="comment"># Must be: &lt;!-- GRAPH: &lt;cypher&gt; --&gt;</span>
 <span class="comment"># Must be the FIRST LINE of the file</span>
 <span class="comment"># Cypher must be a single line</span></pre></div>
 
-    <h3>"Table X does not exist"</h3>
-    <p><strong>Cause:</strong> The workspace tables haven't been created. This happens if you installed a pre-v1.3 DB.</p>
+    <h3>"Label X does not exist"</h3>
+    <p><strong>Cause:</strong> The migration script hasn't been run, or nodes weren't created for this label.</p>
     <p><strong>Fix:</strong></p>
-    <div class="code-block"><pre>node ladybugdb/scripts/seed-default-workspace.mjs</pre></div>
+    <div class="code-block"><pre>python3 migrate_ladybugdb_to_neo4j.py</pre></div>
 
     <h3>Stale workspace content</h3>
     <p><strong>Cause:</strong> Graph query cache hasn't expired (60s TTL).</p>
     <p><strong>Fix:</strong> Wait 60 seconds, or restart the OpenClaw process. The cache is in-memory only.</p>
 
-    <h3>CLI subprocess slow (~100ms+)</h3>
-    <div class="callout"><p><strong>This is expected.</strong> The ~100ms cost is Node.js process startup + lbug init &mdash; not the query itself (which takes &lt;1ms). The cache ensures this cost is paid at most once per 60 seconds per unique query.</p></div>
+    <h3>Neo4j connection refused</h3>
+    <p><strong>Cause:</strong> Neo4j is not running or not listening on <code>bolt://localhost:7687</code>.</p>
+    <p><strong>Fix:</strong></p>
+    <div class="code-block"><pre><span class="comment"># macOS</span>
+brew services start neo4j
 
-    <h3>DB file locked / corrupted</h3>
-    <div class="code-block"><pre><span class="comment"># Check for WAL files</span>
-ls ladybugdb/db/alphaone-skills.db*
+<span class="comment"># Ubuntu / Fedora</span>
+sudo systemctl start neo4j
 
-<span class="comment"># If .wal files exist, the DB may have been interrupted during a write</span>
-<span class="comment"># Backup and re-install</span>
-mv ladybugdb/db/alphaone-skills.db ladybugdb/db/alphaone-skills.db.corrupted
-bash install.sh --full
-node ladybugdb/scripts/seed-default-workspace.mjs</pre></div>
+<span class="comment"># Verify</span>
+cypher-shell "RETURN 1"</pre></div>
 
     <!-- PERFORMANCE REFERENCE -->
     <h2 id="performance">Performance Reference</h2>
     <table>
-      <tr><th>Query</th><th>In-process</th><th>CLI subprocess</th></tr>
-      <tr><td>Skill PK lookup</td><td>0.18ms</td><td>~111ms</td></tr>
-      <tr><td>AgentConfig (9 nodes)</td><td>0.33ms</td><td>~127ms</td></tr>
-      <tr><td>Tool query (26 nodes)</td><td>0.41ms</td><td>~106ms</td></tr>
-      <tr><td>Reference PK (545k table)</td><td>0.11ms</td><td>&mdash;</td></tr>
-      <tr><td>Full skill scan (316)</td><td>2.02ms</td><td>&mdash;</td></tr>
+      <tr><th>Query</th><th>Neo4j (bolt)</th></tr>
+      <tr><td>Skill PK lookup</td><td>&lt;1ms</td></tr>
+      <tr><td>AgentConfig (9 nodes)</td><td>&lt;1ms</td></tr>
+      <tr><td>Tool query (26 nodes)</td><td>&lt;1ms</td></tr>
+      <tr><td>Cluster traversal (IN_CLUSTER)</td><td>&lt;1ms</td></tr>
+      <tr><td>Multi-hop reasoning (2-hop RELATED_TO)</td><td>~3ms</td></tr>
+      <tr><td>Full skill scan (316)</td><td>~2ms</td></tr>
     </table>
-    <p>All in-process queries are sub-millisecond. CLI subprocess cost (~104ms) is amortized by the 60&ndash;180s adaptive TTL cache. All 5 workspace GRAPH directives resolve in <strong>parallel</strong> via <code>Promise.allSettled()</code> &mdash; cold workspace load is ~104ms total, not 5&times;104ms.</p>
-    <p>Workspace tables (Soul, Memory, AgentConfig) hold 4&ndash;30 nodes each &mdash; full table scans are sub-millisecond at this scale. lbug 0.14.x does not expose a secondary-index DDL for non-PK properties; the scan cost is negligible today and indexes will be added when lbug support lands.</p>
+    <p>All queries are sub-millisecond via Neo4j's index-free adjacency. Traversal times stay constant regardless of total graph size. All 5 workspace GRAPH directives resolve in <strong>parallel</strong>.</p>
     <p>Full benchmark data: <a href="https://github.com/alphaonedev/openclaw-graph/blob/main/benchmarks/results.md">benchmarks/results.md</a></p>
 
   </main>
 </div>
 
 <footer>
-  openclaw-graph v1.3 &middot; MIT License &middot;
+  openclaw-graph v1.4 &middot; MIT License &middot;
   <a href="index.html">Home</a> &middot;
   <a href="user-guide.html">User Guide</a> &middot;
   <a href="https://github.com/alphaonedev/openclaw-graph">GitHub</a>

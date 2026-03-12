@@ -208,7 +208,7 @@
       <tr><td>AGENTS.md</td><td>~500 bytes</td><td>127 bytes</td><td>AgentConfig</td></tr>
       <tr><td><strong>Total</strong></td><td><strong>~11,000+ bytes</strong></td><td><strong>~655 bytes</strong></td><td></td></tr>
     </table>
-    <p>Content is stored as <strong>nodes</strong> in LadybugDB (an embedded graph database). Stubs query the database at runtime and inject the resolved content into your agent's system prompt &mdash; exactly as if you'd written it by hand.</p>
+    <p>Content is stored as <strong>nodes</strong> in Neo4j. Stubs query the graph database at runtime and inject the resolved content into your agent's system prompt &mdash; exactly as if you'd written it by hand.</p>
 
     <!-- HOW IT WORKS -->
     <h2 id="how-it-works">How It Works</h2>
@@ -216,7 +216,7 @@
 
   1. Read ~/.openclaw/workspace/SOUL.md
   2. Detect <span class="hl">&lt;!-- GRAPH: ... --&gt;</span> directive on first line
-  3. Execute Cypher query against LadybugDB
+  3. Execute Cypher query against Neo4j
   4. Format result as markdown
   5. Inject into system prompt (as if SOUL.md was flat)
 
@@ -362,23 +362,14 @@
       <tr><td><code>skill_path</code></td><td>STRING</td><td>Path to skill definition file (if installed)</td></tr>
       <tr><td><code>clawhub_install</code></td><td>STRING</td><td>ClawHub install command (if available)</td></tr>
     </table>
-    <p>Skills are queried via the CLI &mdash; they're not loaded into workspace stubs:</p>
-    <div class="code-block"><pre><span class="comment"># Search by natural language</span>
-node ladybugdb/scripts/query.js <span class="string">"build a SwiftUI watchOS app"</span>
+    <p>Skills are queried via Cypher &mdash; they're not loaded into workspace stubs:</p>
+    <div class="code-block"><pre><span class="comment"># Find skills by cluster</span>
+cypher-shell <span class="string">"MATCH (s:Skill)-[:IN_CLUSTER]->(c:SkillCluster {name:'devops-sre'})
+RETURN s.name, s.description"</span>
 
-<span class="comment"># Filter by cluster</span>
-node ladybugdb/scripts/query.js --cluster devops-sre
-
-<span class="comment"># Traverse relationships</span>
-node ladybugdb/scripts/query.js --skill cloudflare --hops 2</pre></div>
-
-    <!-- REFERENCE -->
-    <h2 id="reference">Reference</h2>
-    <p><strong>Purpose:</strong> 545,072 entries from 718 DevDocs docsets &mdash; programming language documentation, framework APIs, library references. Available in the <strong>Full</strong> tier only.</p>
-    <p>References are queried on-demand, not loaded into workspace stubs:</p>
-    <div class="code-block"><pre><span class="comment"># Find Python standard library docs</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (r:Reference) WHERE r.source = 'python~3.12' AND r.path STARTS WITH 'library/' RETURN r.title, r.path LIMIT 20"</span></pre></div>
+<span class="comment"># Traverse relationships (2 hops)</span>
+cypher-shell <span class="string">"MATCH (s:Skill {name:'cloudflare'})-[:RELATED_TO*1..2]-(t:Skill)
+RETURN DISTINCT t.name, t.cluster"</span></pre></div>
 
     <!-- GRAPH DIRECTIVE SPECIFICATION -->
     <h2 id="graph-directive">GRAPH Directive Specification</h2>
@@ -389,7 +380,7 @@ node ladybugdb/scripts/query.js --cypher \
       <li><strong>Must be the first line</strong> of the workspace file</li>
       <li><strong>Must be a single line</strong> &mdash; no multi-line Cypher</li>
       <li><strong>Must start with</strong> <code>&lt;!-- GRAPH:</code> and end with <code>--&gt;</code></li>
-      <li>The Cypher query is extracted and executed via <code>execFileAsync(node, [query.js, '--workspace', '--cypher', ...])</code></li>
+      <li>The Cypher query is extracted and executed against Neo4j via the <code>neo4j</code> driver</li>
     </ol>
 
     <h3 id="return-columns">Return column conventions</h3>
@@ -435,35 +426,30 @@ node ladybugdb/scripts/query.js --cypher \
     <h3>Option A &mdash; Edit nodes with Cypher</h3>
     <p>Best for quick changes to individual nodes.</p>
     <div class="code-block"><pre><span class="comment"># Update your agent's identity</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (s:Soul {id:'soul-openclaw-identity'}) \
-   SET s.content = 'Name: Aria | Role: DevOps agent | Emoji: &#x1f6e1;&#xfe0f;'"</span>
+cypher-shell <span class="string">"MATCH (s:Soul {id:'soul-openclaw-identity'})
+SET s.content = 'Name: Aria | Role: DevOps agent | Emoji: &#x1f6e1;&#xfe0f;'"</span>
 
 <span class="comment"># Fill in the Principal memory (who you are)</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (m:Memory {id:'mem-openclaw-principal'}) \
-   SET m.content = 'Name: Alice | Timezone: America/Chicago | Channel: signal'"</span>
+cypher-shell <span class="string">"MATCH (m:OCMemory {id:'mem-openclaw-principal'})
+SET m.content = 'Name: Alice | Timezone: America/Chicago | Channel: signal'"</span>
 
 <span class="comment"># Fill in Infrastructure memory</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (m:Memory {id:'mem-openclaw-infrastructure'}) \
-   SET m.content = 'DB: ~/myapp/ladybugdb/db/alphaone-skills.db | Node: /usr/local/bin/node'"</span>
+cypher-shell <span class="string">"MATCH (m:OCMemory {id:'mem-openclaw-infrastructure'})
+SET m.content = 'Neo4j: bolt://localhost:7687 | Python: /opt/anaconda3/bin/python3'"</span>
 
 <span class="comment"># Add a new memory domain</span>
-node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"CREATE (m:Memory { \
-     id: 'mem-openclaw-api-keys', \
-     workspace: 'openclaw', \
-     domain: 'API Keys', \
-     content: 'Brave Search: \$BRAVE_API_KEY | xAI: \$XAI_API_KEY', \
-     timestamp: '2026-01-01' \
-   })"</span></pre></div>
+cypher-shell <span class="string">"CREATE (m:OCMemory {
+  id: 'mem-openclaw-api-keys',
+  workspace: 'openclaw',
+  domain: 'API Keys',
+  content: 'Brave Search: \$BRAVE_API_KEY | xAI: \$XAI_API_KEY',
+  timestamp: '2026-01-01'
+})"</span></pre></div>
 
-    <h3>Option B &mdash; Fork the seed script</h3>
+    <h3>Option B &mdash; Re-run migration with customizations</h3>
     <p>Best for reproducible, version-controlled workspace definitions.</p>
-    <div class="code-block"><pre>cp ladybugdb/scripts/seed-default-workspace.mjs ladybugdb/scripts/seed-myagent.mjs
-<span class="comment"># Edit SOUL, MEMORY, AGENT_CONFIG, TOOLS arrays</span>
-node ladybugdb/scripts/seed-myagent.mjs --workspace myagent --reset</pre></div>
+    <div class="code-block"><pre><span class="comment"># Edit the migration script's workspace config, then re-run</span>
+python3 migrate_ladybugdb_to_neo4j.py --workspace myagent</pre></div>
     <p>Then update your stubs to point to your workspace:</p>
     <div class="code-block"><pre><span class="comment"># In each stub, change workspace = 'openclaw' to workspace = 'myagent'</span>
 sed -i '' <span class="string">"s/workspace = 'openclaw'/workspace = 'myagent'/g"</span> ~/.openclaw/workspace/*.md</pre></div>
@@ -472,14 +458,9 @@ sed -i '' <span class="string">"s/workspace = 'openclaw'/workspace = 'myagent'/g
     <p>For running several agents with different personalities or capabilities. See <a href="admin-guide.html#fleet">Fleet Management</a> in the Admin Guide.</p>
 
     <h3>Keeping customizations across upgrades</h3>
-    <p>When the DB is replaced during an upgrade, workspace nodes are lost. Two strategies:</p>
-    <ol>
-      <li><strong>Re-run your seed script</strong> after every <code>install.sh</code> run (recommended)</li>
-      <li><strong>Export nodes before upgrading:</strong></li>
-    </ol>
-    <div class="code-block"><pre>node ladybugdb/scripts/query.js --cypher \
-  <span class="string">"MATCH (s:Soul {workspace:'openclaw'}) RETURN s.id, s.section, s.content, s.priority"</span> \
-  &gt; workspace-backup.json</pre></div>
+    <p>The migration script uses MERGE (not CREATE) &mdash; it is safe to re-run without losing customizations. Just pull the latest version and re-run:</p>
+    <div class="code-block"><pre>cd openclaw-graph &amp;&amp; git pull
+python3 migrate_ladybugdb_to_neo4j.py</pre></div>
     <p>See <a href="admin-guide.html#upgrading">Upgrading</a> in the Admin Guide for the full workflow.</p>
 
     <!-- QUICK REFERENCE -->
@@ -506,25 +487,19 @@ sed -i '' <span class="string">"s/workspace = 'openclaw'/workspace = 'myagent'/g
 
     <!-- IMPORT WORKSPACE -->
     <h2 id="import-workspace">Import Your Existing Workspace</h2>
-    <p>Already running OpenClaw with flat <code>SOUL.md</code>, <code>MEMORY.md</code>, <code>USER.md</code>, <code>TOOLS.md</code>, <code>AGENTS.md</code> files? One command loads them all into LadybugDB:</p>
+    <p>Already running OpenClaw with flat <code>SOUL.md</code>, <code>MEMORY.md</code>, <code>USER.md</code>, <code>TOOLS.md</code>, <code>AGENTS.md</code> files? The migration script loads them all into Neo4j:</p>
 
     <div class="code-block"><pre><span class="comment"># From your openclaw-graph directory</span>
-<span class="fn">node</span> ladybugdb/scripts/import-workspace.mjs</pre></div>
+<span class="fn">python3</span> migrate_ladybugdb_to_neo4j.py</pre></div>
 
-    <p>The importer scans <code>~/.openclaw/workspace/</code> by default, parses each file by <code>##</code> headings, and creates the correct graph nodes. Files already containing a <code>&lt;!-- GRAPH: --&gt;</code> stub are automatically skipped.</p>
+    <p>The migration script creates all workspace nodes in Neo4j. Deploy GRAPH stubs to replace your flat files:</p>
 
     <h3>Options</h3>
     <div class="code-block"><pre><span class="comment"># Preview what will be imported — no DB writes</span>
-<span class="fn">node</span> ladybugdb/scripts/import-workspace.mjs --dry-run
+<span class="fn">python3</span> migrate_ladybugdb_to_neo4j.py --dry-run
 
-<span class="comment"># Import + replace flat files with GRAPH stubs (backs up originals to *.bak)</span>
-<span class="fn">node</span> ladybugdb/scripts/import-workspace.mjs --write-stubs
-
-<span class="comment"># Replace existing nodes</span>
-<span class="fn">node</span> ladybugdb/scripts/import-workspace.mjs --overwrite
-
-<span class="comment"># Custom source directory or workspace name</span>
-<span class="fn">node</span> ladybugdb/scripts/import-workspace.mjs --workspace-dir ~/my/path --workspace-name myagent</pre></div>
+<span class="comment"># Deploy GRAPH stubs (backs up originals to *.bak)</span>
+<span class="fn">cp</span> workspace-stubs/*.md ~/.openclaw/workspace/</pre></div>
 
     <h3>File → Node mapping</h3>
     <table>
@@ -544,40 +519,39 @@ sed -i '' <span class="string">"s/workspace = 'openclaw'/workspace = 'myagent'/g
     <h3>Do I need to change my prompts or workflows?</h3>
     <p>No. The agent sees the same markdown content it always did. The graph database is transparent &mdash; it's a storage and delivery mechanism, not a new interface.</p>
 
-    <h3>What happens if the database is missing?</h3>
-    <p>The GRAPH directive returns empty content. Your agent will start with blank workspace sections. Run <code>install.sh</code> to download the database, then <code>seed-default-workspace.mjs</code> if workspace nodes are missing.</p>
+    <h3>What happens if Neo4j is down?</h3>
+    <p>The GRAPH directive returns empty content. Your agent will start with blank workspace sections. Start Neo4j and verify with <code>cypher-shell "RETURN 1"</code>.</p>
 
     <h3>How do I import my existing flat workspace files?</h3>
-    <p>Run <code>node ladybugdb/scripts/import-workspace.mjs</code> from your openclaw-graph directory. It reads <code>~/.openclaw/workspace/</code>, parses each file by <code>##</code> headings, and creates the correct graph nodes. Add <code>--write-stubs</code> to automatically replace your flat files with GRAPH stubs (originals backed up as <code>*.bak</code>). See the <a href="#import-workspace">Import Your Files</a> section above.</p>
+    <p>Run <code>python3 migrate_ladybugdb_to_neo4j.py</code> from your openclaw-graph directory. It creates all workspace nodes in Neo4j. Then deploy GRAPH stubs with <code>cp workspace-stubs/*.md ~/.openclaw/workspace/</code>. See the <a href="#import-workspace">Import Your Files</a> section above.</p>
 
     <h3>Can I mix flat files and graph stubs?</h3>
     <p>Yes. Any workspace file without a <code>&lt;!-- GRAPH: ... --&gt;</code> directive on line 1 is loaded as a normal flat file. You can migrate one file at a time.</p>
 
     <h3>How do I see what my agent actually receives?</h3>
-    <p>Run the same query the stub uses:</p>
+    <p>Run the same Cypher query the stub uses:</p>
     <div class="code-block"><pre><span class="comment"># See exactly what SOUL.md resolves to</span>
-node ladybugdb/scripts/query.js --workspace --cypher \
-  <span class="string">"MATCH (s:Soul {workspace:'openclaw'}) RETURN s.section AS section, s.content AS content ORDER BY s.priority"</span>
+cypher-shell <span class="string">"MATCH (s:Soul) WHERE s.workspace = 'openclaw'
+RETURN s.section AS section, s.content AS content ORDER BY s.priority"</span>
 
 <span class="comment"># See what AGENTS.md resolves to</span>
-node ladybugdb/scripts/query.js --workspace --cypher \
-  <span class="string">"MATCH (a:AgentConfig {workspace:'openclaw'}) RETURN a.key AS section, a.value AS content ORDER BY a.id"</span></pre></div>
-    <p>The <code>--workspace</code> flag produces the same clean markdown output that gets injected into the system prompt.</p>
+cypher-shell <span class="string">"MATCH (a:AgentConfig) WHERE a.workspace = 'openclaw'
+RETURN a.key AS section, a.value AS content ORDER BY a.id"</span></pre></div>
 
     <h3>What's the performance impact?</h3>
-    <p>Negligible. In-process queries are sub-millisecond (0.11&ndash;0.41ms). CLI subprocess calls take ~100ms but are cached for 60+ seconds. See <a href="admin-guide.html#performance">Performance Reference</a> in the Admin Guide.</p>
+    <p>Negligible. All Neo4j queries are sub-millisecond (&lt;1ms for typical workspace queries, ~2ms for full skill scan). See <a href="admin-guide.html#performance">Performance Reference</a> in the Admin Guide.</p>
 
     <h3>Can I query the skill graph from my agent's prompts?</h3>
-    <p>Yes. Agents can run CLI queries as part of their task execution:</p>
-    <div class="code-block"><pre>node ladybugdb/scripts/query.js <span class="string">"kubernetes monitoring"</span>
-node ladybugdb/scripts/query.js --skill cloudflare --hops 2</pre></div>
+    <p>Yes. Agents can run Cypher queries as part of their task execution:</p>
+    <div class="code-block"><pre>cypher-shell <span class="string">"MATCH (s:Skill)-[:IN_CLUSTER]->(c:SkillCluster {name:'devops-sre'})
+RETURN s.name, s.description"</span></pre></div>
     <p>This is how cron jobs and automated workflows discover relevant skills at runtime.</p>
 
   </main>
 </div>
 
 <footer>
-  openclaw-graph v1.3 &middot; MIT License &middot;
+  openclaw-graph v1.4 &middot; MIT License &middot;
   <a href="index.html">Home</a> &middot;
   <a href="admin-guide.html">Admin Guide</a> &middot;
   <a href="https://github.com/alphaonedev/openclaw-graph">GitHub</a>

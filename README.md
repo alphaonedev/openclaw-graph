@@ -1,14 +1,13 @@
 # openclaw-graph
 
-**Graph-native workspace backend for [OpenClaw](https://github.com/openclaw/openclaw) — now with Neo4j integration**
+**Graph-native workspace backend for [OpenClaw](https://github.com/openclaw/openclaw) — powered by Neo4j**
 
-Replace flat workspace markdown files with Cypher graph directives. 316 skills across 27 clusters · 217 skill relationships · proper graph modeling with SkillCluster nodes. Supports two backends: **Neo4j** (production, shared graph infrastructure) and **LadybugDB** (embedded, zero-daemon standalone).
+Replace flat workspace markdown files with Cypher graph directives. 316 skills across 27 clusters · 217 skill relationships · proper graph modeling with SkillCluster nodes · namespaced labels for multi-graph coexistence.
 
 [![v1.4](https://img.shields.io/badge/release-v1.4-brightgreen)](https://github.com/alphaonedev/openclaw-graph/releases)
 [![Skills](https://img.shields.io/badge/skills-316-blue)](skills/)
 [![Clusters](https://img.shields.io/badge/clusters-27-green)](skills/)
 [![Neo4j](https://img.shields.io/badge/Neo4j-2026.01-blue)](https://neo4j.com)
-[![LadybugDB](https://img.shields.io/badge/LadybugDB-0.14.3-purple)](https://www.npmjs.com/package/lbug)
 [![License](https://img.shields.io/badge/license-MIT-orange)](LICENSE)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://alphaonedev.github.io/openclaw-graph)
 
@@ -16,49 +15,17 @@ Replace flat workspace markdown files with Cypher graph directives. 316 skills a
 
 ## What's new in v1.4
 
-**Neo4j integration.** The skill graph can now be migrated into Neo4j for production deployments that benefit from a shared graph infrastructure. The migration script creates proper graph modeling with `SkillCluster` nodes, `IN_CLUSTER` and `RELATED_TO` relationships, and namespaced labels (`OCAgent`, `OCMemory`, `OCTool`) to coexist with other graph domains in the same Neo4j instance.
+**Neo4j-native.** OpenClaw Graph now runs on Neo4j with proper graph modeling — SkillCluster nodes, typed relationships, namespaced labels, and workspace-scoped isolation.
 
 | | v1.3 | v1.4 |
 |--|------|------|
-| Neo4j backend support | ❌ | ✅ full migration script |
-| Proper SkillCluster nodes | clusters as property | ✅ first-class nodes + `IN_CLUSTER` edges |
+| Graph backend | embedded SQLite | ✅ Neo4j (native Cypher) |
+| SkillCluster nodes | clusters as property | ✅ first-class nodes + `IN_CLUSTER` edges |
 | Multi-graph coexistence | N/A | ✅ namespaced labels, workspace isolation |
-| Migration script (`migrate_ladybugdb_to_neo4j.py`) | ❌ | ✅ one-shot, idempotent |
-| LadybugDB (embedded) | ✅ | ✅ still supported as standalone option |
+| Storage footprint | 3.2 GB | ✅ ~10 MB |
+| Installation | `curl \| bash` + Node.js | ✅ Neo4j + Python migration script |
 
-**Why Neo4j?** When your deployment already runs Neo4j for other workloads (intelligence analysis, knowledge graphs, etc.), migrating OpenClaw Graph into the same instance eliminates a separate database dependency. The 316 skills + 27 clusters + workspace nodes add only ~10 MB to an existing Neo4j instance — vs 3.2 GB for the standalone LadybugDB with embeddings.
-
----
-
-## What's new in v1.3
-
-**Security and correctness release.** Fixes Cypher injection, removes dead index DDL, ships platform-aware install improvements.
-
-| | v1.2 | v1.3 |
-|--|------|------|
-| Cypher injection protection (`escCypher`) | ❌ | ✅ sanitizes all user-supplied parameters |
-| Honest DDL — no false secondary-index code | ❌ | ✅ lbug 0.14.3 doesn't support `CREATE INDEX` |
-| Platform-aware install (macOS / Ubuntu / Fedora) | ❌ | ✅ auto-detects package manager |
-| `curl \| bash` pipe fix (no interactive prompts) | ❌ | ✅ |
-| `OPENCLAW_GRAPH_QUERY_SCRIPT` env var | ❌ | ✅ configurable script path |
-
----
-
-<details>
-<summary><strong>What's new in v1.2</strong></summary>
-
-**9 AgentConfig nodes out of the box.** Default `workspace='openclaw'` pre-seeded — Soul, Memory, AgentConfig, Tool nodes ready to use.
-
-| | v1.0 | v1.2 |
-|--|------|------|
-| Default workspace | ❌ | ✅ `workspace='openclaw'` |
-| Soul / Memory / AgentConfig / Tool | manual seed | ✅ pre-seeded (4 + 2 + 9 + 21) |
-| QueryMetrics | ❌ | ✅ auto-fills on every workspace load |
-| Prompt optimization (Path Aliases, TOON) | ❌ | ✅ 70% token reduction |
-
-</details>
-
-See [CUSTOMIZING.md](CUSTOMIZING.md) for how to personalize or fork the default workspace.
+**Why Neo4j?** Native graph storage with index-free adjacency. Sub-millisecond traversals, Cypher queries, proper relationship modeling. The 316 skills + 27 clusters + workspace nodes add only ~10 MB to a Neo4j instance.
 
 ---
 
@@ -72,21 +39,9 @@ OpenClaw agents load workspace context from flat markdown files (`SOUL.md`, `MEM
 <!-- GRAPH: MATCH (s:Soul) WHERE s.workspace = 'myapp' RETURN s.section AS section, s.content AS content ORDER BY s.priority ASC -->
 ```
 
-When OpenClaw loads the workspace, the directive is resolved by querying either **Neo4j** (production) or **LadybugDB** (embedded), formatted as structured markdown, and injected into the system prompt — exactly as if it were a flat file.
+When OpenClaw loads the workspace, the directive is resolved by querying Neo4j, formatted as structured markdown, and injected into the system prompt — exactly as if it were a flat file.
 
-**Result:** Workspace stubs shrink from ~25,000 bytes to ~660 bytes. Graph-resolved content is cached in-process for 60 seconds. Skill lookup by natural language text takes ~101ms.
-
-### Two Backend Options
-
-| | Neo4j | LadybugDB |
-|--|-------|-----------|
-| **Best for** | Production, shared graph infra | Standalone, zero-dependency |
-| **Storage** | ~10 MB added to existing instance | 3.2 GB (includes embeddings) |
-| **Graph modeling** | SkillCluster nodes + typed edges | Clusters as properties |
-| **Multi-domain** | Coexists with intelligence, analytics, etc. | Single-purpose |
-| **Vector search** | Requires GDS plugin or external store | Built-in 1536d embeddings |
-| **Daemon** | Neo4j server required | Zero daemons |
-| **Migration** | `python3 migrate_ladybugdb_to_neo4j.py` | `./install.sh --lite` |
+**Result:** Workspace stubs shrink from ~25,000 bytes to ~660 bytes. Sub-millisecond query times. Skill lookup across 316 nodes in ~2ms.
 
 ---
 
@@ -97,51 +52,42 @@ OpenClaw Session
 │
 ├── loadWorkspaceBootstrapFiles()
 │   ├── SOUL.md    (1 line: <!-- GRAPH: MATCH (s:Soul)... -->)
-│   ├── MEMORY.md  (1 line: <!-- GRAPH: MATCH (m:Memory)... -->)
-│   ├── USER.md    (1 line: <!-- GRAPH: MATCH (m:Memory) WHERE m.domain STARTS WITH 'User:'... -->)
-│   ├── TOOLS.md   (1 line: <!-- GRAPH: MATCH (t:Tool)... -->)
+│   ├── MEMORY.md  (1 line: <!-- GRAPH: MATCH (m:OCMemory)... -->)
+│   ├── USER.md    (1 line: <!-- GRAPH: MATCH (m:OCMemory) WHERE m.domain STARTS WITH 'User:'... -->)
+│   ├── TOOLS.md   (1 line: <!-- GRAPH: MATCH (t:OCTool)... -->)
 │   └── AGENTS.md  (1 line: <!-- GRAPH: MATCH (a:AgentConfig)... -->)
 │       │
 │       └── readFileWithCache()
 │           ├── detect GRAPH directive
-│           ├── execute: node query.js --workspace --cypher "<cypher>"
+│           ├── execute Cypher query against Neo4j
 │           ├── cache result 60s (in-process Map)
 │           └── return formatted markdown
 │
 └── buildAgentSystemPrompt()
     └── injects graph-resolved markdown → system prompt
 
-Skills (316 nodes, 27 clusters)
-│
-├── loader.js               → parse SKILL.md files → insert into DB
-├── query.js                → text search / cluster / graph traversal / Cypher
-│                              (auto-records QueryMetrics on every --workspace call)
-├── import-workspace.mjs    → load flat SOUL/MEMORY/USER/TOOLS/AGENTS.md into DB
-├── seed-default-workspace.mjs → populate Soul / Memory / Tool / AgentConfig tables
-├── sync-metrics.mjs        → view / reset QueryMetrics dashboard
-└── migrate_ladybugdb_to_neo4j.py → one-shot migration to Neo4j
-
-Backend (choose one):
-├── LadybugDB (embedded SQLite + Cypher, no daemon)
-│   └── ladybugdb/db/alphaone-skills.db
-└── Neo4j (production, shared graph infrastructure)
-    └── bolt://localhost:7687
+Neo4j (bolt://localhost:7687)
+├── Skill          316 nodes · 27 SkillCluster nodes · 217 RELATED_TO edges
+├── SkillCluster   proper graph nodes with IN_CLUSTER relationships
+├── Soul           identity, persona, capabilities per workspace
+├── OCMemory       project context, infrastructure facts (namespaced)
+├── OCTool         available tools + usage notes (namespaced)
+├── OCAgent        agent definitions (namespaced)
+├── AgentConfig    per-workspace agent behavior overrides
+└── Bootstrap      boot identity
 ```
 
 ---
 
 ## Prerequisites
 
-Install these **before** running the installer:
+Install these **before** running the migration:
 
 | Dependency | Version | macOS | Ubuntu / Debian | Fedora |
 |------------|---------|-------|-----------------|--------|
-| **Node.js** | 18+ | `brew install node@22` | NodeSource (see below) | `sudo dnf install -y nodejs npm` |
-| **lbug** | 0.14.3+ | `npm install -g lbug` | `npm install -g lbug` | `npm install -g lbug` |
-| **zstd** | 1.5+ | `brew install zstd` | `sudo apt-get install -y zstd` | `sudo dnf install -y zstd` |
-| **curl** | any | pre-installed | `sudo apt-get install -y curl` | pre-installed |
-
-> **Quick check:** `node --version && npm --version && zstd --version && node --input-type=module -e "import 'lbug'" && echo "✅ all good"`
+| **Neo4j** | 2026.01+ | `brew install neo4j` | See below | See below |
+| **Python** | 3.10+ | pre-installed or `brew install python` | `sudo apt install python3` | `sudo dnf install python3` |
+| **neo4j driver** | 5.x | `pip install neo4j` | `pip install neo4j` | `pip install neo4j` |
 
 <details>
 <summary><strong>macOS — step by step</strong></summary>
@@ -150,18 +96,12 @@ Install these **before** running the installer:
 # 1. Install Homebrew (skip if already installed)
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# 2. Install Node.js 22 LTS (includes npm)
-brew install node@22
-echo 'export PATH="/opt/homebrew/opt/node@22/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
+# 2. Install Neo4j
+brew install neo4j
+brew services start neo4j
 
-# 3. Install lbug globally
-npm install -g lbug
-
-# 4. Install zstd
-brew install zstd
-
-# curl is pre-installed on macOS — no action needed
+# 3. Install Python neo4j driver
+pip install neo4j
 ```
 
 </details>
@@ -170,19 +110,16 @@ brew install zstd
 <summary><strong>Ubuntu / Debian — step by step</strong></summary>
 
 ```bash
-# 1. Install curl
-sudo apt-get update && sudo apt-get install -y curl
+# 1. Add Neo4j repository and install
+wget -O - https://debian.neo4j.com/neotechnology.gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/neo4j.gpg
+echo "deb [signed-by=/usr/share/keyrings/neo4j.gpg] https://debian.neo4j.com stable latest" | sudo tee /etc/apt/sources.list.d/neo4j.list
+sudo apt-get update && sudo apt-get install -y neo4j
 
-# 2. Add NodeSource repo and install Node.js 22 LTS (includes npm)
-#    (apt's default nodejs is often too old — use NodeSource for v22)
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt-get install -y nodejs
+# 2. Start Neo4j
+sudo systemctl start neo4j
 
-# 3. Install lbug globally
-npm install -g lbug
-
-# 4. Install zstd
-sudo apt-get install -y zstd
+# 3. Install Python neo4j driver
+pip install neo4j
 ```
 
 </details>
@@ -191,85 +128,46 @@ sudo apt-get install -y zstd
 <summary><strong>Fedora — step by step</strong></summary>
 
 ```bash
-# 1. Install Node.js 22 and npm
-sudo dnf install -y nodejs npm
+# 1. Add Neo4j repository and install
+sudo rpm --import https://debian.neo4j.com/neotechnology.gpg.key
+cat << EOF | sudo tee /etc/yum.repos.d/neo4j.repo
+[neo4j]
+name=Neo4j RPM Repository
+baseurl=https://yum.neo4j.com/stable/5
+gpgcheck=1
+gpgkey=https://debian.neo4j.com/neotechnology.gpg.key
+EOF
+sudo dnf install -y neo4j
 
-# 2. Install lbug globally
-npm install -g lbug
+# 2. Start Neo4j
+sudo systemctl start neo4j
 
-# 3. Install zstd
-sudo dnf install -y zstd
-
-# curl is pre-installed on Fedora — no action needed
+# 3. Install Python neo4j driver
+pip install neo4j
 ```
 
 </details>
 
 ---
 
-## Importing Your Existing Workspace
-
-Already running OpenClaw with flat `SOUL.md`, `MEMORY.md`, `USER.md`, `TOOLS.md`, `AGENTS.md` files? One command loads them into LadybugDB:
-
-```bash
-# From your openclaw-graph directory:
-node ladybugdb/scripts/import-workspace.mjs
-```
-
-The importer reads `~/.openclaw/workspace/` by default, parses each file by `##` headings, and creates the appropriate graph nodes. Then optionally replaces the flat files with single-line GRAPH stubs:
-
-```bash
-# Preview what will be imported (no writes)
-node ladybugdb/scripts/import-workspace.mjs --dry-run
-
-# Import + automatically replace flat files with GRAPH stubs (backs up originals to *.bak)
-node ladybugdb/scripts/import-workspace.mjs --write-stubs
-
-# Custom workspace directory or name
-node ladybugdb/scripts/import-workspace.mjs --workspace-dir ~/my/workspace --workspace-name myagent
-```
-
-**File → Node mapping:**
-
-| File | Node type | Section format |
-|------|-----------|----------------|
-| `SOUL.md` | `Soul` | Each `##` heading → one node |
-| `MEMORY.md` | `Memory` | Each `##` heading → one domain |
-| `USER.md` | `Memory` | Each `##` heading → `User: <section>` domain |
-| `TOOLS.md` | `Tool` | Each `##` heading → one tool entry |
-| `AGENTS.md` | `AgentConfig` | Each `##` heading → one config key |
-
-> **Format your files with `##` headings** — each `##` section becomes one graph node. Files with no `##` headings are imported as a single node.
-
----
-
 ## Quick Start
 
-### Option A — One-line install (recommended)
-
-```bash
-# Lite install — skills + embeddings (~300 MB compressed)
-curl -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh | bash -s -- --lite
-
-# Full install — skills + 545k DevDocs reference nodes (~500 MB compressed)
-curl -fsSL https://raw.githubusercontent.com/alphaonedev/openclaw-graph/main/install.sh | bash -s -- --full
-```
-
-The DB ships with `workspace='openclaw'` pre-seeded. Skip to step 3.
-
-### Option B — From source
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/alphaonedev/openclaw-graph.git
-cd openclaw-graph && npm install
+cd openclaw-graph
+```
 
-# Load skill database
-node ladybugdb/scripts/loader.js
-# → 316 skills | 27 clusters | 247 edges
+### 2. Run the migration
 
-# Seed default workspace (Soul, Memory, AgentConfig, Tool nodes)
-node ladybugdb/scripts/seed-default-workspace.mjs
-# → workspace='openclaw' seeded with agnostic defaults
+```bash
+# Preview first (no writes)
+python3 migrate_ladybugdb_to_neo4j.py --dry-run
+
+# Migrate — creates all nodes, relationships, constraints
+python3 migrate_ladybugdb_to_neo4j.py
+# → 316 Skills, 27 SkillClusters, 217 RELATED_TO, 316 IN_CLUSTER — 0.9s
 ```
 
 ### 3. Patch OpenClaw
@@ -284,66 +182,28 @@ pnpm build
 
 ```bash
 cp workspace-stubs/*.md ~/.openclaw/workspace/
-# Stubs reference workspace='openclaw' by default — works immediately
+# Edit each stub: change workspace name to match your deployment
 ```
 
 ### 5. Personalize
 
 ```bash
-# Update your identity
-node ladybugdb/scripts/query.js --cypher \
-  "MATCH (s:Soul {id:'soul-openclaw-identity'}) SET s.content = 'Name: MyAgent | Role: ...'"
+# Update your identity via Cypher
+python3 -c "
+from neo4j import GraphDatabase
+d = GraphDatabase.driver('bolt://localhost:7687')
+with d.session() as s:
+    s.run('''MATCH (s:Soul {id: \"soul-openclaw-identity\"})
+             SET s.content = \"Name: MyAgent | Role: Expert Engineer | Workspace: my_workspace\"''')
+d.close()
+"
 
-# Add memory facts, restrict tools, create a custom workspace
 # See CUSTOMIZING.md for the full guide
 ```
 
 ---
 
-## Neo4j Migration (Production)
-
-For deployments that already run Neo4j, migrate the entire skill graph into your existing instance. This adds ~10 MB to Neo4j (vs 3.2 GB for LadybugDB with embeddings).
-
-### Prerequisites
-
-- Neo4j Community or Enterprise Edition running on `bolt://localhost:7687`
-- Python 3.10+ with `neo4j` driver (`pip install neo4j`)
-- LadybugDB export at `/tmp/ladybugdb_export.json` (generated by the export script)
-
-### Step 1 — Export from LadybugDB
-
-```bash
-cd openclaw-graph
-node -e "
-import('lbug').then(async ({Database, Connection}) => {
-  const db = new Database('./ladybugdb/db/alphaone-skills.db');
-  await db.init(); const c = new Connection(db); await c.init();
-  const clean = obj => { const o = {...obj}; delete o._id; delete o._label; delete o.embedding; delete o.embedding_hint; return o; };
-  const result = {};
-  result.skills = (await (await c.query('MATCH (s:Skill) RETURN s')).getAll()).map(r => clean(r.s));
-  result.skill_rels = await (await c.query('MATCH (a:Skill)-[r]->(b:Skill) RETURN a.id AS from_id, b.id AS to_id')).getAll();
-  result.souls = (await (await c.query('MATCH (s:Soul) RETURN s')).getAll()).map(r => clean(r.s));
-  result.memories = (await (await c.query('MATCH (m:Memory) RETURN m')).getAll()).map(r => clean(r.m));
-  result.agent_configs = (await (await c.query('MATCH (a:AgentConfig) RETURN a')).getAll()).map(r => clean(r.a));
-  result.agents = (await (await c.query('MATCH (a:Agent) RETURN a')).getAll()).map(r => clean(r.a));
-  result.tools = (await (await c.query('MATCH (t:Tool) RETURN t')).getAll()).map(r => clean(r.t));
-  result.bootstrap = (await (await c.query('MATCH (b:Bootstrap) RETURN b')).getAll()).map(r => clean(r.b));
-  require('fs').writeFileSync('/tmp/ladybugdb_export.json', JSON.stringify(result, null, 2));
-  console.log('Exported', result.skills.length, 'skills');
-  process.exit(0);
-});
-"
-```
-
-### Step 2 — Run the migration
-
-```bash
-python3 migrate_ladybugdb_to_neo4j.py
-# or preview first:
-python3 migrate_ladybugdb_to_neo4j.py --dry-run
-```
-
-### What gets created in Neo4j
+## What gets created in Neo4j
 
 | Label | Count | Description |
 |-------|-------|-------------|
@@ -360,26 +220,9 @@ python3 migrate_ladybugdb_to_neo4j.py --dry-run
 
 All nodes get a `workspace` property for multi-tenant isolation.
 
-### Step 3 — Deploy workspace stubs
-
-```bash
-# Stubs query Neo4j directly via the same Cypher syntax
-cp workspace-stubs/*.md ~/.openclaw/workspace/
-# Edit each stub: change 'openclaw' → your workspace name
-```
-
 ### Multi-graph coexistence
 
-The migration uses namespaced labels (`OCAgent`, `OCMemory`, `OCTool`) so OpenClaw Graph nodes coexist safely with other graph domains in the same Neo4j instance. For example, the AlphaOne production deployment runs 4 logical graphs in a single Neo4j:
-
-| Graph | Nodes | Purpose |
-|-------|-------|---------|
-| Sentinel Intelligence | 51K+ | 16-agent intelligence fleet |
-| OpenClaw Graph | 393 | Skill graph + workspace config |
-| Analytics/Support | 20K+ | GDS metrics, quality scores |
-| Alpha Report | 30+ | AI-driven alpha play detection |
-
-Total: 72K+ nodes, 258K+ relationships, 178 MB on disk.
+Namespaced labels (`OCAgent`, `OCMemory`, `OCTool`) let OpenClaw Graph nodes coexist safely with other graph domains in the same Neo4j instance. If your Neo4j already hosts other workloads (knowledge graphs, analytics, etc.), OpenClaw Graph's namespaced labels and workspace-scoped queries ensure zero interference — no label collisions, no cross-domain leakage.
 
 ---
 
@@ -398,7 +241,7 @@ const GRAPH_DIRECTIVE_PREFIX = "<!-- GRAPH:";
 const GRAPH_NODE_BIN = process.env.OPENCLAW_GRAPH_NODE_BIN ?? "node";
 const GRAPH_QUERY_SCRIPT =
   process.env.OPENCLAW_GRAPH_QUERY_SCRIPT ??
-  path.join(os.homedir(), "openclaw-graph", "ladybugdb", "scripts", "query.js");
+  path.join(os.homedir(), "openclaw-graph", "scripts", "query.js");
 
 function extractGraphDirective(content: string): string | null {
   const trimmed = content.trim();
@@ -449,7 +292,7 @@ return content;
 
 ```bash
 export OPENCLAW_GRAPH_NODE_BIN=/usr/local/bin/node
-export OPENCLAW_GRAPH_QUERY_SCRIPT=/path/to/openclaw-graph/ladybugdb/scripts/query.js
+export OPENCLAW_GRAPH_QUERY_SCRIPT=/path/to/openclaw-graph/scripts/query.js
 ```
 
 ---
@@ -490,29 +333,27 @@ export OPENCLAW_GRAPH_QUERY_SCRIPT=/path/to/openclaw-graph/ladybugdb/scripts/que
 ### Querying skills
 
 ```bash
-# Natural language text search
-node ladybugdb/scripts/query.js "deploy a React app to Cloudflare Pages"
+# Cypher queries against Neo4j
+python3 -c "
+from neo4j import GraphDatabase
+d = GraphDatabase.driver('bolt://localhost:7687')
+with d.session() as s:
+    # Find skills by cluster
+    for r in s.run('MATCH (s:Skill)-[:IN_CLUSTER]->(c:SkillCluster {name: \"devops-sre\"}) RETURN s.name, s.description'):
+        print(f'{r[\"s.name\"]:30s} {r[\"s.description\"]}')
 
-# Browse a cluster
-node ladybugdb/scripts/query.js --cluster devops-sre
-
-# Graph traversal (skill + related skills, 2 hops)
-node ladybugdb/scripts/query.js --skill terraform --hops 2
-
-# Raw Cypher
-node ladybugdb/scripts/query.js --cypher "MATCH (s:Skill {cluster: 'ai-apis'}) RETURN s.name, s.description"
-
-# Database stats
-node ladybugdb/scripts/query.js --stats
+    # Multi-hop skill discovery (2 hops)
+    for r in s.run('MATCH (s:Skill {name: \"terraform\"})-[:RELATED_TO*1..2]->(t:Skill) RETURN DISTINCT t.name, t.cluster'):
+        print(f'{r[\"t.name\"]:30s} {r[\"t.cluster\"]}')
+d.close()
+"
 ```
 
 ---
 
 ## Performance
 
-### Neo4j backend
-
-Measured on production Neo4j 2026.01 with GDS 2.26.0 — 72K nodes, 258K relationships, Mac mini M-series.
+Measured on production Neo4j 2026.01 — 316 skills, 27 clusters, 393 total nodes, Mac mini M-series.
 
 | Query | avg |
 |-------|-----|
@@ -521,23 +362,10 @@ Measured on production Neo4j 2026.01 with GDS 2.26.0 — 72K nodes, 258K relatio
 | Cluster traversal (IN_CLUSTER) | **<1ms** |
 | Multi-hop skill reasoning (2 hops) | **~3ms** |
 | Workspace stubs (Soul/Memory/Config) | **<1ms** |
-| Migration (full LadybugDB → Neo4j) | **0.9s** |
+| Migration (full import) | **0.9s** |
 | Neo4j storage overhead | **~10 MB** |
 
-### LadybugDB backend
-
-Measured on production data — 316 skills · 545,072 Reference nodes · Mac mini M-series 32 GB RAM.
-
-| Query | avg |
-|-------|-----|
-| Skill PK lookup (warm, in-process) | **0.18ms** |
-| AGENTS.md hot path (9 AgentConfig nodes) | **0.33ms** |
-| TOOLS.md hot path (21 Tool nodes) | **0.41ms** |
-| Full skill scan (316 nodes) | **2.02ms** |
-| GRAPH directive — first load (CLI subprocess) | **~104ms** |
-| GRAPH directive — cached hit | **0ms** |
-
-### Context efficiency (both backends)
+### Context efficiency
 
 | Metric | Value |
 |--------|-------|
@@ -552,7 +380,7 @@ See [benchmarks/results.md](benchmarks/results.md) for full measurements.
 
 ## Multi-Instance Deployment
 
-For teams running multiple OpenClaw instances (e.g., a fleet of AI agents), all instances can share one LadybugDB file. Differentiate instances by `workspace` identifier:
+For teams running multiple OpenClaw instances (e.g., a fleet of AI agents), all instances share the same Neo4j. Differentiate instances by `workspace` identifier:
 
 ```sql
 -- Instance A (intelligence agent)
@@ -569,94 +397,40 @@ Each instance gets its own identity, memory, and tool configuration from the sha
 
 ---
 
-## Query Metrics
-
-Every time OpenClaw resolves a GRAPH directive from a workspace stub, `query.js` automatically records the event into the `QueryMetrics` table — no configuration needed.
-
-```bash
-# Show the metrics dashboard (top 20 queries by hit count)
-node ladybugdb/scripts/sync-metrics.mjs
-
-# Show top 40
-node ladybugdb/scripts/sync-metrics.mjs --top 40
-
-# Include queries that returned 0 results
-node ladybugdb/scripts/sync-metrics.mjs --zero
-
-# Raw JSON (for scripting)
-node ladybugdb/scripts/sync-metrics.mjs --json
-
-# Clear all metrics
-node ladybugdb/scripts/sync-metrics.mjs --reset
-```
-
-The dashboard shows: **hits · misses · hit-rate % · avg_ms · p95_ms · last_hit** per query.
-
-> **New install?** `QueryMetrics` starts empty and fills automatically — no setup required. The first entry appears after OpenClaw loads any workspace stub.
-
----
-
-## Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `OPENCLAW_GRAPH_NODE_BIN` | `node` | Path to Node.js binary |
-| `OPENCLAW_GRAPH_QUERY_SCRIPT` | `~/openclaw-graph/ladybugdb/scripts/query.js` | Path to query script |
-
----
-
 ## Service Management
 
-> **openclaw-graph has no daemon.** It is embedded in the OpenClaw gateway process. Managing openclaw-graph = managing the OpenClaw gateway. The DB file is always directly queryable via `query.js --stats` regardless of gateway state.
-
-### macOS (launchd — `ai.openclaw.gateway`)
+### Neo4j
 
 ```bash
-# Start
+# macOS (Homebrew)
+brew services start neo4j
+brew services stop neo4j
+brew services restart neo4j
+
+# Ubuntu / Debian / Fedora (systemd)
+sudo systemctl start neo4j
+sudo systemctl stop neo4j
+sudo systemctl restart neo4j
+sudo systemctl status neo4j
+```
+
+### OpenClaw Gateway
+
+```bash
+# macOS (launchd — ai.openclaw.gateway)
 launchctl bootstrap gui/$UID ~/Library/LaunchAgents/ai.openclaw.gateway.plist
-
-# Stop
 launchctl bootout gui/$UID/ai.openclaw.gateway
-
-# Restart
 launchctl kickstart -k gui/$UID/ai.openclaw.gateway
 
-# Status  (look for "state = running" and "pid =")
-launchctl print gui/$UID/ai.openclaw.gateway | grep -E "state|pid"
-
-# Logs
-tail -f ~/.openclaw/logs/gateway.log          # stdout
-tail -f ~/.openclaw/logs/gateway.err.log       # stderr
-log stream --predicate 'subsystem == "ai.openclaw"' --level info   # unified log
-```
-
-### Ubuntu & Fedora (systemd — `openclaw-gateway.service`)
-
-```bash
-# Start
+# Ubuntu & Fedora (systemd)
 systemctl --user start openclaw-gateway.service
-
-# Stop
 systemctl --user stop openclaw-gateway.service
-
-# Restart
 systemctl --user restart openclaw-gateway.service
-
-# Status
-systemctl --user status openclaw-gateway.service
-
-# Logs
-journalctl --user -u openclaw-gateway.service -f
-tail -f ~/.openclaw/logs/gateway.log          # or read flat file directly
 ```
 
-### DB health check (all platforms — no gateway needed)
+### Health check
 
 ```bash
-# LadybugDB stats
-node ~/openclaw-graph/ladybugdb/scripts/query.js --stats
-
-# Neo4j workspace check (requires Python + neo4j driver)
 python3 -c "
 from neo4j import GraphDatabase
 d = GraphDatabase.driver('bolt://localhost:7687')
@@ -673,7 +447,7 @@ d.close()
 
 Pull requests welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-To add skills: create a `SKILL.md` file in the appropriate cluster directory and run `node ladybugdb/scripts/loader.js`.
+To add skills: create a `SKILL.md` file in the appropriate cluster directory and run the migration script to load into Neo4j.
 
 Skill format:
 
@@ -713,8 +487,8 @@ What the agent can do with this skill.
 
 | Guide | Description |
 |-------|-------------|
-| **[Admin Guide](https://alphaonedev.github.io/openclaw-graph/admin-guide.html)** | Installation, database layout, CLI reference, cron jobs, fleet management, upgrading, troubleshooting |
-| **[User Guide](https://alphaonedev.github.io/openclaw-graph/user-guide.html)** | Workspace stubs, GRAPH directives, node schemas (Soul/Memory/AgentConfig/Tool/Skill/Reference), loading flow |
+| **[Admin Guide](https://alphaonedev.github.io/openclaw-graph/admin-guide.html)** | Installation, database layout, CLI reference, fleet management, upgrading, troubleshooting |
+| **[User Guide](https://alphaonedev.github.io/openclaw-graph/user-guide.html)** | Workspace stubs, GRAPH directives, node schemas (Soul/Memory/AgentConfig/Tool/Skill), loading flow |
 | **[Customizing](CUSTOMIZING.md)** | Step-by-step workspace personalization — identity, memory, tools, multi-workspace setup |
 | **[Benchmarks](benchmarks/results.md)** | Full performance measurements with methodology |
 | **[GitHub Pages](https://alphaonedev.github.io/openclaw-graph/)** | Interactive documentation site |
