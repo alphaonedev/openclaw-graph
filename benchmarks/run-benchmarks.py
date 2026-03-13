@@ -219,7 +219,7 @@ def main():
     md += f"- **{full_scan['avg'] if full_scan else '?'}ms** for full {skill_count}-skill scan — Neo4j keeps the entire corpus in page cache\n"
     md += "- **~10 MB** total Neo4j footprint vs 3.2 GB embedded SQLite\n"
     md += "- **cypher-shell** subprocess startup amortized by 60s adaptive TTL cache\n"
-    md += "\n---\n\n*Previous benchmarks (LadybugDB/lbug): see git history for pre-v1.4 baseline*\n"
+    md += "\n---\n\n*Previous benchmarks (pre-v1.4): see git history for baseline*\n"
 
     with open(RESULTS_MD, "w") as f:
         f.write(md)

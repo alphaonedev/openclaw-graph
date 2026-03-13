@@ -40,4 +40,4 @@
 
 ---
 
-*Previous benchmarks (LadybugDB/lbug): see git history for pre-v1.4 baseline*
+*Previous benchmarks (pre-v1.4): see git history for baseline*
