@@ -186,7 +186,7 @@
 
     <!-- WHAT SHIPS -->
     <h2 id="whats-included">What ships in the DB</h2>
-    <p>Every v1.4+ release includes these <code>workspace='openclaw'</code> nodes out of the box:</p>
+    <p>Every v1.5+ release includes these <code>workspace='openclaw'</code> nodes out of the box:</p>
     <table>
       <tr><th>Table</th><th>Nodes</th><th>What's there</th></tr>
       <tr><td><span class="node-badge soul">Soul</span></td><td>4</td><td>Prime Directive &middot; Identity (placeholder) &middot; Safety &middot; Heartbeat Protocol</td></tr>
@@ -207,7 +207,7 @@ RETURN s.section, s.priority ORDER BY s.priority"</span>
 
 cypher-shell <span class="string">"MATCH (a:AgentConfig) WHERE a.workspace = 'openclaw'
 RETURN a.key ORDER BY a.id"</span></pre></div>
-    <p>You should see 4 Soul sections and 9 AgentConfig keys. If not, run <code>python3 migrate_ladybugdb_to_neo4j.py</code> to seed them.</p>
+    <p>You should see 4 Soul sections and 9 AgentConfig keys. If not, run <code>python3 seed.py</code> to seed them.</p>
 
     <!-- STEP 2 -->
     <div class="step-header" id="step-2">
@@ -264,10 +264,10 @@ SET t.available = true"</span></pre></div>
     <!-- FLEET -->
     <h2 id="fleet">Running multiple workspaces (fleet setup)</h2>
     <p>For an 8-agent fleet, give each agent its own workspace ID:</p>
-    <div class="code-block"><pre><span class="comment"># Seed separate workspaces via the migration script</span>
-python3 migrate_ladybugdb_to_neo4j.py --workspace intel-agent
-python3 migrate_ladybugdb_to_neo4j.py --workspace code-agent
-python3 migrate_ladybugdb_to_neo4j.py --workspace ops-agent
+    <div class="code-block"><pre><span class="comment"># Seed separate workspaces</span>
+python3 seed.py --workspace intel-agent
+python3 seed.py --workspace code-agent
+python3 seed.py --workspace ops-agent
 
 <span class="comment"># Each agent's workspace stubs point to its own workspace</span>
 <span class="comment"># ~/.openclaw/workspace-intel/SOUL.md:</span>
@@ -275,18 +275,18 @@ python3 migrate_ladybugdb_to_neo4j.py --workspace ops-agent
     <p>See <a href="admin-guide.html#fleet">Fleet Management</a> in the Admin Guide for the full topology and per-workspace tool overrides.</p>
 
     <!-- FORKING -->
-    <h2 id="forking">Customizing the migration script</h2>
-    <p>For full control, modify the workspace configuration in <code>migrate_ladybugdb_to_neo4j.py</code>:</p>
+    <h2 id="forking">Customizing the seed script</h2>
+    <p>For full control, modify the workspace defaults in <code>seed.py</code>:</p>
     <p>Edit the Soul, Memory, AgentConfig, and Tool data structures, then run:</p>
-    <div class="code-block"><pre>python3 migrate_ladybugdb_to_neo4j.py --workspace myagent</pre></div>
-    <div class="callout warn"><p>The migration uses MERGE &mdash; safe to re-run. Existing nodes are updated, not duplicated.</p></div>
+    <div class="code-block"><pre>python3 seed.py --workspace myagent</pre></div>
+    <div class="callout warn"><p>The seed script uses MERGE &mdash; safe to re-run. Existing nodes are updated, not duplicated.</p></div>
 
     <!-- UPGRADES -->
     <h2 id="upgrades">Keeping your customizations across upgrades</h2>
-    <p>The migration script uses MERGE (not CREATE), so it's safe to re-run after pulling new versions. Your customizations to existing nodes are preserved.</p>
+    <p>The seed script uses MERGE (not CREATE), so it's safe to re-run after pulling new versions. Your customizations to existing nodes are preserved.</p>
     <div class="code-block"><pre><span class="comment"># Pull latest and re-run</span>
 cd openclaw-graph &amp;&amp; git pull
-python3 migrate_ladybugdb_to_neo4j.py</pre></div>
+python3 seed.py</pre></div>
     <p>See <a href="admin-guide.html#upgrading">Upgrading</a> in the Admin Guide for the full workflow.</p>
 
     <!-- NODE IDS -->
@@ -316,7 +316,7 @@ python3 migrate_ladybugdb_to_neo4j.py</pre></div>
 </div>
 
 <footer>
-  openclaw-graph v1.4 &middot; MIT License &middot;
+  openclaw-graph v1.5 &middot; MIT License &middot;
   <a href="index.html">Home</a> &middot;
   <a href="admin-guide.html">Admin Guide</a> &middot;
   <a href="user-guide.html">User Guide</a> &middot;

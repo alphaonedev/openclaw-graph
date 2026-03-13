@@ -446,10 +446,10 @@ cypher-shell <span class="string">"CREATE (m:OCMemory {
   timestamp: '2026-01-01'
 })"</span></pre></div>
 
-    <h3>Option B &mdash; Re-run migration with customizations</h3>
+    <h3>Option B &mdash; Re-run seed with customizations</h3>
     <p>Best for reproducible, version-controlled workspace definitions.</p>
-    <div class="code-block"><pre><span class="comment"># Edit the migration script's workspace config, then re-run</span>
-python3 migrate_ladybugdb_to_neo4j.py --workspace myagent</pre></div>
+    <div class="code-block"><pre><span class="comment"># Edit the seed script's workspace defaults, then re-run</span>
+python3 seed.py --workspace myagent</pre></div>
     <p>Then update your stubs to point to your workspace:</p>
     <div class="code-block"><pre><span class="comment"># In each stub, change workspace = 'openclaw' to workspace = 'myagent'</span>
 sed -i '' <span class="string">"s/workspace = 'openclaw'/workspace = 'myagent'/g"</span> ~/.openclaw/workspace/*.md</pre></div>
@@ -458,9 +458,9 @@ sed -i '' <span class="string">"s/workspace = 'openclaw'/workspace = 'myagent'/g
     <p>For running several agents with different personalities or capabilities. See <a href="admin-guide.html#fleet">Fleet Management</a> in the Admin Guide.</p>
 
     <h3>Keeping customizations across upgrades</h3>
-    <p>The migration script uses MERGE (not CREATE) &mdash; it is safe to re-run without losing customizations. Just pull the latest version and re-run:</p>
+    <p>The seed script uses MERGE (not CREATE) &mdash; it is safe to re-run without losing customizations. Just pull the latest version and re-run:</p>
     <div class="code-block"><pre>cd openclaw-graph &amp;&amp; git pull
-python3 migrate_ladybugdb_to_neo4j.py</pre></div>
+python3 seed.py</pre></div>
     <p>See <a href="admin-guide.html#upgrading">Upgrading</a> in the Admin Guide for the full workflow.</p>
 
     <!-- QUICK REFERENCE -->
@@ -487,16 +487,16 @@ python3 migrate_ladybugdb_to_neo4j.py</pre></div>
 
     <!-- IMPORT WORKSPACE -->
     <h2 id="import-workspace">Import Your Existing Workspace</h2>
-    <p>Already running OpenClaw with flat <code>SOUL.md</code>, <code>MEMORY.md</code>, <code>USER.md</code>, <code>TOOLS.md</code>, <code>AGENTS.md</code> files? The migration script loads them all into Neo4j:</p>
+    <p>Already running OpenClaw with flat <code>SOUL.md</code>, <code>MEMORY.md</code>, <code>USER.md</code>, <code>TOOLS.md</code>, <code>AGENTS.md</code> files? The seed script loads them all into Neo4j:</p>
 
     <div class="code-block"><pre><span class="comment"># From your openclaw-graph directory</span>
-<span class="fn">python3</span> migrate_ladybugdb_to_neo4j.py</pre></div>
+<span class="fn">python3</span> seed.py</pre></div>
 
-    <p>The migration script creates all workspace nodes in Neo4j. Deploy GRAPH stubs to replace your flat files:</p>
+    <p>The seed script creates all workspace nodes in Neo4j. Deploy GRAPH stubs to replace your flat files:</p>
 
     <h3>Options</h3>
     <div class="code-block"><pre><span class="comment"># Preview what will be imported — no DB writes</span>
-<span class="fn">python3</span> migrate_ladybugdb_to_neo4j.py --dry-run
+<span class="fn">python3</span> seed.py --dry-run
 
 <span class="comment"># Deploy GRAPH stubs (backs up originals to *.bak)</span>
 <span class="fn">cp</span> workspace-stubs/*.md ~/.openclaw/workspace/</pre></div>
@@ -523,7 +523,7 @@ python3 migrate_ladybugdb_to_neo4j.py</pre></div>
     <p>The GRAPH directive returns empty content. Your agent will start with blank workspace sections. Start Neo4j and verify with <code>cypher-shell "RETURN 1"</code>.</p>
 
     <h3>How do I import my existing flat workspace files?</h3>
-    <p>Run <code>python3 migrate_ladybugdb_to_neo4j.py</code> from your openclaw-graph directory. It creates all workspace nodes in Neo4j. Then deploy GRAPH stubs with <code>cp workspace-stubs/*.md ~/.openclaw/workspace/</code>. See the <a href="#import-workspace">Import Your Files</a> section above.</p>
+    <p>Run <code>python3 seed.py</code> from your openclaw-graph directory. It creates all workspace nodes in Neo4j. Then deploy GRAPH stubs with <code>cp workspace-stubs/*.md ~/.openclaw/workspace/</code>. See the <a href="#import-workspace">Import Your Files</a> section above.</p>
 
     <h3>Can I mix flat files and graph stubs?</h3>
     <p>Yes. Any workspace file without a <code>&lt;!-- GRAPH: ... --&gt;</code> directive on line 1 is loaded as a normal flat file. You can migrate one file at a time.</p>
@@ -551,7 +551,7 @@ RETURN s.name, s.description"</span></pre></div>
 </div>
 
 <footer>
-  openclaw-graph v1.4 &middot; MIT License &middot;
+  openclaw-graph v1.5 &middot; MIT License &middot;
   <a href="index.html">Home</a> &middot;
   <a href="admin-guide.html">Admin Guide</a> &middot;
   <a href="https://github.com/alphaonedev/openclaw-graph">GitHub</a>

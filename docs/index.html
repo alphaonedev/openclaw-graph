@@ -171,7 +171,7 @@
 
 <!-- HERO -->
 <div class="hero">
-  <div class="badge">⚡ v1.4 Released — Neo4j Integration</div>
+  <div class="badge">⚡ v1.5 Released — Rust Sync Daemon + Self-Contained Installer</div>
   <h1>Graph-Native Workspace<br>for <span>OpenClaw</span></h1>
   <p class="hero-sub">
     Replace flat workspace markdown with embedded Cypher queries.
@@ -217,16 +217,16 @@
   </div>
 </div>
 
-<!-- v1.4 CALLOUT -->
+<!-- v1.5 CALLOUT -->
 <div style="background:rgba(0,212,170,0.04); border-top:1px solid rgba(0,212,170,0.15); border-bottom:1px solid rgba(0,212,170,0.15); padding:1.25rem 2rem;">
   <div style="max-width:1100px; margin:0 auto; display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
-    <div style="background:rgba(0,212,170,0.15); border:1px solid rgba(0,212,170,0.3); color:var(--accent2); padding:0.25rem 0.7rem; border-radius:6px; font-size:0.78rem; font-weight:700; white-space:nowrap;">NEW IN v1.4</div>
+    <div style="background:rgba(0,212,170,0.15); border:1px solid rgba(0,212,170,0.3); color:var(--accent2); padding:0.25rem 0.7rem; border-radius:6px; font-size:0.78rem; font-weight:700; white-space:nowrap;">NEW IN v1.5</div>
     <div style="font-size:0.88rem; color:var(--text2); flex:1; min-width:200px;">
       <strong style="color:var(--text);">Neo4j integration.</strong>
       Migrate the entire skill graph into an existing Neo4j instance in under 1 second (~10 MB). Proper graph modeling with <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">SkillCluster</code> nodes, <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">IN_CLUSTER</code> + <code style="background:var(--code-bg); padding:0.1rem 0.35rem; border-radius:3px; font-family:'JetBrains Mono',monospace;">RELATED_TO</code> edges, and namespaced labels for multi-graph coexistence.
     </div>
     <div style="display:flex; gap:0.75rem; flex-shrink:0;">
-      <a href="#install" style="background:var(--accent2); color:#000; padding:0.35rem 0.9rem; border-radius:6px; font-size:0.82rem; font-weight:700; text-decoration:none;">Install v1.4 ↓</a>
+      <a href="#install" style="background:var(--accent2); color:#000; padding:0.35rem 0.9rem; border-radius:6px; font-size:0.82rem; font-weight:700; text-decoration:none;">Install v1.5 ↓</a>
       <a href="customizing.html" style="background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:0.35rem 0.9rem; border-radius:6px; font-size:0.82rem; font-weight:600; text-decoration:none;">Customize →</a>
     </div>
   </div>
@@ -256,7 +256,7 @@
 │           ├── [2] graphQueryCache     <span style="color:#525570">cypher-keyed — resolved content, adaptive TTL (60s × log₁₀(hits+10))</span>
 │           ├── [3] graphQueryInFlight  <span style="color:#525570">per-query Promise dedup (no thundering herd)</span>
 │           └── executeGraphQuery()     <span style="color:#525570">execFileAsync — non-blocking</span>
-│               └── <span class="hl2">node query.js --cypher "..."</span>
+│               └── <span class="hl2">cypher-shell -a bolt://localhost:7687 --format plain "..."</span>
 │                   └── return <span class="hl">formatted markdown → system prompt</span>
 │
 └── buildAgentSystemPrompt()
@@ -533,7 +533,7 @@ matters. Not a corporate drone...
 <section id="optimization">
   <div class="section-label">Cost &amp; Performance <span class="badge-new">NEW</span></div>
   <h2>Prompt optimization — 70% token reduction</h2>
-  <p>v1.4 ships with four AgentConfig nodes that reduce API costs and improve agent reliability. These optimizations are pre-seeded in every release and active out of the box.</p>
+  <p>v1.5 ships with four AgentConfig nodes that reduce API costs and improve agent reliability. These optimizations are pre-seeded in every release and active out of the box.</p>
 
   <div class="how-grid" style="margin-top:2rem;">
     <div class="how-card" style="border-color:rgba(0,212,170,0.25);">
@@ -665,13 +665,13 @@ EOF
     <div class="step">
       <div class="step-num">2</div>
       <div class="step-body">
-        <h4>Run the migration</h4>
+        <h4>Run the seed script</h4>
         <div class="code-block">
           <pre><span class="comment"># Preview (no writes)</span>
-<span class="fn">python3</span> migrate_ladybugdb_to_neo4j.py --dry-run
+<span class="fn">python3</span> seed.py --dry-run
 
-<span class="comment"># Migrate — creates all nodes, relationships, constraints</span>
-<span class="fn">python3</span> migrate_ladybugdb_to_neo4j.py
+<span class="comment"># Seed — creates all nodes, relationships, constraints</span>
+<span class="fn">python3</span> seed.py
 <span class="comment"># → 316 Skills, 27 SkillClusters, 217 RELATED_TO, 316 IN_CLUSTER — 0.9s</span></pre>
         </div>
       </div>
@@ -715,7 +715,7 @@ EOF
     <a href="https://github.com/alphaonedev/openclaw-graph" class="how-card" style="text-decoration:none; transition:border-color 0.2s;">
       <div class="how-num" style="background:rgba(108,99,255,0.15); border-color:rgba(108,99,255,0.3); color:var(--accent);">R</div>
       <h3 style="color:var(--text);">README</h3>
-      <p>Project overview, quick start, Neo4j setup, workspace architecture, and what's new in v1.4.</p>
+      <p>Project overview, quick start, Neo4j setup, workspace architecture, and what's new in v1.5.</p>
     </a>
   </div>
 </section>
@@ -737,11 +737,11 @@ EOF
 </div>
 
 <footer>
-  openclaw-graph v1.4 · MIT License · Built for the <a href="https://github.com/openclaw/openclaw">OpenClaw</a> community ·
+  openclaw-graph v1.5 · MIT License · Built for the <a href="https://github.com/openclaw/openclaw">OpenClaw</a> community ·
   <a href="admin-guide.html">Admin Guide</a> ·
   <a href="user-guide.html">User Guide</a> ·
   <a href="https://neo4j.com/">Neo4j</a> ·
-  <a href="https://github.com/alphaonedev/openclaw-graph/releases/tag/v1.4">Release Notes</a>
+  <a href="https://github.com/alphaonedev/openclaw-graph/releases/tag/v1.5">Release Notes</a>
   <br><br>
   Created by and open source contributed by <a href="https://alpha-one.mobi" style="color: var(--accent);">AlphaOne LLC</a> to the open source <a href="https://github.com/openclaw/openclaw" style="color: var(--accent2);">OpenClaw</a> community
 </footer>

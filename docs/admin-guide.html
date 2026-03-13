@@ -187,7 +187,7 @@
 
     <!-- PREREQUISITES -->
     <h2 id="prerequisites">Prerequisites</h2>
-    <p>Install these <strong>before</strong> running the migration. Quick check:</p>
+    <p>Install these <strong>before</strong> running the seed script. Quick check:</p>
     <div class="code-block"><pre>cypher-shell "RETURN 1" &amp;&amp; python3 -c "import neo4j; print('✅ all good')"</pre></div>
     <table>
       <tr><th>Dependency</th><th>Version</th><th>macOS</th><th>Ubuntu / Debian</th><th>Fedora</th></tr>
@@ -238,9 +238,9 @@ pip install neo4j</pre></div>
 git clone https://github.com/alphaonedev/openclaw-graph.git
 cd openclaw-graph
 
-<span class="comment"># 2. Run the migration (creates all nodes, relationships, constraints)</span>
-python3 migrate_ladybugdb_to_neo4j.py --dry-run   <span class="comment"># preview first</span>
-python3 migrate_ladybugdb_to_neo4j.py              <span class="comment"># run it</span>
+<span class="comment"># 2. Run the seed script (creates all nodes, relationships, constraints)</span>
+python3 seed.py --dry-run   <span class="comment"># preview first</span>
+python3 seed.py              <span class="comment"># run it</span>
 <span class="comment"># → 316 Skills, 27 SkillClusters, 217 RELATED_TO, 316 IN_CLUSTER — 0.9s</span>
 
 <span class="comment"># 3. Deploy workspace stubs</span>
@@ -249,7 +249,7 @@ cp workspace-stubs/*.md ~/.openclaw/workspace/
 <span class="comment"># 4. Verify</span>
 cypher-shell <span class="string">"MATCH (s:Skill) RETURN count(s)"</span></pre></div>
 
-    <h3>What Neo4j contains (v1.4)</h3>
+    <h3>What Neo4j contains (v1.5)</h3>
     <table>
       <tr><th>Label</th><th>Nodes</th><th>Description</th></tr>
       <tr><td>Skill</td><td>316</td><td>Skills across 27 clusters</td></tr>
@@ -265,14 +265,14 @@ cypher-shell <span class="string">"MATCH (s:Skill) RETURN count(s)"</span></pre>
 
     <!-- IMPORT WORKSPACE -->
     <h2 id="import-workspace">Import Your Workspace</h2>
-    <p>Already running OpenClaw with flat markdown files? The migration script loads them into Neo4j.</p>
+    <p>Already running OpenClaw with flat markdown files? The seed script loads them into Neo4j.</p>
 
     <h3>Quick start</h3>
-    <div class="code-block"><pre><span class="comment"># Run the migration — imports all workspace data into Neo4j</span>
-python3 migrate_ladybugdb_to_neo4j.py
+    <div class="code-block"><pre><span class="comment"># Run the seed script — imports all workspace data into Neo4j</span>
+python3 seed.py
 
 <span class="comment"># Preview what will be imported without writing anything</span>
-python3 migrate_ladybugdb_to_neo4j.py --dry-run
+python3 seed.py --dry-run
 
 <span class="comment"># Deploy GRAPH stubs to workspace</span>
 cp workspace-stubs/*.md ~/.openclaw/workspace/</pre></div>
@@ -315,7 +315,7 @@ cp workspace-stubs/*.md ~/.openclaw/workspace/</pre></div>
 &#9474;   &#9500;&#9472;&#9472; IN_CLUSTER (316)         <span class="hl"># Skill → SkillCluster membership</span>
 &#9474;   &#9492;&#9472;&#9472; RELATED_TO (217)         <span class="hl"># Skill → Skill dependency graph</span>
 &#9492;&#9472;&#9472; Scripts:
-    &#9492;&#9472;&#9472; migrate_ladybugdb_to_neo4j.py  <span class="hl"># One-shot migration script</span></pre></div>
+    &#9492;&#9472;&#9472; seed.py                        <span class="hl"># Self-contained Neo4j seeder</span></pre></div>
     <p>Neo4j stores all graph data with proper graph modeling. Namespaced labels (OCAgent, OCMemory, OCTool) allow coexistence with other graph domains in a shared Neo4j instance. All nodes include a <code>workspace</code> property for multi-tenant isolation.</p>
 
     <!-- CLI REFERENCE -->
@@ -471,10 +471,10 @@ RETURN DISTINCT t.name, t.cluster"</span></pre></div>
     <p>For multi-instance deployments, each OpenClaw instance gets its own workspace ID. All instances share the same Neo4j instance &mdash; workspace-scoped queries ensure isolation.</p>
 
     <h3>Seed separate workspaces</h3>
-    <div class="code-block"><pre><span class="comment"># Run migration with different workspace names</span>
-python3 migrate_ladybugdb_to_neo4j.py --workspace intel-agent
-python3 migrate_ladybugdb_to_neo4j.py --workspace code-agent
-python3 migrate_ladybugdb_to_neo4j.py --workspace ops-agent</pre></div>
+    <div class="code-block"><pre><span class="comment"># Run seed script with different workspace names</span>
+python3 seed.py --workspace intel-agent
+python3 seed.py --workspace code-agent
+python3 seed.py --workspace ops-agent</pre></div>
 
     <h3>Point stubs to the correct workspace</h3>
     <div class="code-block"><pre><span class="comment"># Instance A stubs (~/.openclaw/workspace-intel/)</span>
@@ -606,7 +606,7 @@ cypher-shell <span class="string">"MATCH ()-[r:RELATED_TO]->() RETURN count(r) A
     <!-- QUERY METRICS -->
     <h2 id="metrics">Query Metrics</h2>
 
-    <p><code>query.js</code> automatically records a row into <code>QueryMetrics</code> every time a GRAPH directive resolves from a workspace stub (<code>--workspace</code> mode). <strong>No configuration needed</strong> — it just works after install.</p>
+    <p><code>cypher-shell</code> queries can be profiled using Neo4j's built-in <code>PROFILE</code> prefix to inspect execution plans and timing. <code>QueryMetrics</code> nodes are populated automatically every time a GRAPH directive resolves from a workspace stub. <strong>No configuration needed</strong> — it just works after install.</p>
 
     <div class="callout"><p><strong>New install?</strong> <code>QueryMetrics</code> starts empty and fills itself automatically. The first entry appears after OpenClaw loads any workspace stub for the first time.</p></div>
 
@@ -635,16 +635,16 @@ cypher-shell <span class="string">"PROFILE MATCH (s:Skill) WHERE s.workspace = '
     <p>When you upgrade to a new release, the DB is <strong>replaced</strong>. Workspace nodes live in the DB.</p>
 
     <h3>Upgrade workflow</h3>
-    <div class="code-block"><pre><span class="comment"># 1. Pull latest migration script</span>
+    <div class="code-block"><pre><span class="comment"># 1. Pull latest seed script</span>
 cd openclaw-graph &amp;&amp; git pull
 
-<span class="comment"># 2. Re-run migration (idempotent — uses MERGE)</span>
-python3 migrate_ladybugdb_to_neo4j.py
+<span class="comment"># 2. Re-run seed script (idempotent — uses MERGE)</span>
+python3 seed.py
 
 <span class="comment"># 3. Verify</span>
 cypher-shell <span class="string">"MATCH (s:Skill) WHERE s.workspace = 'openclaw' RETURN count(s)"</span></pre></div>
 
-    <div class="callout"><p><strong>Recommended:</strong> The migration script uses MERGE (not CREATE) — it is safe to re-run. Existing nodes are updated, new nodes are created.</p></div>
+    <div class="callout"><p><strong>Recommended:</strong> The seed script uses MERGE (not CREATE) — it is safe to re-run. Existing nodes are updated, new nodes are created.</p></div>
 
     <!-- BACKUP & RESTORE -->
     <h2 id="backup">Backup &amp; Restore</h2>
@@ -686,9 +686,9 @@ cypher-shell <span class="string">"MATCH (a:AgentConfig) WHERE a.workspace = 'op
 <span class="comment"># Cypher must be a single line</span></pre></div>
 
     <h3>"Label X does not exist"</h3>
-    <p><strong>Cause:</strong> The migration script hasn't been run, or nodes weren't created for this label.</p>
+    <p><strong>Cause:</strong> The seed script hasn't been run, or nodes weren't created for this label.</p>
     <p><strong>Fix:</strong></p>
-    <div class="code-block"><pre>python3 migrate_ladybugdb_to_neo4j.py</pre></div>
+    <div class="code-block"><pre>python3 seed.py</pre></div>
 
     <h3>Stale workspace content</h3>
     <p><strong>Cause:</strong> Graph query cache hasn't expired (60s TTL).</p>
@@ -724,7 +724,7 @@ cypher-shell "RETURN 1"</pre></div>
 </div>
 
 <footer>
-  openclaw-graph v1.4 &middot; MIT License &middot;
+  openclaw-graph v1.5 &middot; MIT License &middot;
   <a href="index.html">Home</a> &middot;
   <a href="user-guide.html">User Guide</a> &middot;
   <a href="https://github.com/alphaonedev/openclaw-graph">GitHub</a>
