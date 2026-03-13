@@ -11,7 +11,7 @@ scope: general
 model_hint: claude-sonnet
 embedding_hint: "local offline tts speech no api privacy on-device sherpa onnx"
 clawhub_install: "clawhub install sherpa-onnx-tts"
-note: "NOT installed via ClaWHub CLI — registered in LadybugDB only. To activate: clawhub install sherpa-onnx-tts"
+note: "NOT installed via ClaWHub CLI — registered in Neo4j skill graph only. To activate: clawhub install sherpa-onnx-tts"
 ---
 
 # Sherpa Onnx Tts
@@ -25,7 +25,7 @@ clawhub install sherpa-onnx-tts
 ```
 
 ## Note
-This skill is registered in LadybugDB for discovery purposes only.
+This skill is registered in the Neo4j skill graph for discovery purposes only.
 It is **NOT installed** via the traditional ClaWHub methodology.
 When a task matches this skill, the agent will inform you to install it if needed.
 

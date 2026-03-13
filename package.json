@@ -1,18 +1,13 @@
 {
   "name": "openclaw-graph",
-  "version": "1.3.0",
-  "description": "Graph-native workspace backend for OpenClaw using LadybugDB — 316 skills, embedded Cypher queries, zero flat files",
+  "version": "1.4.0",
+  "description": "Graph-native workspace backend for OpenClaw using Neo4j — 316 skills, Cypher queries, zero flat files",
   "type": "module",
   "scripts": {
-    "seed": "node ladybugdb/scripts/seed-default-workspace.mjs",
-    "seed:reset": "node ladybugdb/scripts/seed-default-workspace.mjs --reset",
-    "load": "node ladybugdb/scripts/loader.js",
-    "query": "node ladybugdb/scripts/query.js",
-    "stats": "node ladybugdb/scripts/query.js --stats"
+    "seed": "python3 migrate_ladybugdb_to_neo4j.py",
+    "seed:reset": "python3 migrate_ladybugdb_to_neo4j.py --reset",
+    "query": "cypher-shell -a bolt://localhost:7687"
   },
-  "keywords": ["openclaw", "ladybugdb", "graph", "skills", "ai-assistant", "workspace"],
-  "license": "MIT",
-  "dependencies": {
-    "lbug": "^0.14.3"
-  }
+  "keywords": ["openclaw", "neo4j", "graph", "skills", "ai-assistant", "workspace", "cypher"],
+  "license": "MIT"
 }

@@ -11,7 +11,7 @@ Skills live in `skills/<cluster>/SKILL.md`. To add a new skill:
 1. Choose an existing cluster or propose a new one
 2. Create `skills/<cluster>/<skill-name>/SKILL.md`
 3. Use the template below
-4. Run `node ladybugdb/scripts/loader.js` to verify it loads cleanly
+4. Run `python3 migrate_ladybugdb_to_neo4j.py --dry-run` to verify it loads cleanly
 5. Open a PR
 
 **Skill template:**
@@ -53,16 +53,16 @@ What this skill enables the agent to do.
 - CALLED_BY: []
 ```
 
-### Improve the query script
+### Improve Neo4j queries
 
-`ladybugdb/scripts/query.js` handles text search, cluster queries, and workspace output formatting. Improvements welcome — especially:
+Cypher queries power skill discovery, workspace resolution, and graph traversals. Improvements welcome — especially:
 - Better text search ranking
 - Vector/semantic search support
 - Additional output formatters
 
 ### Extend the schema
 
-New node tables or relationship types can be added in `ladybugdb/schema/`. Document any schema changes in your PR.
+New node labels or relationship types can be added via Cypher constraints in Neo4j. Use namespaced labels (e.g., `OCMemory`, `OCTool`) to avoid collisions with other graphs. Document any schema changes in your PR.
 
 ### Fix bugs or improve docs
 

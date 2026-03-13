@@ -2,7 +2,7 @@
  * openclaw-graph — Graph-Native Workspace Backend
  *
  * Drop-in patch for OpenClaw's src/agents/workspace.ts
- * Adds LadybugDB graph query resolution for workspace files
+ * Adds Neo4j graph query resolution for workspace files
  * that contain a <!-- GRAPH: <cypher> --> directive.
  *
  * HOW IT WORKS:
@@ -12,7 +12,7 @@
  *     <!-- GRAPH: MATCH (s:Soul) WHERE s.workspace = 'myapp' RETURN ... -->
  *
  *   When OpenClaw loads the workspace, this module intercepts the read,
- *   executes the Cypher query against LadybugDB, and returns formatted
+ *   executes the Cypher query against Neo4j, and returns formatted
  *   markdown — injected into the agent's system prompt as if it were
  *   a normal flat file.
  *
@@ -24,44 +24,44 @@
  *   - Graceful degradation: if DB unavailable, empty string returned
  *
  * INTEGRATION:
- *   1. npm install lbug
- *   2. Run: node ladybugdb/scripts/seed-workspace.js
+ *   1. Install Neo4j Community Edition (brew install neo4j / apt install neo4j)
+ *   2. Run: python3 migrate_ladybugdb_to_neo4j.py
  *   3. Copy the GRAPH_DIRECTIVE block into your workspace.ts
  *      (see the marked section below)
- *   4. Update GRAPH_NODE_BIN and GRAPH_QUERY_SCRIPT paths
+ *   4. Update GRAPH_QUERY_CMD and NEO4J_URI env vars if needed
  *   5. Update your SOUL.md / MEMORY.md / TOOLS.md with GRAPH directives
  *
  * APPLY AS PATCH:
- *   See patches/workspace.graph.patch in this repo for the exact diff.
+ *   See patches/workspace-cache-fix.patch in this repo for the exact diff.
  */
 
 import path from "node:path";
 import os from "node:os";
 import { execSync } from "node:child_process";
 
-// ─── openclaw-graph LadybugDB Backend ──────────────────────────────────────────
+// ─── openclaw-graph Neo4j Backend ───────────────────────────────────────────
 // Copy this entire block into your workspace.ts, after the imports.
-// Adjust GRAPH_NODE_BIN and GRAPH_QUERY_SCRIPT to your environment.
+// Adjust GRAPH_QUERY_CMD and NEO4J_URI to your environment.
 
 const GRAPH_DIRECTIVE_PREFIX = "<!-- GRAPH:";
 
 /**
- * Path to the Node.js binary used to run query.js.
- * Adjust to match your system's Node installation.
+ * Path to the cypher-shell binary used to execute Cypher queries.
+ * Adjust to match your system's Neo4j installation.
  * Examples:
- *   /usr/bin/node
- *   /opt/homebrew/bin/node
- *   /opt/homebrew/Cellar/node@22/22.22.0/bin/node
+ *   cypher-shell                          (if on PATH)
+ *   /opt/homebrew/bin/cypher-shell        (macOS Homebrew)
+ *   /usr/bin/cypher-shell                 (Linux apt)
  */
-const GRAPH_NODE_BIN = process.env.OPENCLAW_GRAPH_NODE_BIN ?? "node";
+const GRAPH_QUERY_CMD =
+  process.env.OPENCLAW_GRAPH_QUERY_CMD ?? "cypher-shell";
 
 /**
- * Path to the LadybugDB query script.
- * Default: <home>/openclaw-graph/ladybugdb/scripts/query.js
+ * Neo4j connection URI.
+ * Default: bolt://localhost:7687 (local Neo4j Community Edition, no auth)
  */
-const GRAPH_QUERY_SCRIPT =
-  process.env.OPENCLAW_GRAPH_QUERY_SCRIPT ??
-  path.join(os.homedir(), "openclaw-graph", "ladybugdb", "scripts", "query.js");
+const GRAPH_NEO4J_URI =
+  process.env.NEO4J_URI ?? "bolt://localhost:7687";
 
 function extractGraphDirective(content: string): string | null {
   const trimmed = content.trim();
@@ -74,7 +74,7 @@ function extractGraphDirective(content: string): string | null {
 function executeGraphQuery(cypher: string): string {
   try {
     const result = execSync(
-      `${GRAPH_NODE_BIN} ${GRAPH_QUERY_SCRIPT} --workspace --cypher ${JSON.stringify(cypher)}`,
+      `${GRAPH_QUERY_CMD} -a ${GRAPH_NEO4J_URI} --format plain "${cypher.replace(/"/g, '\\"')}"`,
       { encoding: "utf-8", timeout: 8000 },
     );
     return result.trim();

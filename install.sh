@@ -1,40 +1,23 @@
 #!/usr/bin/env bash
 # ============================================================
-# install.sh — LadybugDB Skill Graph Installer
+# install.sh — Neo4j Skill Graph Installer
 # https://github.com/alphaonedev/openclaw-graph
 #
-# Downloads a pre-built LadybugDB database from GitHub Releases
-# and places it at the configured path.
+# Installs Neo4j Community Edition, seeds the skill graph,
+# and verifies the database.
 #
 # Usage:
-#   ./install.sh              # interactive (prompts lite vs full)
-#   ./install.sh --lite       # skills only (~300 MB compressed)
-#   ./install.sh --full       # skills + all DevDocs (~500 MB compressed)
-#   ./install.sh --verify     # verify existing DB without reinstalling
-#   ./install.sh --version v1.3  # install a specific release version
+#   ./install.sh              # interactive (installs + seeds)
+#   ./install.sh --verify     # verify existing Neo4j data
 # ============================================================
 
 set -euo pipefail
 
 # ── Config ───────────────────────────────────────────────────
 REPO="alphaonedev/openclaw-graph"
-RELEASE_VERSION="${RELEASE_VERSION:-latest}"
-# Detect repo-relative path or fallback for curl|bash piped installs
-_SELF_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd)" || _SELF_DIR=""
-if [ -n "$_SELF_DIR" ] && [ -d "$_SELF_DIR/ladybugdb/db" ]; then
-  DB_DIR="$_SELF_DIR/ladybugdb/db"
-else
-  DB_DIR="${OPENCLAW_GRAPH_DB_DIR:-$HOME/openclaw-graph/ladybugdb/db}"
-fi
-DB_FILE="$DB_DIR/alphaone-skills.db"
-TMP_DIR="$(mktemp -d)"
-NODE_BIN="${NODE_BIN:-node}"
-
-GITHUB_BASE="https://github.com/${REPO}/releases/download"
-
-# SHA256 checksums — updated each release
-LITE_SHA256="6da38b83a4cb7f865a55677386101d4745db146a7912042abc0e896357291e1b"
-FULL_SHA256="d8f9e8f16583e58b974c30f8c1b8eba0580fe3595e89a24bd03ee1ac7733ce56"
+NEO4J_URI="${NEO4J_URI:-bolt://localhost:7687}"
+PYTHON="${PYTHON:-python3}"
+MIGRATION_SCRIPT="migrate_ladybugdb_to_neo4j.py"
 # ─────────────────────────────────────────────────────────────
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
@@ -46,65 +29,26 @@ warn()    { echo -e "${YELLOW}⚠️ ${RESET} $*"; }
 error()   { echo -e "${RED}❌${RESET} $*"; exit 1; }
 header()  { echo -e "\n${BOLD}$*${RESET}"; }
 
-cleanup() { rm -rf "$TMP_DIR"; }
-trap cleanup EXIT
-
 # ── Parse args ───────────────────────────────────────────────
-MODE=""
 VERIFY_ONLY=false
 while [ $# -gt 0 ]; do
   case "$1" in
-    --lite)        MODE="lite" ;;
-    --full)        MODE="full" ;;
-    --verify)      VERIFY_ONLY=true ;;
-    --version)     shift; RELEASE_VERSION="${1:-v1.3}" ;;
+    --verify)  VERIFY_ONLY=true ;;
     --help|-h)
-      echo "Usage: $0 [--lite|--full|--verify|--version <tag>]"
+      echo "Usage: $0 [--verify]"
       echo ""
-      echo "  --lite          Skills only (~300 MB compressed)"
-      echo "  --full          Skills + all DevDocs (~500 MB compressed)"
-      echo "  --verify        Verify existing DB"
-      echo "  --version <tag> Pin to a specific release (e.g. v1.3)"
+      echo "  (default)   Install Neo4j, seed skill graph, verify"
+      echo "  --verify    Verify existing Neo4j data only"
       exit 0 ;;
   esac
   shift
 done
 
-# ── Resolve version ──────────────────────────────────────────
-if [ "$RELEASE_VERSION" = "latest" ]; then
-  info "Resolving latest release tag..."
-  API_RESP=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null || echo "")
-  if [ -n "$API_RESP" ]; then
-    RELEASE_VERSION=$(echo "$API_RESP" | grep -o '"tag_name"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"\([^"]*\)"/\1/' || echo "v1.3")
-  fi
-  [ -z "$RELEASE_VERSION" ] && RELEASE_VERSION="v1.3"
-  info "Latest: $RELEASE_VERSION"
-fi
-
 # ── Header ───────────────────────────────────────────────────
 echo ""
-echo -e "${BOLD}🐞 LadybugDB Skill Graph — Installer${RESET}"
-echo "   ${REPO} @ ${RELEASE_VERSION}"
+echo -e "${BOLD}🔷 Neo4j Skill Graph — Installer${RESET}"
+echo "   ${REPO}"
 echo ""
-
-# ── Verify-only mode ─────────────────────────────────────────
-if $VERIFY_ONLY; then
-  [ -f "$DB_FILE" ] || error "No database found at $DB_FILE"
-  info "Verifying $DB_FILE ..."
-  SIZE=$(du -sh "$DB_FILE" | cut -f1)
-  "$NODE_BIN" --input-type=module << EOF
-import { Database, Connection } from 'lbug';
-const db = new Database('$DB_FILE');
-await db.init(); const c = new Connection(db); await c.init();
-const s = await (await c.query('MATCH (n:Skill) RETURN count(n) AS n')).getAll();
-const r = await (await c.query('MATCH (n:Reference) RETURN count(n) AS n')).getAll();
-console.log('  Skills:     ' + (s[0]?.n ?? 0));
-console.log('  References: ' + (r[0]?.n ?? 0));
-console.log('  DB size:    $SIZE');
-EOF
-  success "Database OK"
-  exit 0
-fi
 
 # ── Detect platform ──────────────────────────────────────────
 detect_platform() {
@@ -124,34 +68,57 @@ PLATFORM="$(detect_platform)"
 
 install_hint() {
   case "$1" in
-    curl)
+    neo4j)
       case "$PLATFORM" in
-        macos)   echo "brew install curl" ;;
-        debian)  echo "sudo apt-get install -y curl" ;;
-        fedora)  echo "sudo dnf install -y curl" ;;
-        arch)    echo "sudo pacman -S curl" ;;
-        *)       echo "https://curl.se/download.html" ;;
+        macos)   echo "brew install neo4j" ;;
+        debian)  echo "See https://neo4j.com/docs/operations-manual/current/installation/linux/debian/" ;;
+        fedora)  echo "See https://neo4j.com/docs/operations-manual/current/installation/linux/rpm/" ;;
+        arch)    echo "yay -S neo4j-community" ;;
+        *)       echo "https://neo4j.com/download/" ;;
       esac ;;
-    node)
+    python3)
       case "$PLATFORM" in
-        macos)   echo "brew install node@22  OR  https://nodejs.org  OR  nvm install --lts" ;;
-        debian)  echo "sudo apt-get install -y nodejs npm  OR  nvm install --lts" ;;
-        fedora)  echo "sudo dnf install -y nodejs  OR  nvm install --lts" ;;
-        arch)    echo "sudo pacman -S nodejs npm  OR  nvm install --lts" ;;
-        *)       echo "https://nodejs.org (v18+ required)" ;;
+        macos)   echo "brew install python3  OR  use Anaconda" ;;
+        debian)  echo "sudo apt-get install -y python3 python3-pip" ;;
+        fedora)  echo "sudo dnf install -y python3 python3-pip" ;;
+        arch)    echo "sudo pacman -S python python-pip" ;;
+        *)       echo "https://www.python.org/downloads/" ;;
       esac ;;
-    zstd)
+    neo4j-driver)  echo "pip install neo4j" ;;
+    cypher-shell)
       case "$PLATFORM" in
-        macos)   echo "brew install zstd" ;;
-        debian)  echo "sudo apt-get install -y zstd" ;;
-        fedora)  echo "sudo dnf install -y zstd" ;;
-        arch)    echo "sudo pacman -S zstd" ;;
-        *)       echo "https://github.com/facebook/zstd/releases" ;;
+        macos)   echo "Included with: brew install neo4j" ;;
+        debian)  echo "sudo apt-get install -y cypher-shell" ;;
+        fedora)  echo "sudo dnf install -y cypher-shell" ;;
+        *)       echo "https://neo4j.com/download-center/#cypher-shell" ;;
       esac ;;
-    npm)   echo "npm ships with Node.js — install node first (see above)" ;;
-    lbug)  echo "npm install -g lbug" ;;
   esac
 }
+
+# ── Verify-only mode ─────────────────────────────────────────
+if $VERIFY_ONLY; then
+  header "Verifying Neo4j data..."
+  if ! command -v cypher-shell &>/dev/null; then
+    error "cypher-shell not found  →  $(install_hint cypher-shell)"
+  fi
+
+  SKILL_COUNT=$(echo "MATCH (n:Skill) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+  CLUSTER_COUNT=$(echo "MATCH (n:SkillCluster) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+  SOUL_COUNT=$(echo "MATCH (n:Soul) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+  AC_COUNT=$(echo "MATCH (n:AgentConfig) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+
+  echo "  Skills:        $SKILL_COUNT"
+  echo "  SkillClusters: $CLUSTER_COUNT"
+  echo "  Soul:          $SOUL_COUNT"
+  echo "  AgentConfig:   $AC_COUNT"
+
+  if [ "$SKILL_COUNT" -gt 0 ] 2>/dev/null; then
+    success "Database OK"
+  else
+    error "No skills found — run the migration script first"
+  fi
+  exit 0
+fi
 
 # ── Check dependencies ───────────────────────────────────────
 header "Checking dependencies..."
@@ -170,31 +137,32 @@ check_dep() {
   fi
 }
 
-check_dep curl
-NODE_OK=false
-if check_dep "$NODE_BIN" node; then
-  # Verify minimum version (Node 18+)
-  NODE_MAJ=$("$NODE_BIN" --version 2>/dev/null | sed 's/v//' | cut -d. -f1)
-  if [ -n "$NODE_MAJ" ] && [ "$NODE_MAJ" -lt 18 ] 2>/dev/null; then
-    warn "Node.js v$NODE_MAJ detected — v18+ required  →  $(install_hint node)"
-    MISSING+=("node-v18+")
-  else
-    success "Node.js $("$NODE_BIN" --version) — version OK"
-    NODE_OK=true
-  fi
+# Check Neo4j
+if command -v neo4j &>/dev/null; then
+  success "Neo4j found ($(command -v neo4j))"
+else
+  warn "Neo4j not found  →  $(install_hint neo4j)"
+  MISSING+=("neo4j")
 fi
-check_dep npm
-check_dep zstd
-EXT="zst"
 
-# Check lbug (only if node is usable)
-if $NODE_OK; then
-  if "$NODE_BIN" --input-type=module -e "import 'lbug'" 2>/dev/null; then
-    success "lbug found"
-  else
-    warn "lbug not found  →  npm install -g lbug"
-    MISSING+=("lbug")
-  fi
+# Check cypher-shell
+check_dep cypher-shell
+
+# Check Python
+if command -v "$PYTHON" &>/dev/null; then
+  PY_VER=$("$PYTHON" --version 2>&1)
+  success "Python found: $PY_VER"
+else
+  warn "Python not found  →  $(install_hint python3)"
+  MISSING+=("python3")
+fi
+
+# Check neo4j Python driver
+if "$PYTHON" -c "import neo4j" 2>/dev/null; then
+  success "neo4j Python driver found"
+else
+  warn "neo4j Python driver not found  →  $(install_hint neo4j-driver)"
+  MISSING+=("neo4j-driver")
 fi
 
 if [ ${#MISSING[@]} -gt 0 ]; then
@@ -206,105 +174,55 @@ if [ ${#MISSING[@]} -gt 0 ]; then
   exit 1
 fi
 
-# ── Choose tier ──────────────────────────────────────────────
-if [ -z "$MODE" ]; then
-  # When piped from curl, stdin is not a TTY — prompt will silently fail.
-  # Require an explicit flag in that case.
-  if [ ! -t 0 ]; then
-    echo ""
-    echo -e "${BOLD}Usage (piped install requires explicit flag):${RESET}"
-    echo ""
-    echo "  Lite (~300 MB):  curl -fsSL https://raw.githubusercontent.com/${REPO}/main/install.sh | bash -s -- --lite"
-    echo "  Full (~500 MB):  curl -fsSL https://raw.githubusercontent.com/${REPO}/main/install.sh | bash -s -- --full"
-    echo ""
-    exit 1
-  fi
-  header "Choose database tier:"
-  echo ""
-  echo "  [1] Lite  — 316 skills + 9 AgentConfig + 1536d embeddings    (~300 MB)"
-  echo "  [2] Full  — Lite + 718 DevDocs docsets (~545k entries)      (~500 MB)"
-  echo ""
-  read -rp "  Choice [1/2]: " CHOICE
-  case "$CHOICE" in
-    1) MODE="lite" ;;
-    2) MODE="full" ;;
-    *) error "Invalid choice." ;;
-  esac
-fi
-
-FILENAME="alphaone-skills-${MODE}.db.${EXT}"
-DOWNLOAD_URL="${GITHUB_BASE}/${RELEASE_VERSION}/${FILENAME}"
-EXPECTED_SHA256="${MODE}" # resolved below
-[ "$MODE" = "lite" ] && EXPECTED_SHA256="$LITE_SHA256" || EXPECTED_SHA256="$FULL_SHA256"
-
-# ── Check existing DB ────────────────────────────────────────
-if [ -f "$DB_FILE" ]; then
-  warn "Existing DB found at $DB_FILE"
-  read -rp "  Overwrite? [y/N]: " OW
-  [[ "$OW" == "y" || "$OW" == "Y" ]] || { info "Keeping existing DB."; exit 0; }
-  mv "$DB_FILE" "${DB_FILE}.bak-$(date +%H%M)"
-  info "Backed up existing DB."
-fi
-
-mkdir -p "$DB_DIR"
-
-# ── Download ─────────────────────────────────────────────────
-header "Downloading ${MODE} database (${RELEASE_VERSION})..."
-echo ""
-info "URL: $DOWNLOAD_URL"
-echo ""
-
-COMPRESSED_FILE="$TMP_DIR/$FILENAME"
-
-curl -L \
-  --progress-bar \
-  --fail \
-  -o "$COMPRESSED_FILE" \
-  "$DOWNLOAD_URL" \
-  || error "Download failed. Check https://github.com/${REPO}/releases for available versions."
-
-success "Downloaded: $(du -sh "$COMPRESSED_FILE" | cut -f1)"
-
-# ── Checksum ─────────────────────────────────────────────────
-header "Verifying checksum..."
-if [[ "$EXPECTED_SHA256" != "PLACEHOLDER"* ]]; then
-  if command -v sha256sum &>/dev/null; then
-    ACTUAL=$(sha256sum "$COMPRESSED_FILE" | awk '{print $1}')
-  else
-    ACTUAL=$(shasum -a 256 "$COMPRESSED_FILE" | awk '{print $1}')
-  fi
-  [ "$ACTUAL" = "$EXPECTED_SHA256" ] || error "Checksum mismatch!\n  Expected: $EXPECTED_SHA256\n  Got:      $ACTUAL"
-  success "Checksum OK"
+# ── Check Neo4j is running ───────────────────────────────────
+header "Checking Neo4j status..."
+if echo "RETURN 1;" | cypher-shell -a "$NEO4J_URI" --format plain &>/dev/null; then
+  success "Neo4j is running at $NEO4J_URI"
 else
-  warn "Checksums not yet set in this install.sh — skipping verification"
+  error "Neo4j is not running at $NEO4J_URI\n\n  Start it with:\n    macOS:  brew services start neo4j\n    Linux:  sudo systemctl start neo4j"
 fi
 
-# ── Decompress ───────────────────────────────────────────────
-header "Decompressing..."
-zstd -d "$COMPRESSED_FILE" -o "$DB_FILE"
-success "Decompressed: $(du -sh "$DB_FILE" | cut -f1)"
+# ── Run migration script ─────────────────────────────────────
+header "Seeding skill graph..."
 
-# ── Verify DB ────────────────────────────────────────────────
+# Find migration script
+SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd)" || SCRIPT_DIR=""
+if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/$MIGRATION_SCRIPT" ]; then
+  SCRIPT_PATH="$SCRIPT_DIR/$MIGRATION_SCRIPT"
+elif [ -f "$HOME/openclaw-graph/$MIGRATION_SCRIPT" ]; then
+  SCRIPT_PATH="$HOME/openclaw-graph/$MIGRATION_SCRIPT"
+else
+  error "Migration script not found: $MIGRATION_SCRIPT\n\n  Clone the repo first:\n    git clone https://github.com/${REPO}.git ~/openclaw-graph"
+fi
+
+info "Running: $PYTHON $SCRIPT_PATH"
+"$PYTHON" "$SCRIPT_PATH" || error "Migration failed — check Neo4j connection"
+
+# ── Verify ───────────────────────────────────────────────────
 header "Verifying database..."
-"$NODE_BIN" --input-type=module << EOF
-import { Database, Connection } from 'lbug';
-try {
-  const db = new Database('$DB_FILE');
-  await db.init(); const c = new Connection(db); await c.init();
-  const s = await (await c.query('MATCH (n:Skill) RETURN count(n) AS n')).getAll();
-  const r = await (await c.query('MATCH (n:Reference) RETURN count(n) AS n')).getAll();
-  console.log('  Skills:     ' + (s[0]?.n ?? 0));
-  console.log('  References: ' + (r[0]?.n ?? 0));
-} catch(e) { console.error('Verify failed:', e.message); process.exit(1); }
-EOF
+SKILL_COUNT=$(echo "MATCH (n:Skill) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+CLUSTER_COUNT=$(echo "MATCH (n:SkillCluster) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+SOUL_COUNT=$(echo "MATCH (n:Soul) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+AC_COUNT=$(echo "MATCH (n:AgentConfig) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+
+echo "  Skills:        $SKILL_COUNT"
+echo "  SkillClusters: $CLUSTER_COUNT"
+echo "  Soul:          $SOUL_COUNT"
+echo "  AgentConfig:   $AC_COUNT"
+
+if [ "$SKILL_COUNT" -gt 0 ] 2>/dev/null; then
+  success "Database verified"
+else
+  error "Verification failed — no skills found"
+fi
 
 # ── Done ─────────────────────────────────────────────────────
 echo ""
-echo -e "${BOLD}${GREEN}🐞 Installation complete!${RESET}"
+echo -e "${BOLD}${GREEN}🔷 Installation complete!${RESET}"
 echo ""
-echo "  DB: $DB_FILE ($(du -sh "$DB_FILE" | cut -f1))"
+echo "  Neo4j: $NEO4J_URI"
 echo ""
 echo "  Query the graph:"
-echo "    node ladybugdb/scripts/query.js --cluster python"
-echo "    node ladybugdb/scripts/query.js \"async rate limiting\""
+echo "    cypher-shell -a $NEO4J_URI --format plain \"MATCH (s:Skill) RETURN s.name, s.cluster LIMIT 10\""
+echo "    cypher-shell -a $NEO4J_URI --format plain \"MATCH (s:Skill {cluster:'devops-sre'}) RETURN s.name\""
 echo ""

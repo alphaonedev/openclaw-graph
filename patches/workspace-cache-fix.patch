@@ -47,7 +47,7 @@ index a119d02d7..de92161d7 100644
  import { resolveUserPath } from "../utils.js";
 @@ -12,6 +15,16 @@ import { resolveWorkspaceTemplateDir } from "./workspace-templates.js";
  // When a workspace file contains <!-- GRAPH: <cypher> --> as its first line,
- // the content is resolved by querying LadybugDB instead of returning the raw stub.
+ // the content is resolved by querying Neo4j instead of returning the raw stub.
  // This enables 100% graph-native workspace files with zero flat-file content.
 +//
 +// Cache architecture (three layers, fixed ordering):
@@ -141,7 +141,7 @@ index a119d02d7..de92161d7 100644
   * Read file with caching based on mtime. Returns cached content if file
 @@ -97,6 +133,11 @@ const workspaceFileCache = new Map<string, { content: string; mtimeMs: number }>
   * <!-- GRAPH: <cypher> --> directive, the content is resolved by querying
-  * LadybugDB and returned as structured text. The stub file on disk acts
+  * Neo4j and returned as structured text. The stub file on disk acts
   * purely as a pointer — no markdown content is stored in flat files.
 + *
 + * Cache behaviour:

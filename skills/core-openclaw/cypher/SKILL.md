@@ -2,7 +2,7 @@
 name: cypher
 cluster: core-openclaw
 description: "Cypher query language: MATCH CREATE MERGE DELETE path expressions BFS/DFS aggregations graph algorithms"
-tags: ["cypher","query-language","graph","ladybugdb"]
+tags: ["cypher","query-language","graph","neo4j"]
 dependencies: []
 composes: []
 similar_to: []
@@ -10,11 +10,11 @@ called_by: []
 authorization_required: false
 scope: general
 model_hint: claude-sonnet
-embedding_hint: "cypher query graph MATCH CREATE MERGE relationship path ladybugdb"
+embedding_hint: "cypher query graph MATCH CREATE MERGE relationship path neo4j"
 ---
 
 ## Purpose
-This skill allows OpenClaw to execute Cypher queries for interacting with graph databases, specifically LadybugDB, enabling operations like node matching, relationship creation, and graph traversals.
+This skill allows OpenClaw to execute Cypher queries for interacting with graph databases, specifically Neo4j, enabling operations like node matching, relationship creation, and graph traversals.
 
 ## When to Use
 Use this skill when working with graph-structured data, such as social networks or recommendation systems. For example, query relationships in a user graph or perform BFS on a knowledge base. Avoid it for relational data; opt for SQL-based skills instead.
@@ -25,48 +25,66 @@ Use this skill when working with graph-structured data, such as social networks 
 - Support BFS/DFS traversals via algorithms like shortestPath().
 - Perform aggregations (e.g., COUNT, SUM) on graph data.
 - Run graph algorithms such as PageRank or community detection.
-- Integrate with LadybugDB for querying nodes and relationships.
+- Integrate with Neo4j for querying nodes and relationships.
 
 ## Usage Patterns
-To execute a Cypher query via OpenClaw, structure your request as a JSON payload sent to the LadybugDB API endpoint. Always include authentication via the $LADYBUG_API_KEY environment variable. For simple queries, use a single-line invocation; for complex ones, chain clauses like MATCH followed by RETURN.
+To execute a Cypher query, use `cypher-shell` or the Python `neo4j` driver. Neo4j Community Edition runs on `bolt://localhost:7687` with no authentication by default.
 
 Example 1: Match all nodes and return their labels.
 ```cypher
-MATCH (n) RETURN n.label LIMIT 10;
+MATCH (n) RETURN labels(n), count(n) LIMIT 10;
 ```
-Invoke it in OpenClaw by: `openclaw execute cypher --query "MATCH (n) RETURN n.label LIMIT 10;" --env $LADYBUG_API_KEY`.
+Via CLI: `cypher-shell -a bolt://localhost:7687 --format plain "MATCH (n) RETURN labels(n), count(n) LIMIT 10"`
 
 Example 2: Create a relationship between two nodes.
 ```cypher
-MATCH (a:Person {name: 'Alice'}), (b:Person {name: 'Bob'}) 
+MATCH (a:Person {name: 'Alice'}), (b:Person {name: 'Bob'})
 CREATE (a)-[:KNOWS]->(b);
 ```
-Run via OpenClaw: `openclaw execute cypher --query "MATCH (a:Person {name: 'Alice'}), (b:Person {name: 'Bob'}) CREATE (a)-[:KNOWS]->(b);" --api-key $LADYBUG_API_KEY`.
 
 ## Common Commands/API
-Use the LadybugDB API endpoint for queries: POST to https://api.ladybugdb.com/v1/query. Include the Authorization header with Bearer $LADYBUG_API_KEY. CLI flags for OpenClaw: `--query` for the Cypher string, `--env` for environment variables, and `--format json` for output.
+Use `cypher-shell` for interactive queries or the Python `neo4j` driver for programmatic access:
 
-To run a query:
 ```bash
-curl -X POST -H "Authorization: Bearer $LADYBUG_API_KEY" \
--H "Content-Type: application/json" \
--d '{"query": "MATCH (n:Person) RETURN n.name"}' \
-https://api.ladybugdb.com/v1/query
+# CLI query
+cypher-shell -a bolt://localhost:7687 --format plain "MATCH (n:Skill) RETURN n.name LIMIT 10"
 ```
-Config format: Queries must be in JSON like {"query": "YOUR_CYPHER_QUERY"}. For aggregations, add clauses like RETURN COUNT(n) AS count. Use MERGE for upsert operations: MERGE (n:Person {name: 'Alice'}).
-
-## Integration Notes
-Integrate this skill in OpenClaw by setting $LADYBUG_API_KEY in your environment. For example, export it in a .env file: `LADYBUG_API_KEY=your_key_here`. Ensure LadybugDB is running or accessible via the API. To test, use OpenClaw's invoke command: `openclaw invoke cypher --params '{"query": "MATCH (n) RETURN n"}'`. Handle rate limits by adding a delay between requests, e.g., via OpenClaw's --wait 5 flag.
-
-## Error Handling
-Common errors include syntax issues (e.g., missing semicolons) or authentication failures. Check for "Neo4jError: Invalid input" by validating queries first. If authentication fails (HTTP 401), verify $LADYBUG_API_KEY. In code, wrap API calls in try-catch blocks:
 
 ```python
+# Python neo4j driver
+from neo4j import GraphDatabase
+
+driver = GraphDatabase.driver("bolt://localhost:7687")
+with driver.session() as session:
+    result = session.run("MATCH (n:Skill) RETURN n.name LIMIT 10")
+    for record in result:
+        print(record["n.name"])
+driver.close()
+```
+
+Config: Connection via `bolt://localhost:7687`, no auth. Use MERGE for upsert operations: `MERGE (n:Person {name: 'Alice'})`.
+
+## Integration Notes
+Integrate this skill in OpenClaw by ensuring Neo4j is running (`brew services start neo4j` on macOS, `systemctl start neo4j` on Linux). Connection defaults to `bolt://localhost:7687` with no authentication. Override via `NEO4J_URI` environment variable if needed.
+
+## Error Handling
+Common errors include syntax issues (e.g., missing semicolons) or connection failures. Check for "Neo4jError: Invalid input" by validating queries first. If connection fails, verify Neo4j is running. In code, wrap queries in try-catch blocks:
+
+```python
+from neo4j import GraphDatabase
+from neo4j.exceptions import ServiceUnavailable, CypherSyntaxError
+
+driver = GraphDatabase.driver("bolt://localhost:7687")
 try:
-    response = requests.post('https://api.ladybugdb.com/v1/query', headers={'Authorization': f'Bearer {os.environ.get("LADYBUG_API_KEY")}'}, json={'query': 'MATCH (n) RETURN n'})
-    response.raise_for_status()
-except requests.exceptions.HTTPError as e:
-    print(f"Error: {e} - Check API key or query syntax.")
+    with driver.session() as session:
+        result = session.run("MATCH (n) RETURN n LIMIT 5")
+        records = list(result)
+except ServiceUnavailable:
+    print("Error: Neo4j is not running. Start with: brew services start neo4j")
+except CypherSyntaxError as e:
+    print(f"Cypher syntax error: {e}")
+finally:
+    driver.close()
 ```
 For graph-specific errors like missing nodes, use OPTIONAL MATCH. Always log errors with details for debugging.
 
