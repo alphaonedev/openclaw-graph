@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  macOS launchd daemon for neo4j-sync.
+  Install: cp launchd.plist.template ~/Library/LaunchAgents/com.alphaone.neo4j-workspace-sync.plist
+  Edit paths to match your system, then:
+    launchctl load ~/Library/LaunchAgents/com.alphaone.neo4j-workspace-sync.plist
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.alphaone.neo4j-workspace-sync</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>$HOME/.openclaw/bin/neo4j-sync</string>
+    </array>
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>5</integer>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>NEO4J_URI</key>
+        <string>bolt://localhost:7687</string>
+        <key>RUST_LOG</key>
+        <string>info</string>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>$HOME/.openclaw/logs/neo4j-sync.stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>$HOME/.openclaw/logs/neo4j-sync.stderr.log</string>
+    <key>RunAtLoad</key>
+    <true/>
+</dict>
+</plist>

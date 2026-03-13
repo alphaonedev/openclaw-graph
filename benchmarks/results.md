@@ -31,11 +31,42 @@
 | workspace TOOLS.md (subprocess) | 846.99ms | 833.63ms | 853.45ms | 831.82ms |
 | workspace Soul default (subprocess) | 843.61ms | 839.98ms | 850.27ms | 836.83ms |
 
+## Rust Sync Daemon (`neo4j-sync` v1.5)
+
+> Long-running Rust binary with persistent Bolt connection and FSEvents file watching.
+> Replaces Python polling script — eliminates interpreter startup overhead entirely.
+
+| Metric | Python (v1.4) | Rust (v1.5) | Improvement |
+|--------|---------------|-------------|-------------|
+| Full sync cycle (8 files, 2 workspaces) | 555ms | 5ms | **111x** |
+| Python import overhead (`from neo4j import GraphDatabase`) | 550ms | 0ms | **eliminated** |
+| Write-back latency (IDENTITY.md → Neo4j) | up to 60s | <500ms | **120x** |
+| Memory (RSS) | ~50 MB | ~4 MB | **12x smaller** |
+| Binary size | N/A (interpreter) | 3.8 MB (arm64) | — |
+| Neo4j connections per hour | 60 (new each cycle) | 1 (persistent) | **60x fewer** |
+| CPU duty cycle (per sync) | 0.9% | <0.01% | — |
+
+### Where the 555ms went (Python profiling)
+
+```
+Python interpreter startup:     ~10ms
+from neo4j import GraphDatabase: ~540ms  ← 97% of wall time
+Neo4j queries (8 files):          ~4ms
+File I/O (write .md files):     ~0.5ms
+                               ─────────
+Total:                          ~555ms
+```
+
+The Rust binary eliminates the interpreter startup entirely. With a persistent Bolt connection,
+each 60s sync cycle costs only the query + file I/O time (~5ms).
+
 ## Key Takeaways
 
 - **Sub-millisecond** for all hot-path workspace queries (AgentConfig: 0.26ms, TOOLS.md: 0.45ms, OCMemory: 0.21ms)
 - **3.09ms** for full 316-skill scan — Neo4j keeps the entire corpus in page cache
 - **~10 MB** total Neo4j footprint vs 3.2 GB embedded SQLite
+- **111x faster** sync cycles with Rust daemon (5ms vs 555ms)
+- **<500ms write-back** via FSEvents file watching (vs 60s polling)
 - **cypher-shell** subprocess startup amortized by 60s adaptive TTL cache
 
 ---

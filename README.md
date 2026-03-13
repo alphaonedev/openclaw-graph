@@ -4,26 +4,34 @@
 
 Replace flat workspace markdown files with Cypher graph directives. 316 skills across 27 clusters · 217 skill relationships · proper graph modeling with SkillCluster nodes · namespaced labels for multi-graph coexistence.
 
-[![v1.4](https://img.shields.io/badge/release-v1.4-brightgreen)](https://github.com/alphaonedev/openclaw-graph/releases)
+[![v1.5](https://img.shields.io/badge/release-v1.5-brightgreen)](https://github.com/alphaonedev/openclaw-graph/releases)
 [![Skills](https://img.shields.io/badge/skills-316-blue)](skills/)
 [![Clusters](https://img.shields.io/badge/clusters-27-green)](skills/)
 [![Neo4j](https://img.shields.io/badge/Neo4j-2026.01-blue)](https://neo4j.com)
+[![Rust](https://img.shields.io/badge/sync-Rust-orange)](tools/neo4j-sync/)
 [![License](https://img.shields.io/badge/license-MIT-orange)](LICENSE)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://alphaonedev.github.io/openclaw-graph)
 
 ---
 
-## What's new in v1.4
+## What's new in v1.5
 
-**Neo4j-native.** OpenClaw Graph now runs on Neo4j with proper graph modeling — SkillCluster nodes, typed relationships, namespaced labels, and workspace-scoped isolation.
+**Rust event-driven sync daemon.** The workspace materializer is now a long-running Rust binary with FSEvents file watching — replacing the Python polling script. Sub-second write-back, persistent Bolt connection, 3.8 MB binary, ~4 MB RSS.
 
-| | v1.3 | v1.4 |
+| | v1.4 | v1.5 |
 |--|------|------|
-| Graph backend | embedded SQLite | ✅ Neo4j (native Cypher) |
-| SkillCluster nodes | clusters as property | ✅ first-class nodes + `IN_CLUSTER` edges |
-| Multi-graph coexistence | N/A | ✅ namespaced labels, workspace isolation |
-| Storage footprint | 3.2 GB | ✅ ~10 MB |
-| Installation | `curl \| bash` + Node.js | ✅ Neo4j + Python migration script |
+| Sync daemon | Python polling (60s) | ✅ Rust event-driven (FSEvents) |
+| Write-back latency | up to 60s | ✅ <500ms |
+| Per-sync cost | ~555ms (Python import overhead) | ✅ ~5ms |
+| Memory (RSS) | ~50 MB | ✅ ~4 MB |
+| Neo4j connections/hour | 60 new | ✅ 1 persistent |
+| Binary size | N/A (interpreter) | ✅ 3.8 MB (arm64) |
+
+See [tools/neo4j-sync/](tools/neo4j-sync/) for the full source.
+
+### Previous: v1.4
+
+**Neo4j-native.** OpenClaw Graph runs on Neo4j with proper graph modeling — SkillCluster nodes, typed relationships, namespaced labels, and workspace-scoped isolation.
 
 **Why Neo4j?** Native graph storage with index-free adjacency. Sub-millisecond traversals, Cypher queries, proper relationship modeling. The 316 skills + 27 clusters + workspace nodes add only ~10 MB to a Neo4j instance.
 
@@ -351,6 +359,103 @@ d.close()
 
 ---
 
+## Rust Sync Daemon (`neo4j-sync`)
+
+A long-running Rust binary that materializes Neo4j graph data into OpenClaw workspace flat files and syncs agent writes back to Neo4j — with event-driven file watching for instant write-back.
+
+### Architecture
+
+```
+                    ┌──────────────────────────────┐
+                    │    tokio::select! event loop  │
+                    │    (current_thread runtime)   │
+                    │                               │
+                    │  ticker (60s) ─── read sync   │ Neo4j → .md files
+                    │  FSEvents    ─── write-back   │ IDENTITY.md → Neo4j
+                    │  SIGTERM     ─── shutdown     │
+                    └──────────────────────────────┘
+                              │
+                    ┌─────────┴─────────┐
+                    │                   │
+             [neo4rs Graph]    [notify debouncer]
+             persistent         macOS FSEvents
+             Bolt connection    500ms debounce
+```
+
+### Two sync paths
+
+| Path | Direction | Trigger | Latency |
+|------|-----------|---------|---------|
+| **Read** | Neo4j → flat .md files | Periodic (60s) | ~5ms per cycle |
+| **Write-back** | IDENTITY.md → Neo4j Soul node | FSEvents file change | <500ms |
+
+### Module structure
+
+```
+tools/neo4j-sync/src/
+├── main.rs         — tokio event loop, signal handling
+├── config.rs       — paths, env vars, constants
+├── db.rs           — Neo4j connection (neo4rs), query execution
+├── stub.rs         — <!-- GRAPH: ... --> directive parsing
+├── formatter.rs    — query results → plain-text CSV
+├── sync_read.rs    — Neo4j → flat file materialization
+├── sync_write.rs   — IDENTITY.md → Neo4j write-back
+├── state.rs        — sync state persistence (JSON)
+└── watcher.rs      — FSEvents file watcher setup
+```
+
+### Crate stack
+
+| Crate | Purpose |
+|-------|---------|
+| `neo4rs` 0.8 | Async Neo4j Bolt driver |
+| `notify` 8 + `notify-debouncer-mini` 0.7 | FSEvents file watching with debounce |
+| `tokio` 1 | Async runtime (current_thread) |
+| `serde` + `serde_json` | State serialization |
+| `regex` | Cypher extraction + name parsing |
+| `tracing` | Structured logging (`RUST_LOG` env filter) |
+
+### Build & install
+
+```bash
+cd tools/neo4j-sync
+cargo build --release
+mkdir -p ~/.openclaw/bin
+cp target/release/neo4j-sync ~/.openclaw/bin/neo4j-sync
+```
+
+### macOS launchd
+
+```bash
+# Copy and edit the template
+cp tools/neo4j-sync/launchd.plist.template \
+   ~/Library/LaunchAgents/com.alphaone.neo4j-workspace-sync.plist
+# Edit paths ($HOME → your home directory)
+
+# Load
+launchctl load ~/Library/LaunchAgents/com.alphaone.neo4j-workspace-sync.plist
+
+# Verify
+launchctl list | grep neo4j-workspace-sync
+tail -10 ~/.openclaw/logs/neo4j-sync.stdout.log
+```
+
+### Sync daemon performance
+
+Measured on Apple Silicon, Neo4j 2026.01, 8 workspace files across 2 workspaces.
+
+| Metric | Python (v1.4) | Rust (v1.5) | Improvement |
+|--------|---------------|-------------|-------------|
+| Per-sync wall time | 555ms | 5ms | **111x faster** |
+| Python import overhead | 550ms | 0ms (compiled) | **eliminated** |
+| Write-back latency | up to 60s | <500ms | **120x faster** |
+| Memory (RSS) | ~50 MB | ~4 MB | **12x smaller** |
+| Binary size | N/A (interpreter) | 3.8 MB | — |
+| Neo4j connections/hour | 60 new | 1 persistent | **60x fewer** |
+| CPU duty cycle | 0.9% | <0.01% | — |
+
+---
+
 ## Performance
 
 Measured on production Neo4j 2026.01 — 316 skills, 27 clusters, 393 total nodes, Mac mini M-series.
@@ -489,6 +594,7 @@ What the agent can do with this skill.
 |-------|-------------|
 | **[Admin Guide](https://alphaonedev.github.io/openclaw-graph/admin-guide.html)** | Installation, database layout, CLI reference, fleet management, upgrading, troubleshooting |
 | **[User Guide](https://alphaonedev.github.io/openclaw-graph/user-guide.html)** | Workspace stubs, GRAPH directives, node schemas (Soul/Memory/AgentConfig/Tool/Skill), loading flow |
+| **[Rust Sync Daemon](tools/neo4j-sync/)** | Event-driven Neo4j workspace sync — Rust source, build instructions, launchd template |
 | **[Customizing](CUSTOMIZING.md)** | Step-by-step workspace personalization — identity, memory, tools, multi-workspace setup |
 | **[Benchmarks](benchmarks/results.md)** | Full performance measurements with methodology |
 | **[GitHub Pages](https://alphaonedev.github.io/openclaw-graph/)** | Interactive documentation site |
