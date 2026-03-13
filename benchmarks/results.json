@@ -1,9 +1,139 @@
 {
-  "run_date": "pending",
-  "run_time": "pending",
+  "run_date": "2026-03-13",
+  "run_time": "08:03 ET",
   "host": "Apple Silicon, 32 GB RAM",
   "db_uri": "bolt://localhost:7687",
-  "db_stats": {},
-  "results": [],
-  "notes": "Benchmarks pending re-run after v1.4 migration to Neo4j. Run: python3 benchmarks/run-benchmarks.py"
+  "db_stats": {
+    "skill_nodes": 316,
+    "skill_clusters": 27,
+    "related_to_edges": 217,
+    "in_cluster_edges": 316,
+    "soul_nodes": 4,
+    "memory_nodes": 2,
+    "agent_config_nodes": 9,
+    "tool_nodes": 26
+  },
+  "results": [
+    {
+      "label": "PK lookup \u2014 skill by name (warm)",
+      "avg": 0.51,
+      "p50": 0.31,
+      "p95": 1.54,
+      "min": 0.27,
+      "max": 2.24,
+      "iters": 20,
+      "unit": "ms"
+    },
+    {
+      "label": "Cluster scan \u2014 devops-sre (via SkillCluster)",
+      "avg": 0.62,
+      "p50": 0.46,
+      "p95": 0.9,
+      "min": 0.35,
+      "max": 3.07,
+      "iters": 20,
+      "unit": "ms"
+    },
+    {
+      "label": "Full skill scan \u2014 316 nodes",
+      "avg": 4.06,
+      "p50": 3.71,
+      "p95": 4.93,
+      "min": 3.4,
+      "max": 5.97,
+      "iters": 10,
+      "unit": "ms"
+    },
+    {
+      "label": "SkillCluster traversal \u2014 all clusters",
+      "avg": 1.13,
+      "p50": 0.89,
+      "p95": 1.49,
+      "min": 0.69,
+      "max": 2.48,
+      "iters": 10,
+      "unit": "ms"
+    },
+    {
+      "label": "RELATED_TO graph walk (2 hops)",
+      "avg": 0.65,
+      "p50": 0.39,
+      "p95": 0.63,
+      "min": 0.31,
+      "max": 2.66,
+      "iters": 10,
+      "unit": "ms"
+    },
+    {
+      "label": "Soul workspace query \u2014 default (4 nodes)",
+      "avg": 0.45,
+      "p50": 0.32,
+      "p95": 0.6,
+      "min": 0.26,
+      "max": 2.36,
+      "iters": 20,
+      "unit": "ms"
+    },
+    {
+      "label": "OCMemory query \u2014 default (2 nodes)",
+      "avg": 0.32,
+      "p50": 0.25,
+      "p95": 0.54,
+      "min": 0.22,
+      "max": 1.07,
+      "iters": 20,
+      "unit": "ms"
+    },
+    {
+      "label": "AgentConfig \u2014 AGENTS.md hot path (9 nodes)",
+      "avg": 0.47,
+      "p50": 0.35,
+      "p95": 0.6,
+      "min": 0.29,
+      "max": 1.99,
+      "iters": 20,
+      "unit": "ms"
+    },
+    {
+      "label": "OCTool query \u2014 TOOLS.md hot path (26 nodes)",
+      "avg": 0.64,
+      "p50": 0.53,
+      "p95": 1.02,
+      "min": 0.47,
+      "max": 1.83,
+      "iters": 20,
+      "unit": "ms"
+    },
+    {
+      "label": "CLI \u2014 workspace AGENTS.md (subprocess)",
+      "avg": 855.34,
+      "p50": 849.73,
+      "p95": 850.47,
+      "min": 834.07,
+      "max": 892.5,
+      "iters": 5,
+      "unit": "ms"
+    },
+    {
+      "label": "CLI \u2014 workspace TOOLS.md (subprocess)",
+      "avg": 849.19,
+      "p50": 848.27,
+      "p95": 850.71,
+      "min": 843.07,
+      "max": 854.02,
+      "iters": 5,
+      "unit": "ms"
+    },
+    {
+      "label": "CLI \u2014 workspace Soul default (subprocess)",
+      "avg": 866.7,
+      "p50": 860.08,
+      "p95": 870.34,
+      "min": 853.32,
+      "max": 889.48,
+      "iters": 5,
+      "unit": "ms"
+    }
+  ],
+  "notes": "In-process queries use the neo4j Python driver. CLI subprocess benchmarks represent workspace.ts GRAPH directive resolution cost (cypher-shell). 60s adaptive TTL cache means CLI cost is paid at most once per minute per unique Cypher query."
 }
