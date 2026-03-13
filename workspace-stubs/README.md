@@ -3,7 +3,7 @@
 Five files that replace your full `~/.openclaw/workspace/*.md` flat files.
 Each contains one `<!-- GRAPH: ... -->` directive — OpenClaw resolves it against Neo4j at session start.
 
-Default workspace ID: **`openclaw`** — seeded via `migrate_ladybugdb_to_neo4j.py`.
+Default workspace ID: **`openclaw`** — seeded via `python3 seed.py`.
 
 ## Before → After
 
@@ -50,12 +50,12 @@ cypher-shell -a bolt://localhost:7687 --format plain \
   "MATCH (t:OCTool {id:'tool-sessions-spawn'}) SET t.available = false"
 ```
 
-**Option B — Re-run migration with custom workspace:**
+**Option B — Re-run seed with custom workspace:**
 ```bash
-python3 migrate_ladybugdb_to_neo4j.py --workspace myagent
+python3 seed.py --workspace myagent
 
-# Update stubs to point to your workspace
-sed -i "s/workspace = 'openclaw'/workspace = 'myagent'/g" workspace-stubs/*.md
+# Or use the installer (auto-deploys stubs with correct workspace)
+./install.sh --workspace myagent
 ```
 
 **Option C — Multiple workspaces (8-instance fleet):**
@@ -64,8 +64,8 @@ sed -i "s/workspace = 'openclaw'/workspace = 'myagent'/g" workspace-stubs/*.md
 # Instance A: workspace='intel-agent'
 # Instance B: workspace='code-agent'
 # etc.
-python3 migrate_ladybugdb_to_neo4j.py --workspace intel-agent
-python3 migrate_ladybugdb_to_neo4j.py --workspace code-agent
+python3 seed.py --workspace intel-agent
+python3 seed.py --workspace code-agent
 ```
 
 ## Stub Format
@@ -87,6 +87,6 @@ python3 migrate_ladybugdb_to_neo4j.py --workspace code-agent
 | AGENTS.md | AgentConfig | `workspace = 'X'` | Delegation, heartbeats, session config |
 | SOUL.md   | Soul        | `workspace = 'X'` | Identity, prime directive, vibe |
 | MEMORY.md | OCMemory    | `workspace = 'X'` | Project facts, infrastructure, state |
-| TOOLS.md  | OCTool      | `available = true` | Available tools + usage notes |
+| TOOLS.md  | OCTool      | `available = true AND workspace = 'X'` | Available tools + usage notes |
 
 Session filtering in OpenClaw: cron/subagent sessions only load AGENTS.md + TOOLS.md (`MINIMAL_BOOTSTRAP_ALLOWLIST`).

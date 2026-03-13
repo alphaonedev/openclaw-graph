@@ -1,0 +1,870 @@
+[
+  {
+    "from_id": "web-wasm",
+    "to_id": "coding-go"
+  },
+  {
+    "from_id": "web-wasm",
+    "to_id": "coding-rust"
+  },
+  {
+    "from_id": "web-vue",
+    "to_id": "coding-typescript"
+  },
+  {
+    "from_id": "web-tailwind",
+    "to_id": "web-css"
+  },
+  {
+    "from_id": "web-security",
+    "to_id": "web"
+  },
+  {
+    "from_id": "web-react",
+    "to_id": "coding-typescript"
+  },
+  {
+    "from_id": "web-pwa",
+    "to_id": "web"
+  },
+  {
+    "from_id": "web-performance",
+    "to_id": "web"
+  },
+  {
+    "from_id": "web-nextjs",
+    "to_id": "web-react"
+  },
+  {
+    "from_id": "web-html",
+    "to_id": "web"
+  },
+  {
+    "from_id": "web-deploy",
+    "to_id": "cloudflare"
+  },
+  {
+    "from_id": "web-deploy",
+    "to_id": "cloudflare"
+  },
+  {
+    "from_id": "web-css",
+    "to_id": "web-html"
+  },
+  {
+    "from_id": "web-api",
+    "to_id": "arch-api"
+  },
+  {
+    "from_id": "web-api",
+    "to_id": "coding-node"
+  },
+  {
+    "from_id": "web-api",
+    "to_id": "coding-python"
+  },
+  {
+    "from_id": "twilio-whatsapp",
+    "to_id": "wacli"
+  },
+  {
+    "from_id": "twilio-whatsapp",
+    "to_id": "twilio"
+  },
+  {
+    "from_id": "twilio-voice",
+    "to_id": "twilio"
+  },
+  {
+    "from_id": "twilio-video",
+    "to_id": "twilio"
+  },
+  {
+    "from_id": "twilio-verify",
+    "to_id": "twilio"
+  },
+  {
+    "from_id": "twilio-sms",
+    "to_id": "twilio"
+  },
+  {
+    "from_id": "twilio-lookup",
+    "to_id": "twilio"
+  },
+  {
+    "from_id": "twilio-email",
+    "to_id": "himalaya"
+  },
+  {
+    "from_id": "twilio-email",
+    "to_id": "twilio"
+  },
+  {
+    "from_id": "twilio-conversations",
+    "to_id": "twilio"
+  },
+  {
+    "from_id": "twilio-conversations",
+    "to_id": "twilio-sms"
+  },
+  {
+    "from_id": "twilio-conversations",
+    "to_id": "twilio-whatsapp"
+  },
+  {
+    "from_id": "twilio-admin",
+    "to_id": "twilio"
+  },
+  {
+    "from_id": "testing-unit",
+    "to_id": "testing"
+  },
+  {
+    "from_id": "testing-security",
+    "to_id": "testing"
+  },
+  {
+    "from_id": "testing-performance",
+    "to_id": "testing"
+  },
+  {
+    "from_id": "testing-mobile",
+    "to_id": "mobile"
+  },
+  {
+    "from_id": "testing-mobile",
+    "to_id": "testing"
+  },
+  {
+    "from_id": "testing-integration",
+    "to_id": "testing"
+  },
+  {
+    "from_id": "testing-e2e",
+    "to_id": "testing"
+  },
+  {
+    "from_id": "testing-ci",
+    "to_id": "github"
+  },
+  {
+    "from_id": "testing-ci",
+    "to_id": "github"
+  },
+  {
+    "from_id": "testing-ci",
+    "to_id": "testing"
+  },
+  {
+    "from_id": "arch-scalability",
+    "to_id": "arch-distributed"
+  },
+  {
+    "from_id": "arch-patterns",
+    "to_id": "arch"
+  },
+  {
+    "from_id": "arch-microservices",
+    "to_id": "linux-docker"
+  },
+  {
+    "from_id": "arch-microservices",
+    "to_id": "arch"
+  },
+  {
+    "from_id": "arch-microservices",
+    "to_id": "arch-distributed"
+  },
+  {
+    "from_id": "arch-event-driven",
+    "to_id": "arch"
+  },
+  {
+    "from_id": "arch-domain-driven",
+    "to_id": "arch"
+  },
+  {
+    "from_id": "arch-distributed",
+    "to_id": "cs-networks"
+  },
+  {
+    "from_id": "arch-distributed",
+    "to_id": "arch"
+  },
+  {
+    "from_id": "arch-diagrams",
+    "to_id": "arch"
+  },
+  {
+    "from_id": "arch-database",
+    "to_id": "arch"
+  },
+  {
+    "from_id": "arch-cloud",
+    "to_id": "cloudflare"
+  },
+  {
+    "from_id": "arch-cloud",
+    "to_id": "arch"
+  },
+  {
+    "from_id": "arch-clean",
+    "to_id": "arch"
+  },
+  {
+    "from_id": "arch-clean",
+    "to_id": "arch-patterns"
+  },
+  {
+    "from_id": "arch-api",
+    "to_id": "web-api"
+  },
+  {
+    "from_id": "arch-api",
+    "to_id": "arch"
+  },
+  {
+    "from_id": "ios-watchos",
+    "to_id": "ios-swift"
+  },
+  {
+    "from_id": "ios-watchos",
+    "to_id": "ios-swiftui"
+  },
+  {
+    "from_id": "ios-uikit",
+    "to_id": "ios-swift"
+  },
+  {
+    "from_id": "ios-swiftui",
+    "to_id": "ios-swift"
+  },
+  {
+    "from_id": "ios-swift",
+    "to_id": "coding-swift"
+  },
+  {
+    "from_id": "ios-swift",
+    "to_id": "ios"
+  },
+  {
+    "from_id": "ios-frameworks",
+    "to_id": "ios"
+  },
+  {
+    "from_id": "ios-deploy",
+    "to_id": "macos-xcode"
+  },
+  {
+    "from_id": "ios-deploy",
+    "to_id": "ios"
+  },
+  {
+    "from_id": "ios",
+    "to_id": "mobile"
+  },
+  {
+    "from_id": "cross-platform",
+    "to_id": "mobile"
+  },
+  {
+    "from_id": "android-kotlin",
+    "to_id": "coding-kotlin"
+  },
+  {
+    "from_id": "android-kotlin",
+    "to_id": "android"
+  },
+  {
+    "from_id": "android-jetpack",
+    "to_id": "android-kotlin"
+  },
+  {
+    "from_id": "android-deploy",
+    "to_id": "android"
+  },
+  {
+    "from_id": "android-compose",
+    "to_id": "android-kotlin"
+  },
+  {
+    "from_id": "android",
+    "to_id": "mobile"
+  },
+  {
+    "from_id": "macos-xcode",
+    "to_id": "ios-deploy"
+  },
+  {
+    "from_id": "macos-xcode",
+    "to_id": "macos-admin"
+  },
+  {
+    "from_id": "macos-security",
+    "to_id": "macos-admin"
+  },
+  {
+    "from_id": "macos-perf",
+    "to_id": "macos-admin"
+  },
+  {
+    "from_id": "macos-networking",
+    "to_id": "linux-networking"
+  },
+  {
+    "from_id": "macos-networking",
+    "to_id": "macos-admin"
+  },
+  {
+    "from_id": "macos-launchd",
+    "to_id": "openclaw-admin"
+  },
+  {
+    "from_id": "macos-launchd",
+    "to_id": "macos-admin"
+  },
+  {
+    "from_id": "macos-keychain",
+    "to_id": "macos-admin"
+  },
+  {
+    "from_id": "macos-brew",
+    "to_id": "macos"
+  },
+  {
+    "from_id": "macos-automation",
+    "to_id": "macos"
+  },
+  {
+    "from_id": "macos-admin",
+    "to_id": "macos"
+  },
+  {
+    "from_id": "linux-systemd",
+    "to_id": "linux-admin"
+  },
+  {
+    "from_id": "linux-networking",
+    "to_id": "macos-networking"
+  },
+  {
+    "from_id": "linux-networking",
+    "to_id": "linux-admin"
+  },
+  {
+    "from_id": "linux-docker",
+    "to_id": "linux-networking"
+  },
+  {
+    "from_id": "linux-cgroups",
+    "to_id": "linux-systemd"
+  },
+  {
+    "from_id": "sensor-fusion",
+    "to_id": "cs-ml"
+  },
+  {
+    "from_id": "sensor-fusion",
+    "to_id": "cs-networks"
+  },
+  {
+    "from_id": "raspberry-pi",
+    "to_id": "coding-python"
+  },
+  {
+    "from_id": "raspberry-pi",
+    "to_id": "linux-admin"
+  },
+  {
+    "from_id": "raspberry-pi",
+    "to_id": "linux-docker"
+  },
+  {
+    "from_id": "mqtt",
+    "to_id": "cs-networks"
+  },
+  {
+    "from_id": "iot-security",
+    "to_id": "cs-networks"
+  },
+  {
+    "from_id": "iot-security",
+    "to_id": "cloudflare"
+  },
+  {
+    "from_id": "iot-security",
+    "to_id": "linux-admin"
+  },
+  {
+    "from_id": "iot-protocols",
+    "to_id": "coding-python"
+  },
+  {
+    "from_id": "iot-protocols",
+    "to_id": "cs-networks"
+  },
+  {
+    "from_id": "iot-cloud",
+    "to_id": "coding-python"
+  },
+  {
+    "from_id": "iot-cloud",
+    "to_id": "cs-networks"
+  },
+  {
+    "from_id": "iot-cloud",
+    "to_id": "arch-cloud"
+  },
+  {
+    "from_id": "home-automation",
+    "to_id": "coding-python"
+  },
+  {
+    "from_id": "home-automation",
+    "to_id": "linux-docker"
+  },
+  {
+    "from_id": "embedded-c",
+    "to_id": "cs-networks"
+  },
+  {
+    "from_id": "embedded-c",
+    "to_id": "linux-admin"
+  },
+  {
+    "from_id": "edge-computing",
+    "to_id": "cs-networks"
+  },
+  {
+    "from_id": "edge-computing",
+    "to_id": "linux-docker"
+  },
+  {
+    "from_id": "arduino",
+    "to_id": "coding-python"
+  },
+  {
+    "from_id": "game-networking",
+    "to_id": "cs-networks"
+  },
+  {
+    "from_id": "game-networking",
+    "to_id": "cs-networks"
+  },
+  {
+    "from_id": "game-ai",
+    "to_id": "cs-ml"
+  },
+  {
+    "from_id": "algo-trading",
+    "to_id": "coding-python"
+  },
+  {
+    "from_id": "session-mesh",
+    "to_id": "skill-graph"
+  },
+  {
+    "from_id": "orchestrator",
+    "to_id": "node-ops"
+  },
+  {
+    "from_id": "orchestrator",
+    "to_id": "session-mesh"
+  },
+  {
+    "from_id": "k8s",
+    "to_id": "arch-cloud"
+  },
+  {
+    "from_id": "k8s",
+    "to_id": "linux-docker"
+  },
+  {
+    "from_id": "ci-cd-ops",
+    "to_id": "github"
+  },
+  {
+    "from_id": "chaos-engineering",
+    "to_id": "testing"
+  },
+  {
+    "from_id": "spark",
+    "to_id": "arch-distributed"
+  },
+  {
+    "from_id": "snowflake",
+    "to_id": "arch-database"
+  },
+  {
+    "from_id": "kafka",
+    "to_id": "arch-distributed"
+  },
+  {
+    "from_id": "data-lakehouse",
+    "to_id": "arch-database"
+  },
+  {
+    "from_id": "skill-graph",
+    "to_id": "cypher"
+  },
+  {
+    "from_id": "openclaw-admin",
+    "to_id": "cron-ops"
+  },
+  {
+    "from_id": "openclaw-admin",
+    "to_id": "macos-launchd"
+  },
+  {
+    "from_id": "cron-ops",
+    "to_id": "openclaw-admin"
+  },
+  {
+    "from_id": "cloudflare",
+    "to_id": "arch-cloud"
+  },
+  {
+    "from_id": "cloudflare",
+    "to_id": "web-deploy"
+  },
+  {
+    "from_id": "cs-os",
+    "to_id": "cs"
+  },
+  {
+    "from_id": "cs-networks",
+    "to_id": "cs"
+  },
+  {
+    "from_id": "cs-ml",
+    "to_id": "coding-python"
+  },
+  {
+    "from_id": "cs-ml",
+    "to_id": "coding-r"
+  },
+  {
+    "from_id": "cs-ml",
+    "to_id": "cs-math"
+  },
+  {
+    "from_id": "cs-math",
+    "to_id": "cs"
+  },
+  {
+    "from_id": "cs-formal",
+    "to_id": "cs-math"
+  },
+  {
+    "from_id": "cs-data-structures",
+    "to_id": "cs-algorithms"
+  },
+  {
+    "from_id": "cs-crypto",
+    "to_id": "macos-keychain"
+  },
+  {
+    "from_id": "cs-crypto",
+    "to_id": "cs-math"
+  },
+  {
+    "from_id": "cs-concurrency",
+    "to_id": "cs-os"
+  },
+  {
+    "from_id": "cs-compilers",
+    "to_id": "cs-algorithms"
+  },
+  {
+    "from_id": "cs-compilers",
+    "to_id": "cs-data-structures"
+  },
+  {
+    "from_id": "cs-algorithms",
+    "to_id": "cs"
+  },
+  {
+    "from_id": "coding-web",
+    "to_id": "coding-javascript"
+  },
+  {
+    "from_id": "coding-web",
+    "to_id": "coding-node"
+  },
+  {
+    "from_id": "coding-web",
+    "to_id": "coding-typescript"
+  },
+  {
+    "from_id": "coding-typescript",
+    "to_id": "coding-javascript"
+  },
+  {
+    "from_id": "coding-systems",
+    "to_id": "coding-go"
+  },
+  {
+    "from_id": "coding-systems",
+    "to_id": "coding-nim"
+  },
+  {
+    "from_id": "coding-systems",
+    "to_id": "coding-rust"
+  },
+  {
+    "from_id": "coding-swift",
+    "to_id": "coding-kotlin"
+  },
+  {
+    "from_id": "coding-swift",
+    "to_id": "coding"
+  },
+  {
+    "from_id": "coding-rust",
+    "to_id": "coding-nim"
+  },
+  {
+    "from_id": "coding-rust",
+    "to_id": "coding"
+  },
+  {
+    "from_id": "coding-ruby",
+    "to_id": "coding"
+  },
+  {
+    "from_id": "coding-r",
+    "to_id": "coding-julia"
+  },
+  {
+    "from_id": "coding-r",
+    "to_id": "coding-python"
+  },
+  {
+    "from_id": "coding-r",
+    "to_id": "coding"
+  },
+  {
+    "from_id": "coding-python",
+    "to_id": "coding"
+  },
+  {
+    "from_id": "coding-node",
+    "to_id": "coding"
+  },
+  {
+    "from_id": "coding-node",
+    "to_id": "coding-javascript"
+  },
+  {
+    "from_id": "coding-nim",
+    "to_id": "coding-rust"
+  },
+  {
+    "from_id": "coding-nim",
+    "to_id": "coding"
+  },
+  {
+    "from_id": "coding-kotlin",
+    "to_id": "coding-java"
+  },
+  {
+    "from_id": "coding-kotlin",
+    "to_id": "coding-swift"
+  },
+  {
+    "from_id": "coding-kotlin",
+    "to_id": "coding"
+  },
+  {
+    "from_id": "coding-julia",
+    "to_id": "coding-python"
+  },
+  {
+    "from_id": "coding-julia",
+    "to_id": "coding-r"
+  },
+  {
+    "from_id": "coding-julia",
+    "to_id": "coding"
+  },
+  {
+    "from_id": "coding-javascript",
+    "to_id": "coding"
+  },
+  {
+    "from_id": "coding-java",
+    "to_id": "coding-kotlin"
+  },
+  {
+    "from_id": "coding-java",
+    "to_id": "coding"
+  },
+  {
+    "from_id": "coding-go",
+    "to_id": "coding"
+  },
+  {
+    "from_id": "coding-data-science",
+    "to_id": "coding-julia"
+  },
+  {
+    "from_id": "coding-data-science",
+    "to_id": "coding-python"
+  },
+  {
+    "from_id": "coding-data-science",
+    "to_id": "coding-r"
+  },
+  {
+    "from_id": "coding-dart",
+    "to_id": "coding-typescript"
+  },
+  {
+    "from_id": "coding-dart",
+    "to_id": "coding"
+  },
+  {
+    "from_id": "gcp-cloud-run",
+    "to_id": "arch-cloud"
+  },
+  {
+    "from_id": "gcp-cloud-run",
+    "to_id": "linux-docker"
+  },
+  {
+    "from_id": "gcp-bigquery",
+    "to_id": "arch-database"
+  },
+  {
+    "from_id": "aws-vpc",
+    "to_id": "cs-networks"
+  },
+  {
+    "from_id": "aws-sagemaker",
+    "to_id": "cs-ml"
+  },
+  {
+    "from_id": "aws-rds",
+    "to_id": "arch-database"
+  },
+  {
+    "from_id": "aws-ecs",
+    "to_id": "linux-docker"
+  },
+  {
+    "from_id": "aws-ec2",
+    "to_id": "arch-cloud"
+  },
+  {
+    "from_id": "network-forensics",
+    "to_id": "cs-networks"
+  },
+  {
+    "from_id": "web3-py",
+    "to_id": "cs-crypto"
+  },
+  {
+    "from_id": "web3-py",
+    "to_id": "coding-python"
+  },
+  {
+    "from_id": "smart-contracts",
+    "to_id": "cs-crypto"
+  },
+  {
+    "from_id": "nft",
+    "to_id": "cs-crypto"
+  },
+  {
+    "from_id": "ipfs",
+    "to_id": "arch-distributed"
+  },
+  {
+    "from_id": "ethers-js",
+    "to_id": "coding-javascript"
+  },
+  {
+    "from_id": "defi-protocols",
+    "to_id": "cs-crypto"
+  },
+  {
+    "from_id": "visionos",
+    "to_id": "macos-admin"
+  },
+  {
+    "from_id": "vector-db",
+    "to_id": "arch-database"
+  },
+  {
+    "from_id": "rag",
+    "to_id": "cs-ml"
+  },
+  {
+    "from_id": "prompt-engineering",
+    "to_id": "cs-ml"
+  },
+  {
+    "from_id": "model-deployment",
+    "to_id": "arch-cloud"
+  },
+  {
+    "from_id": "model-deployment",
+    "to_id": "linux-docker"
+  },
+  {
+    "from_id": "langchain",
+    "to_id": "cs-ml"
+  },
+  {
+    "from_id": "fine-tuning",
+    "to_id": "cs-ml"
+  },
+  {
+    "from_id": "embedding-pipelines",
+    "to_id": "cs-ml"
+  },
+  {
+    "from_id": "embedding-pipelines",
+    "to_id": "cs-ml"
+  },
+  {
+    "from_id": "xai-grok",
+    "to_id": "coding-python"
+  },
+  {
+    "from_id": "abtesting-web",
+    "to_id": "cloudflare"
+  },
+  {
+    "from_id": "abtesting-web",
+    "to_id": "abtesting"
+  },
+  {
+    "from_id": "abtesting-web",
+    "to_id": "web"
+  },
+  {
+    "from_id": "abtesting-stats",
+    "to_id": "abtesting"
+  },
+  {
+    "from_id": "abtesting-stats",
+    "to_id": "cs-math"
+  },
+  {
+    "from_id": "abtesting-mobile",
+    "to_id": "abtesting"
+  },
+  {
+    "from_id": "abtesting-mobile",
+    "to_id": "mobile"
+  },
+  {
+    "from_id": "abtesting-design",
+    "to_id": "abtesting"
+  },
+  {
+    "from_id": "abtesting-analysis",
+    "to_id": "abtesting-stats"
+  }
+]

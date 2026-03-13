@@ -100,9 +100,9 @@ def main():
         # Get DB stats
         skill_count = session.run("MATCH (n:Skill) RETURN count(n) AS n").single()["n"]
         cluster_count = session.run("MATCH (n:SkillCluster) RETURN count(n) AS n").single()["n"]
-        soul_count = session.run("MATCH (n:Soul {workspace:'openclaw_master_conductor'}) RETURN count(n) AS n").single()["n"]
+        soul_count = session.run("MATCH (n:Soul {workspace:'openclaw'}) RETURN count(n) AS n").single()["n"]
         mem_count = session.run("MATCH (n:OCMemory) RETURN count(n) AS n").single()["n"]
-        ac_count = session.run("MATCH (n:AgentConfig {workspace:'openclaw_master_conductor'}) RETURN count(n) AS n").single()["n"]
+        ac_count = session.run("MATCH (n:AgentConfig {workspace:'openclaw'}) RETURN count(n) AS n").single()["n"]
         tool_count = session.run("MATCH (n:OCTool) RETURN count(n) AS n").single()["n"]
         rel_to_count = session.run("MATCH ()-[r:RELATED_TO]->() RETURN count(r) AS n").single()["n"]
         in_cluster_count = session.run("MATCH ()-[r:IN_CLUSTER]->() RETURN count(r) AS n").single()["n"]
@@ -122,9 +122,9 @@ def main():
         results.append(bench(session, "RELATED_TO graph walk (2 hops)", "MATCH (s:Skill {name:'python'})-[:RELATED_TO*1..2]-(t:Skill) RETURN DISTINCT t.name LIMIT 20", 10))
 
         # Workspace queries
-        results.append(bench(session, f"Soul workspace query — default ({soul_count} nodes)", "MATCH (s:Soul {workspace:'openclaw_master_conductor'}) RETURN s.section, s.content ORDER BY s.priority", 20))
+        results.append(bench(session, f"Soul workspace query — default ({soul_count} nodes)", "MATCH (s:Soul {workspace:'openclaw'}) RETURN s.section, s.content ORDER BY s.priority", 20))
         results.append(bench(session, f"OCMemory query — default ({mem_count} nodes)", "MATCH (m:OCMemory) RETURN m.domain, m.content", 20))
-        results.append(bench(session, f"AgentConfig — AGENTS.md hot path ({ac_count} nodes)", "MATCH (a:AgentConfig {workspace:'openclaw_master_conductor'}) RETURN a.key, a.value ORDER BY a.id", 20))
+        results.append(bench(session, f"AgentConfig — AGENTS.md hot path ({ac_count} nodes)", "MATCH (a:AgentConfig {workspace:'openclaw'}) RETURN a.key, a.value ORDER BY a.id", 20))
         results.append(bench(session, f"OCTool query — TOOLS.md hot path ({tool_count} nodes)", "MATCH (t:OCTool) RETURN t.name, t.available, t.notes ORDER BY t.name", 20))
 
     driver.close()
@@ -134,7 +134,7 @@ def main():
 
     cli_agents = bench_cli(
         "CLI — workspace AGENTS.md (subprocess)",
-        "MATCH (a:AgentConfig {workspace:'openclaw_master_conductor'}) RETURN a.key, a.value ORDER BY a.id",
+        "MATCH (a:AgentConfig {workspace:'openclaw'}) RETURN a.key, a.value ORDER BY a.id",
         5
     )
     if cli_agents:
@@ -150,7 +150,7 @@ def main():
 
     cli_soul = bench_cli(
         "CLI — workspace Soul default (subprocess)",
-        "MATCH (s:Soul {workspace:'openclaw_master_conductor'}) RETURN s.section, s.content ORDER BY s.priority",
+        "MATCH (s:Soul {workspace:'openclaw'}) RETURN s.section, s.content ORDER BY s.priority",
         5
     )
     if cli_soul:

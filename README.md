@@ -89,7 +89,7 @@ Neo4j (bolt://localhost:7687)
 
 ## Prerequisites
 
-Install these **before** running the migration:
+Install these **before** running `seed.py`:
 
 | Dependency | Version | macOS | Ubuntu / Debian | Fedora |
 |------------|---------|-------|-----------------|--------|
@@ -167,18 +167,19 @@ git clone https://github.com/alphaonedev/openclaw-graph.git
 cd openclaw-graph
 ```
 
-### 2. Run the migration
+### 2. Install (seed + deploy stubs)
 
 ```bash
-# Preview first (no writes)
-python3 migrate_ladybugdb_to_neo4j.py --dry-run
+# One command — seeds Neo4j, deploys workspace stubs, verifies
+./install.sh
 
-# Migrate — creates all nodes, relationships, constraints
-python3 migrate_ladybugdb_to_neo4j.py
-# → 316 Skills, 27 SkillClusters, 217 RELATED_TO, 316 IN_CLUSTER — 0.9s
+# Or step by step:
+python3 seed.py --dry-run     # Preview (no writes)
+python3 seed.py               # Seed Neo4j (skills + workspace)
+cp workspace-stubs/*.md ~/.openclaw/workspace/
 ```
 
-### 3. Patch OpenClaw
+### 3. Patch OpenClaw (optional — for inline resolution)
 
 ```bash
 cd path/to/openclaw
@@ -186,25 +187,15 @@ git apply path/to/openclaw-graph/patches/workspace-cache-fix.patch
 pnpm build
 ```
 
-### 4. Deploy workspace stubs
+> **Note:** If you use the Rust sync daemon (`neo4j-sync`), it materializes flat files directly — no OpenClaw patch needed.
 
-```bash
-cp workspace-stubs/*.md ~/.openclaw/workspace/
-# Edit each stub: change workspace name to match your deployment
-```
-
-### 5. Personalize
+### 4. Personalize
 
 ```bash
 # Update your identity via Cypher
-python3 -c "
-from neo4j import GraphDatabase
-d = GraphDatabase.driver('bolt://localhost:7687')
-with d.session() as s:
-    s.run('''MATCH (s:Soul {id: \"soul-openclaw-identity\"})
-             SET s.content = \"Name: MyAgent | Role: Expert Engineer | Workspace: my_workspace\"''')
-d.close()
-"
+cypher-shell -a bolt://localhost:7687 --format plain \
+  "MATCH (s:Soul {id:'soul-openclaw-identity'}) \
+   SET s.content = 'Name: MyAgent | Role: Expert Engineer | Workspace: openclaw'"
 
 # See CUSTOMIZING.md for the full guide
 ```
@@ -248,8 +239,7 @@ import { execFileSync } from "node:child_process";
 const GRAPH_DIRECTIVE_PREFIX = "<!-- GRAPH:";
 const GRAPH_NODE_BIN = process.env.OPENCLAW_GRAPH_NODE_BIN ?? "node";
 const GRAPH_QUERY_SCRIPT =
-  process.env.OPENCLAW_GRAPH_QUERY_SCRIPT ??
-  path.join(os.homedir(), "openclaw-graph", "scripts", "query.js");
+  process.env.OPENCLAW_GRAPH_QUERY_SCRIPT ?? "";
 
 function extractGraphDirective(content: string): string | null {
   const trimmed = content.trim();
@@ -467,7 +457,7 @@ Measured on production Neo4j 2026.01 — 316 skills, 27 clusters, 393 total node
 | Cluster traversal (IN_CLUSTER) | **<1ms** |
 | Multi-hop skill reasoning (2 hops) | **~3ms** |
 | Workspace stubs (Soul/Memory/Config) | **<1ms** |
-| Migration (full import) | **0.9s** |
+| Full seed (seed.py) | **~1s** |
 | Neo4j storage overhead | **~10 MB** |
 
 ### Context efficiency
@@ -536,11 +526,13 @@ systemctl --user restart openclaw-gateway.service
 ### Health check
 
 ```bash
+python3 seed.py --verify
+# Or manually:
 python3 -c "
 from neo4j import GraphDatabase
 d = GraphDatabase.driver('bolt://localhost:7687')
 with d.session() as s:
-    for r in s.run('MATCH (n) WHERE n.workspace = \$ws RETURN labels(n)[0] AS type, count(n) AS cnt ORDER BY type', ws='openclaw_master_conductor'):
+    for r in s.run('MATCH (n) WHERE n.workspace = \$ws RETURN labels(n)[0] AS type, count(n) AS cnt ORDER BY type', ws='openclaw'):
         print(f'{r[\"type\"]:20s} {r[\"cnt\"]}')
 d.close()
 "
@@ -552,7 +544,7 @@ d.close()
 
 Pull requests welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-To add skills: create a `SKILL.md` file in the appropriate cluster directory and run the migration script to load into Neo4j.
+To add skills: create a `SKILL.md` file in the appropriate cluster directory and run `python3 seed.py` to load into Neo4j.
 
 Skill format:
 

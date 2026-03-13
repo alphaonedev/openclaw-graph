@@ -11,7 +11,7 @@ Skills live in `skills/<cluster>/SKILL.md`. To add a new skill:
 1. Choose an existing cluster or propose a new one
 2. Create `skills/<cluster>/<skill-name>/SKILL.md`
 3. Use the template below
-4. Run `python3 migrate_ladybugdb_to_neo4j.py --dry-run` to verify it loads cleanly
+4. Run `python3 seed.py --dry-run` to verify it loads cleanly
 5. Open a PR
 
 **Skill template:**

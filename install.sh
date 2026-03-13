@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 # ============================================================
-# install.sh — Neo4j Skill Graph Installer
+# install.sh — OpenClaw Graph v1.5 Installer
 # https://github.com/alphaonedev/openclaw-graph
 #
-# Installs Neo4j Community Edition, seeds the skill graph,
-# and verifies the database.
+# Installs Neo4j Community Edition, seeds the skill graph +
+# workspace nodes, deploys workspace stubs, and verifies.
 #
 # Usage:
-#   ./install.sh              # interactive (installs + seeds)
-#   ./install.sh --verify     # verify existing Neo4j data
+#   ./install.sh                    # full install
+#   ./install.sh --verify           # verify existing data
+#   ./install.sh --workspace NAME   # custom workspace ID
 # ============================================================
 
 set -euo pipefail
@@ -17,7 +18,7 @@ set -euo pipefail
 REPO="alphaonedev/openclaw-graph"
 NEO4J_URI="${NEO4J_URI:-bolt://localhost:7687}"
 PYTHON="${PYTHON:-python3}"
-MIGRATION_SCRIPT="migrate_ladybugdb_to_neo4j.py"
+SEED_SCRIPT="seed.py"
 # ─────────────────────────────────────────────────────────────
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
@@ -31,14 +32,20 @@ header()  { echo -e "\n${BOLD}$*${RESET}"; }
 
 # ── Parse args ───────────────────────────────────────────────
 VERIFY_ONLY=false
+WORKSPACE="openclaw"
+SEED_ARGS=""
 while [ $# -gt 0 ]; do
   case "$1" in
-    --verify)  VERIFY_ONLY=true ;;
+    --verify)    VERIFY_ONLY=true ;;
+    --workspace) shift; WORKSPACE="$1"; SEED_ARGS="$SEED_ARGS --workspace $1" ;;
+    --reset)     SEED_ARGS="$SEED_ARGS --reset" ;;
     --help|-h)
-      echo "Usage: $0 [--verify]"
+      echo "Usage: $0 [--verify] [--workspace NAME] [--reset]"
       echo ""
-      echo "  (default)   Install Neo4j, seed skill graph, verify"
-      echo "  --verify    Verify existing Neo4j data only"
+      echo "  (default)        Install Neo4j, seed graph, deploy stubs, verify"
+      echo "  --verify         Verify existing Neo4j data only"
+      echo "  --workspace NAME Custom workspace ID (default: openclaw)"
+      echo "  --reset          Drop existing workspace nodes before seeding"
       exit 0 ;;
   esac
   shift
@@ -46,7 +53,7 @@ done
 
 # ── Header ───────────────────────────────────────────────────
 echo ""
-echo -e "${BOLD}🔷 Neo4j Skill Graph — Installer${RESET}"
+echo -e "${BOLD}🔷 OpenClaw Graph v1.5 — Installer${RESET}"
 echo "   ${REPO}"
 echo ""
 
@@ -98,24 +105,34 @@ install_hint() {
 # ── Verify-only mode ─────────────────────────────────────────
 if $VERIFY_ONLY; then
   header "Verifying Neo4j data..."
-  if ! command -v cypher-shell &>/dev/null; then
-    error "cypher-shell not found  →  $(install_hint cypher-shell)"
-  fi
 
-  SKILL_COUNT=$(echo "MATCH (n:Skill) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
-  CLUSTER_COUNT=$(echo "MATCH (n:SkillCluster) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
-  SOUL_COUNT=$(echo "MATCH (n:Soul) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
-  AC_COUNT=$(echo "MATCH (n:AgentConfig) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+  SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd)" || SCRIPT_DIR=""
+  if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/$SEED_SCRIPT" ]; then
+    "$PYTHON" "$SCRIPT_DIR/$SEED_SCRIPT" --verify
+  elif command -v cypher-shell &>/dev/null; then
+    SKILL_COUNT=$(echo "MATCH (n:Skill) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+    CLUSTER_COUNT=$(echo "MATCH (n:SkillCluster) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+    SOUL_COUNT=$(echo "MATCH (n:Soul) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+    AC_COUNT=$(echo "MATCH (n:AgentConfig) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+    MEM_COUNT=$(echo "MATCH (n:OCMemory) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+    TOOL_COUNT=$(echo "MATCH (n:OCTool) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+    AGENT_COUNT=$(echo "MATCH (n:OCAgent) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
 
-  echo "  Skills:        $SKILL_COUNT"
-  echo "  SkillClusters: $CLUSTER_COUNT"
-  echo "  Soul:          $SOUL_COUNT"
-  echo "  AgentConfig:   $AC_COUNT"
+    echo "  Skills:        $SKILL_COUNT"
+    echo "  SkillClusters: $CLUSTER_COUNT"
+    echo "  Soul:          $SOUL_COUNT"
+    echo "  OCMemory:      $MEM_COUNT"
+    echo "  AgentConfig:   $AC_COUNT"
+    echo "  OCTool:        $TOOL_COUNT"
+    echo "  OCAgent:       $AGENT_COUNT"
 
-  if [ "$SKILL_COUNT" -gt 0 ] 2>/dev/null; then
-    success "Database OK"
+    if [ "$SKILL_COUNT" -gt 0 ] 2>/dev/null; then
+      success "Database OK"
+    else
+      error "No skills found — run: ./install.sh"
+    fi
   else
-    error "No skills found — run the migration script first"
+    error "Neither seed.py nor cypher-shell found"
   fi
   exit 0
 fi
@@ -182,47 +199,87 @@ else
   error "Neo4j is not running at $NEO4J_URI\n\n  Start it with:\n    macOS:  brew services start neo4j\n    Linux:  sudo systemctl start neo4j"
 fi
 
-# ── Run migration script ─────────────────────────────────────
-header "Seeding skill graph..."
+# ── Run seed script ──────────────────────────────────────────
+header "Seeding skill graph + workspace..."
 
-# Find migration script
 SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd)" || SCRIPT_DIR=""
-if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/$MIGRATION_SCRIPT" ]; then
-  SCRIPT_PATH="$SCRIPT_DIR/$MIGRATION_SCRIPT"
-elif [ -f "$HOME/openclaw-graph/$MIGRATION_SCRIPT" ]; then
-  SCRIPT_PATH="$HOME/openclaw-graph/$MIGRATION_SCRIPT"
+if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/$SEED_SCRIPT" ]; then
+  SCRIPT_PATH="$SCRIPT_DIR/$SEED_SCRIPT"
+elif [ -f "$HOME/openclaw-graph/$SEED_SCRIPT" ]; then
+  SCRIPT_PATH="$HOME/openclaw-graph/$SEED_SCRIPT"
 else
-  error "Migration script not found: $MIGRATION_SCRIPT\n\n  Clone the repo first:\n    git clone https://github.com/${REPO}.git ~/openclaw-graph"
+  error "Seed script not found: $SEED_SCRIPT\n\n  Clone the repo first:\n    git clone https://github.com/${REPO}.git ~/openclaw-graph"
 fi
 
-info "Running: $PYTHON $SCRIPT_PATH"
-"$PYTHON" "$SCRIPT_PATH" || error "Migration failed — check Neo4j connection"
+info "Running: $PYTHON $SCRIPT_PATH $SEED_ARGS"
+"$PYTHON" "$SCRIPT_PATH" $SEED_ARGS || error "Seeding failed — check Neo4j connection"
 
-# ── Verify ───────────────────────────────────────────────────
-header "Verifying database..."
-SKILL_COUNT=$(echo "MATCH (n:Skill) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
-CLUSTER_COUNT=$(echo "MATCH (n:SkillCluster) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
-SOUL_COUNT=$(echo "MATCH (n:Soul) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
-AC_COUNT=$(echo "MATCH (n:AgentConfig) RETURN count(n) AS n;" | cypher-shell -a "$NEO4J_URI" --format plain 2>/dev/null | tail -1 || echo "0")
+# ── Deploy workspace stubs ───────────────────────────────────
+header "Deploying workspace stubs..."
 
-echo "  Skills:        $SKILL_COUNT"
-echo "  SkillClusters: $CLUSTER_COUNT"
-echo "  Soul:          $SOUL_COUNT"
-echo "  AgentConfig:   $AC_COUNT"
+STUBS_DIR="$SCRIPT_DIR/workspace-stubs"
+WORKSPACE_DIR="$HOME/.openclaw/workspace"
 
-if [ "$SKILL_COUNT" -gt 0 ] 2>/dev/null; then
-  success "Database verified"
+if [ -d "$STUBS_DIR" ]; then
+  mkdir -p "$WORKSPACE_DIR"
+  for stub in "$STUBS_DIR"/*.md; do
+    [ -f "$stub" ] || continue
+    fname="$(basename "$stub")"
+    # Substitute workspace ID if not default
+    if [ "$WORKSPACE" != "openclaw" ]; then
+      sed "s/workspace = 'openclaw'/workspace = '${WORKSPACE}'/g" "$stub" > "$WORKSPACE_DIR/$fname"
+    else
+      cp "$stub" "$WORKSPACE_DIR/$fname"
+    fi
+    success "Deployed $fname"
+  done
 else
-  error "Verification failed — no skills found"
+  warn "workspace-stubs/ directory not found — skipping stub deployment"
+fi
+
+# ── Optional: Rust daemon ────────────────────────────────────
+header "Rust sync daemon (optional)..."
+
+RUST_DIR="$SCRIPT_DIR/tools/neo4j-sync"
+if [ -d "$RUST_DIR" ] && [ -f "$RUST_DIR/Cargo.toml" ]; then
+  if command -v cargo &>/dev/null; then
+    info "Rust toolchain detected — building neo4j-sync daemon..."
+    (cd "$RUST_DIR" && cargo build --release 2>&1) && {
+      DAEMON_BIN="$RUST_DIR/target/release/neo4j-sync"
+      if [ -f "$DAEMON_BIN" ]; then
+        mkdir -p "$HOME/.openclaw/bin"
+        cp "$DAEMON_BIN" "$HOME/.openclaw/bin/neo4j-sync"
+        success "Daemon installed to ~/.openclaw/bin/neo4j-sync"
+        info "See tools/neo4j-sync/launchd.plist.template for macOS auto-start"
+      fi
+    } || warn "Rust build failed — daemon is optional, continuing"
+  else
+    info "Rust toolchain not found — skipping daemon build (optional)"
+    info "Install Rust: https://rustup.rs/"
+  fi
+else
+  info "Rust daemon source not found — skipping (optional)"
 fi
 
 # ── Done ─────────────────────────────────────────────────────
 echo ""
 echo -e "${BOLD}${GREEN}🔷 Installation complete!${RESET}"
 echo ""
-echo "  Neo4j: $NEO4J_URI"
+echo "  Neo4j:     $NEO4J_URI"
+echo "  Workspace: $WORKSPACE"
+echo "  Stubs:     $WORKSPACE_DIR/"
 echo ""
-echo "  Query the graph:"
-echo "    cypher-shell -a $NEO4J_URI --format plain \"MATCH (s:Skill) RETURN s.name, s.cluster LIMIT 10\""
-echo "    cypher-shell -a $NEO4J_URI --format plain \"MATCH (s:Skill {cluster:'devops-sre'}) RETURN s.name\""
+echo "  Next steps:"
+echo "    1. Customize your identity:"
+echo "       cypher-shell -a $NEO4J_URI --format plain \\"
+echo "         \"MATCH (s:Soul {id:'soul-${WORKSPACE}-identity'}) SET s.content = 'Name: MyAgent | Role: Ops agent'\""
+echo ""
+echo "    2. Query the graph:"
+echo "       cypher-shell -a $NEO4J_URI --format plain \"MATCH (s:Skill) RETURN s.name, s.cluster LIMIT 10\""
+echo ""
+echo "    3. Verify anytime:"
+echo "       ./install.sh --verify"
+echo ""
+echo "    4. (Optional) Start the Rust sync daemon:"
+echo "       See tools/neo4j-sync/launchd.plist.template"
 echo ""

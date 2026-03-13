@@ -1,10 +1,10 @@
 # Customizing Your Workspace
 
-openclaw-graph ships with a minimal, agnostic default workspace (`workspace='openclaw'`) seeded by the migration script. This guide covers how to personalize it.
+openclaw-graph ships with a minimal, agnostic default workspace (`workspace='openclaw'`) seeded by `seed.py`. This guide covers how to personalize it.
 
 ## What ships in the DB
 
-Every v1.4+ release seeds these `workspace='openclaw'` nodes via `migrate_ladybugdb_to_neo4j.py`:
+Every v1.5+ release seeds these `workspace='openclaw'` nodes via `python3 seed.py`:
 
 | Label | Nodes | What's there |
 |-------|-------|-------------|
@@ -91,9 +91,9 @@ For an 8-agent fleet, give each agent its own workspace ID:
 
 ```bash
 # Seed separate workspaces from the default template
-python3 migrate_ladybugdb_to_neo4j.py --workspace intel-agent
-python3 migrate_ladybugdb_to_neo4j.py --workspace code-agent
-python3 migrate_ladybugdb_to_neo4j.py --workspace ops-agent
+python3 seed.py --workspace intel-agent
+python3 seed.py --workspace code-agent
+python3 seed.py --workspace ops-agent
 
 # Each agent's workspace stubs point to its own workspace
 # ~/.openclaw/workspace-intel/SOUL.md:
@@ -102,14 +102,14 @@ python3 migrate_ladybugdb_to_neo4j.py --workspace ops-agent
 
 ---
 
-## Customizing the migration script
+## Customizing the seed script
 
-For full control, modify the workspace configuration in `migrate_ladybugdb_to_neo4j.py`:
+For full control, modify the workspace defaults in `seed.py`:
 
-Edit the `SOUL`, `MEMORY`, `AGENT_CONFIG`, and `TOOLS` data structures, then:
+Edit the `workspace_defaults()` function's data structures, then:
 
 ```bash
-python3 migrate_ladybugdb_to_neo4j.py --workspace myagent --reset
+python3 seed.py --workspace myagent --reset
 ```
 
 `--reset` deletes existing workspace nodes before seeding — use for a clean slate.
@@ -121,7 +121,7 @@ python3 migrate_ladybugdb_to_neo4j.py --workspace myagent --reset
 The migration script uses `MERGE` (upsert), so re-running it is safe and idempotent — existing nodes are updated, not duplicated.
 
 Two options:
-1. **Re-run the migration script** — keeps everything reproducible
+1. **Re-run `python3 seed.py`** — keeps everything reproducible (uses MERGE, idempotent)
 2. **Dump your workspace nodes before upgrading:**
 
 ```bash

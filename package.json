@@ -1,13 +1,15 @@
 {
   "name": "openclaw-graph",
-  "version": "1.4.0",
-  "description": "Graph-native workspace backend for OpenClaw using Neo4j — 316 skills, Cypher queries, zero flat files",
+  "version": "1.5.0",
+  "description": "Graph-native workspace backend for OpenClaw using Neo4j — 315 skills, 27 clusters, Rust sync daemon",
   "type": "module",
   "scripts": {
-    "seed": "python3 migrate_ladybugdb_to_neo4j.py",
-    "seed:reset": "python3 migrate_ladybugdb_to_neo4j.py --reset",
+    "seed": "python3 seed.py",
+    "seed:reset": "python3 seed.py --reset",
+    "seed:verify": "python3 seed.py --verify",
+    "seed:dry-run": "python3 seed.py --dry-run",
     "query": "cypher-shell -a bolt://localhost:7687"
   },
-  "keywords": ["openclaw", "neo4j", "graph", "skills", "ai-assistant", "workspace", "cypher"],
+  "keywords": ["openclaw", "neo4j", "graph", "skills", "ai-assistant", "workspace", "cypher", "rust"],
   "license": "MIT"
 }

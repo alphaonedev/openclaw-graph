@@ -1,8 +1,12 @@
 /**
- * openclaw-graph — Graph-Native Workspace Backend
+ * openclaw-graph — Graph-Native Workspace Backend (v1.4 reference)
  *
  * Drop-in patch for OpenClaw's src/agents/workspace.ts
  * Adds Neo4j graph query resolution for workspace files
+ *
+ * NOTE: In v1.5, the Rust neo4j-sync daemon materializes flat files
+ * directly, making this patch optional. This file is preserved as
+ * a reference for inline graph directive resolution.
  * that contain a <!-- GRAPH: <cypher> --> directive.
  *
  * HOW IT WORKS:
